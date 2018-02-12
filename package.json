@@ -1,0 +1,70 @@
+{
+    "name": "builder-js-package",
+    "description": "A generic build setup for JavaScript packages.",
+    "homepage": "https://github.com/trusktr/builder-js-packages",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:trusktr/builder-js-packages.git"
+    },
+    "bugs": {
+        "url": "https://github.com/trusktr/builder-js-packages/issues"
+    },
+    "scripts": {
+        "build:clean": "./node_modules/builder-js-package/scripts/clean.sh",
+        "build:prod": "rm -rf package-lock.json && builder run build:cjs && builder run build:global",
+        "build:dev": "builder run build:dev:cjs",
+        "build:dev:umd": "builder run build:umd:watch & P1=$!; builder run build:global:watch & P2=$!; wait $P1 $P2",
+        "build:dev:cjs": "builder run build:cjs:watch & P1=$!; builder run build:global:watch & P2=$!; wait $P1 $P2",
+        "build:dev:amd": "builder run build:amd:watch & P1=$!; builder run build:global:watch & P2=$!; wait $P1 $P2",
+        "gulp": "gulp --cwd . --gulpfile ./node_modules/builder-js-package/config/gulpfile.js",
+        "webpack": "webpack --config ./node_modules/builder-js-package/config/webpack.config.js",
+        "build:umd": "builder run gulp -- build-umd",
+        "build:cjs": "builder run gulp -- build-cjs",
+        "build:amd": "builder run gulp -- build-amd",
+        "build:global": "builder run webpack",
+        "build:umd:watch": "builder run gulp -- watch-umd",
+        "build:cjs:watch": "builder run gulp -- watch-cjs",
+        "build:amd:watch": "builder run gulp -- watch-amd",
+        "build:global:watch": "builder run build:global -- --progress --watch",
+        "npm:test": "echo --- Tests are TODO ---",
+        "npm:preversion": "echo '--- PREVERSION' && git reset HEAD global.js && git checkout -- global.js && git add . && git stash && git clean -xfd -e node_modules",
+        "npm:version": "echo '--- VERSION' && builder run add-version-to-source && builder run build:prod && git add -f global.js",
+        "add-version-to-source": "echo '--- VERSION-TO-SOURCE' && ./node_modules/builder-js-package/scripts/version-to-source.js && git add src/index.js",
+        "npm:postversion": "echo '--- POSTVERSION' && npm publish && git push && git push --tags && git stash pop && git reset HEAD"
+    },
+    "dependencies": {
+        "babel-cli": "^6.0.0",
+        "babel-core": "^6.0.0",
+        "babel-loader": "^7.1.2",
+        "babel-minify-webpack-plugin": "^0.2.0",
+        "babel-plugin-add-module-exports": "^0.2.1",
+        "babel-plugin-array-includes": "^2.0.3",
+        "babel-plugin-transform-builtin-classes": "^0.4.0",
+        "babel-plugin-transform-es2015-classes": "^6.24.1",
+        "babel-plugin-transform-es2015-modules-amd": "^6.0.0",
+        "babel-plugin-transform-es2015-modules-commonjs": "^6.0.0",
+        "babel-plugin-transform-es2015-modules-umd": "^6.0.0",
+        "babel-plugin-transform-object-rest-spread": "^6.26.0",
+        "babel-plugin-transform-runtime": "^6.0.0",
+        "babel-runtime": "^6.26.0",
+        "buble": "^0.18.0",
+        "buble-loader": "^0.4.1",
+        "fast-async": "^6.3.0",
+        "gulp": "^4.0.0",
+        "gulp-babel": "^7.0.0",
+        "gulp-buble": "^0.9.0",
+        "gulp-cached": "^1.1.1",
+        "webpack": "^3.10.0"
+    },
+    "keywords": [
+        "build",
+        "builder",
+        "archetype",
+        "build-archetype",
+        "babel",
+        "buble",
+        "webpack",
+        "web-development",
+        "webdev"
+    ]
+}
