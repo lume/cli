@@ -122,6 +122,8 @@ TODOs
 ====
 
 - [ ] Source maps! Important! Coming very soon...
+- [ ] Important! Don't run `git stash` during version script if there's nothing
+  to stash, otherwise it will pop a previous stash after `npm version` is done.
 - [ ] A project template for generating new projects with `builder-init`. (then
   update the Project Structure section above)
 - [ ] Testing configs and procedures
