@@ -4,10 +4,12 @@
 ~function() {
     "use strict"
 
+    const CWD = process.cwd()
+
     const fs = require('fs')
     const path = require('path')
-    const filePath = path.resolve('src', 'index.js')
-    const version = require(path.resolve('package.json')).version
+    const filePath = path.resolve(CWD, 'src', 'index.js')
+    const version = require(path.resolve(CWD, 'package.json')).version
 
     let data = fs.readFileSync(filePath).toString()
 
