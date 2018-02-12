@@ -1,13 +1,10 @@
+const CWD = process.cwd()
+
 const path = require('path')
 const babelConfig = require('./babel.config')
 const bubleConfig = require('./buble.config')
 const BabelMinify = require('babel-minify-webpack-plugin')
 const camelcase = require('camelcase')
-
-const CWD = process.cwd()
-
-console.log(' --- CWD:', CWD)
-console.log(' --------- resolveLoader location: ', path.relative(CWD, path.join(path.dirname(require.resolve('builder-js-package')), 'node_modules')))
 
 const pkg = require(path.resolve(CWD, 'package.json'))
 const NAME = camelcase(pkg.name)
