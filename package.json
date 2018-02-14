@@ -27,16 +27,16 @@
         "build:cjs:watch": "builder run gulp -- watch-cjs",
         "build:amd:watch": "builder run gulp -- watch-amd",
         "build:global:watch": "builder run build:global -- --progress --watch",
-        "npm:test": "echo --- Tests are TODO ---",
+        "npm:test": "jest --config ./node_modules/builder-js-package/config/jest.config.js",
         "npm:preversion": "echo '--- PREVERSION' && git reset HEAD global.js && git checkout -- global.js && git add . && git stash && git clean -xfd -e node_modules",
         "npm:version": "echo '--- VERSION' && builder run add-version-to-source && builder run build:prod && git add -f global.js",
         "add-version-to-source": "echo '--- VERSION-TO-SOURCE' && ./node_modules/builder-js-package/scripts/version-to-source.js && git add src/index.js",
         "npm:postversion": "echo '--- POSTVERSION' && npm publish && git push && git push --tags && git stash pop && git reset HEAD"
     },
     "dependencies": {
-        "ava": "^0.25.0",
         "babel-cli": "^6.0.0",
         "babel-core": "^6.0.0",
+        "babel-jest": "^22.2.2",
         "babel-loader": "^7.1.2",
         "babel-minify-webpack-plugin": "^0.2.0",
         "babel-plugin-add-module-exports": "^0.2.1",
@@ -48,6 +48,7 @@
         "babel-plugin-transform-es2015-modules-umd": "^6.0.0",
         "babel-plugin-transform-object-rest-spread": "^6.26.0",
         "babel-plugin-transform-runtime": "^6.0.0",
+        "babel-preset-env": "^1.6.1",
         "babel-runtime": "^6.26.0",
         "buble": "^0.18.0",
         "buble-loader": "^0.4.1",
@@ -57,6 +58,7 @@
         "gulp-babel": "^7.0.0",
         "gulp-buble": "^0.9.0",
         "gulp-cached": "^1.1.1",
+        "jest": "^22.3.0",
         "webpack": "^3.10.0"
     },
     "keywords": [
