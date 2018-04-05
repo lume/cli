@@ -6,4 +6,7 @@ module.exports = {
     transform: {
         '^.+\\.js$': path.resolve(__dirname, 'babel-jest'),
     },
+
+    // a great environment that supports Custom Elements
+    testEnvironment: '@skatejs/ssr/jest',
 }
