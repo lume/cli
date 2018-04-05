@@ -6,7 +6,7 @@ const babelConfig = require('./babel.config')
 const bubleConfig = require('./buble.config')
 
 function transpile() {
-    return gulp.src('src/**/*.js')
+    return gulp.src(['src/**/*.js', '!src/**/*test.js'])
         .pipe(cached('js')) // in watch mode, prevents rebuilding all files
         .pipe(babel(babelConfig))
         .pipe(buble(bubleConfig))
