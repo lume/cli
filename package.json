@@ -60,7 +60,8 @@
         "gulp-buble": "^0.9.0",
         "gulp-cached": "^1.1.1",
         "jest": "^22.3.0",
-        "webpack": "^3.10.0"
+        "webpack": "^3.10.0",
+        "webpack-merge": "^4.1.2"
     },
     "keywords": [
         "build",
