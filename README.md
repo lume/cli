@@ -22,7 +22,7 @@ making, building, and publishing JS-only packages in a way that makes them:
 
 Example projects using this Builder archetype are:
 
-- [trusktr/perfect](https://github.com/trusktr/perfect)
+- [trusktr/lowclass](https://github.com/trusktr/lowclass)
 
 Notice in those projects that they have no dependencies on any build tools and
 no build configurations, and that they reference only this shared Builder
