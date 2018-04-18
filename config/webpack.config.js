@@ -7,7 +7,12 @@ const BabelMinify = require('babel-minify-webpack-plugin')
 const camelcase = require('camelcase')
 
 const pkg = require(path.resolve(CWD, 'package.json'))
-const NAME = camelcase(pkg.name)
+
+// in case a name is scoped, f.e. `@awaitbox/document-ready`
+const parts = pkg.name.split('/')
+const lastPart = parts[ parts.length - 1 ]
+
+const NAME = camelcase(lastPart)
 
 let DEV = false
 
