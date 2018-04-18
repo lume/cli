@@ -28,10 +28,10 @@
         "build:amd:watch": "builder run gulp -- watch-amd",
         "build:global:watch": "builder run build:global -- --progress --watch",
         "npm:test": "jest --config ./node_modules/builder-js-package/config/jest.config.js",
-        "npm:preversion": "echo '--- PREVERSION' && npm test && git reset HEAD global.js && git checkout -- global.js && git add . && git stash && git clean -xfd -e node_modules",
-        "npm:version": "echo '--- VERSION' && builder run add-version-to-source && builder run build:prod && git add -f global.js",
+        "npm:preversion": "echo '--- PREVERSION' && npm test && git reset HEAD global.js && git checkout -- global.js || true && git add . && git stash && git clean -xfd -e node_modules",
+        "npm:version": "echo '--- VERSION' && builder run add-version-to-source && builder run build:prod && git add -f global.js || true",
         "add-version-to-source": "echo '--- VERSION-TO-SOURCE' && ./node_modules/builder-js-package/scripts/version-to-source.js && git add src/index.js",
-        "npm:postversion": "echo '--- POSTVERSION' && npm publish && git push --follow-tags && git stash pop && git reset HEAD"
+        "npm:postversion": "echo '--- POSTVERSION' && npm publish && git push --follow-tags && git stash pop || true && git reset HEAD"
     },
     "dependencies": {
         "@skatejs/ssr": "^0.19.2",
