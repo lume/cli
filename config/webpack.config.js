@@ -67,7 +67,7 @@ module.exports = {
         ],
     },
     plugins: [
-        //new ModuleConcatenationPlugin(),
+        new ModuleConcatenationPlugin(),
     ].concat(DEV ? [
     ] : [
         //new BabelMinify({}, {
