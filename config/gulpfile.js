@@ -20,8 +20,8 @@ gulp.task('build-cjs', () =>
     transpile()
         .pipe(babel({
             plugins: [
-                'transform-es2015-modules-commonjs',
-                'add-module-exports',
+                '@babel/plugin-transform-modules-commonjs',
+                'babel-plugin-add-module-exports',
             ],
         }))
         // TODO source maps
@@ -32,7 +32,7 @@ gulp.task('watch-cjs', () => watch('build-cjs'))
 gulp.task('build-amd', () =>
     transpile()
         .pipe(babel({
-            plugins: [ 'transform-es2015-modules-amd' ],
+            plugins: [ '@babel/plugin-transform-modules-amd' ],
         }))
         // TODO source maps
         .pipe(gulp.dest('./'))
@@ -44,8 +44,8 @@ gulp.task('build-umd', () =>
         .pipe(babel({
             plugins: [
                 // opposite order from build-cjs
-                'add-module-exports',
-                'transform-es2015-modules-umd',
+                'babel-plugin-add-module-exports',
+                '@babel/plugin-transform-modules-umd',
             ],
         }))
         // TODO source maps

@@ -1,14 +1,17 @@
 module.exports = {
     babelrc: false,
     plugins: [
+
         // this has to go before transform-es2015-classes.
         // makes super() calls to native constructors work properly. We
         // must explicitly specify the classes we extend.
         ['transform-builtin-classes', { globals: [ 'HTMLElement', 'Map' ] }],
-        'transform-es2015-classes',
-        'transform-object-rest-spread',
-        'array-includes',
-        ['transform-runtime', {
+
+        '@babel/plugin-transform-classes',
+        '@babel/plugin-proposal-object-rest-spread',
+        'babel-plugin-array-includes',
+
+        ['@babel/plugin-transform-runtime', {
             helpers: true,
             polyfill: true,
             // we don't need regenerator, we write Promises, or
@@ -16,6 +19,7 @@ module.exports = {
             // generator functions.
             regenerator: false,
         }],
+
         ['fast-async', {
 
             //// broken in Meteor, see https://github.com/MatAtBread/nodent/issues/102
@@ -33,5 +37,6 @@ module.exports = {
                 noRuntime: true,
             },
         }],
+
     ],
 }
