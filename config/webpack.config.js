@@ -4,7 +4,7 @@ const path = require('path')
 const babelConfig = require('./babel.config')
 const bubleConfig = require('./buble.config')
 //const BabelMinify = require('babel-minify-webpack-plugin')
-//const ModuleConcatenationPlugin = require('webpack').optimize.ModuleConcatenationPlugin
+const ModuleConcatenationPlugin = require('webpack').optimize.ModuleConcatenationPlugin
 const camelcase = require('camelcase')
 
 const pkg = require(path.resolve(CWD, 'package.json'))

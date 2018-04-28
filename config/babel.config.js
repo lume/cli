@@ -20,7 +20,7 @@ module.exports = {
             regenerator: false,
         }],
 
-        ['fast-async', {
+        ['module:fast-async', {
 
             //// broken in Meteor, see https://github.com/MatAtBread/nodent/issues/102
             //compiler: {
