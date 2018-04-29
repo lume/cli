@@ -73,4 +73,5 @@ module.exports = {
         //}),
     ]),
     devtool: DEV ? 'eval-source-map' : 'source-map',
+    mode: DEV ? 'development' : 'production',
 }
