@@ -26,7 +26,7 @@ const alsoResolveRelativeToArchetype = () => [
     path.relative(CWD, path.join(path.dirname(require.resolve('builder-js-package')), 'node_modules')),
 
     // otherwise, loaders can also be found in the app's node_modules when deps
-    // are flattened (f.e. when the ARCHETYPE is not `npm link`ed).
+    // are flattened (f.e. when the ARCHETYPE is not `npm link`ed and using NPM v3+).
     'node_modules',
 ]
 
