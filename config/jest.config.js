@@ -21,6 +21,19 @@ let config = {
 
     // a great environment that supports Custom Elements
     testEnvironment: '@skatejs/ssr/jest',
+
+    collectCoverage: true,
+    collectCoverageFrom: [
+        "src/**/*.js",
+    ],
+    coverageThreshold: {
+        "global": {
+            "branches": 80,
+            "functions": 80,
+            "lines": 80,
+            "statements": 80,
+        },
+    },
 }
 
 const userConfigPath = path.resolve( CWD, 'jest.config.js' )
