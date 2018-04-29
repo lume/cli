@@ -4,7 +4,7 @@ const babelJest = require('babel-jest')
 
 module.exports = babelJest.createTransformer({
     presets: [
-        ['env', {
+        ['@babel/preset-env', {
             targets: {
                 node: 6,
             },
