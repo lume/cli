@@ -33,14 +33,14 @@ module.exports = {
             {
                 test: /\.js$/,
                 use: [
-                    {
-                        loader: 'buble-loader',
-                        options: bubleConfig,
-                    },
-                    {
-                        loader: 'babel-loader',
-                        options: babelConfig,
-                    },
+                    //{
+                        //loader: 'buble-loader',
+                        //options: bubleConfig,
+                    //},
+                    //{
+                        //loader: 'babel-loader',
+                        //options: babelConfig,
+                    //},
                 ],
             },
         ],
