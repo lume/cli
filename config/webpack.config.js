@@ -1,10 +1,8 @@
-const CWD = process.cwd()
-
+let config = require('./webpack.base.config.js')
 const path = require('path')
-const babelConfig = require('./babel.config')
-const bubleConfig = require('./buble.config')
 const camelcase = require('camelcase')
 
+const CWD = process.cwd()
 const pkg = require(path.resolve(CWD, 'package.json'))
 
 // in case a name is scoped, f.e. `@awaitbox/document-ready`
@@ -13,24 +11,7 @@ const lastPart = parts[ parts.length - 1 ]
 
 const NAME = camelcase(lastPart)
 
-let DEV = false
-
-// --watch option means dev mode
-if (process.argv.includes('--watch')) {
-    DEV = true
-}
-
-const alsoResolveRelativeToArchetype = () => [
-    // when the ARCHETYPE is `npm link`ed, or in older versions of NPM, loaders
-    // will be found in the ARCHETYPE's node_modules.
-    path.relative(CWD, path.join(path.dirname(require.resolve('builder-js-package')), 'node_modules')),
-
-    // otherwise, loaders can also be found in the app's node_modules when deps
-    // are flattened (f.e. when the ARCHETYPE is not `npm link`ed and using NPM v3+).
-    'node_modules',
-]
-
-module.exports = {
+config = Object.assign({}, config, {
     entry: './src/index.js',
     output: {
         path: CWD,
@@ -38,32 +19,10 @@ module.exports = {
         library: NAME,
         libraryTarget: 'var', // alternative: "window"
     },
-    resolve: {
-        modules: alsoResolveRelativeToArchetype(),
-    },
-    resolveLoader: {
-        modules: alsoResolveRelativeToArchetype(),
-    },
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                include: [
-                    path.resolve(CWD, 'src'),
-                ],
-                use: [
-                    {
-                        loader: 'buble-loader',
-                        options: bubleConfig,
-                    },
-                    {
-                        loader: 'babel-loader',
-                        options: babelConfig,
-                    },
-                ],
-            },
-        ],
-    },
-    devtool: DEV ? 'eval-source-map' : 'source-map',
-    mode: DEV ? 'development' : 'production',
-}
+})
+
+config.module.rules[0].include = [
+    path.resolve(CWD, 'src'),
+]
+
+module.exports = config
