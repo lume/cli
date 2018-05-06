@@ -8,6 +8,7 @@ module.exports = {
         ['transform-builtin-classes', { globals: [ 'HTMLElement', 'Map' ] }],
 
         '@babel/plugin-transform-classes',
+        '@babel/plugin-transform-object-super',
         '@babel/plugin-proposal-object-rest-spread',
         'babel-plugin-array-includes',
 
