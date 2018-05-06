@@ -4,7 +4,7 @@
 # like browser-launcher to detect browsers.
 
 # creates temporary a .karma-test-build/ folder in the project
-ELECTRON_BIN=./node_modules/.bin/electron ./node_modules/.bin/xvfb-maybe ./node_modules/.bin/karma start --single-run --browsers Electron ./node_modules/builder-js-package/config/karma.config.js
+karma start --single-run ./node_modules/builder-js-package/config/karma.config.js
 RESULT=$?
 
 # remove the temporary folder
