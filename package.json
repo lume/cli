@@ -27,8 +27,7 @@
         "build:cjs:watch": "builder run gulp -- watch-cjs",
         "build:amd:watch": "builder run gulp -- watch-amd",
         "build:global:watch": "builder run build:global -- --progress --watch",
-        "npm:test": "jest --config ./node_modules/builder-js-package/config/jest.config.js",
-        "npm:test": "CHROME_BIN=/usr/bin/chromium-browser karma start --single-run --browsers ChromeHeadless ./node_modules/builder-js-package/config/karma.config.js",
+        "npm:test": "./node_modules/builder-js-package/scripts/run-karma-tests.sh",
         "npm:preversion": "echo '--- PREVERSION' && npm test && git reset HEAD global.js && git checkout -- global.js || true && git add . && git stash && git clean -xfd -e node_modules",
         "npm:version": "echo '--- VERSION' && builder run add-version-to-source && builder run build:prod && git add -f global.js || true",
         "add-version-to-source": "echo '--- VERSION-TO-SOURCE' && ./node_modules/builder-js-package/scripts/version-to-source.js && git add src/index.js",
@@ -44,6 +43,7 @@
         "@babel/plugin-transform-modules-umd": "^7.0.0-beta.46",
         "@babel/plugin-transform-runtime": "^7.0.0-beta.46",
         "@babel/preset-env": "^7.0.0-beta.46",
+        "@babel/register": "^7.0.0-beta.46",
         "@babel/runtime": "^7.0.0-beta.46",
         "@skatejs/ssr": "^0.19.2",
         "babel-loader": "^8.0.0-beta.2",
@@ -52,21 +52,26 @@
         "babel-plugin-transform-builtin-classes": "^0.6.0",
         "buble": "^0.19.0",
         "buble-loader": "^0.5.0",
+        "electron": "^2.0.0",
         "fast-async": "^6.3.4",
         "figlet": "^1.2.0",
+        "globby": "^8.0.1",
         "gulp": "^4.0.0",
         "gulp-babel": "^8.0.0-beta.0",
         "gulp-buble": "^0.9.0",
         "gulp-cached": "^1.1.1",
         "jasmine-core": "^3.1.0",
         "karma": "^2.0.2",
-        "karma-chrome-launcher": "^2.2.0",
+        "karma-electron": "^6.0.0",
         "karma-jasmine": "^1.1.1",
+        "karma-sourcemap-loader": "^0.3.7",
         "karma-spec-reporter": "0.0.32",
-        "karma-webpack": "^2.0.9",
+        "karma-stacktrace": "^1.0.3",
+        "mkdirp": "^0.5.1",
         "webpack": "^4.6.0",
         "webpack-cli": "^2.0.15",
-        "webpack-merge": "^4.1.2"
+        "webpack-merge": "^4.1.2",
+        "xvfb-maybe": "^0.2.1"
     },
     "keywords": [
         "build",
@@ -77,6 +82,8 @@
         "buble",
         "webpack",
         "web-development",
-        "webdev"
+        "webdev",
+        "karma",
+        "electron"
     ]
 }

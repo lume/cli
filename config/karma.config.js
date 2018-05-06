@@ -1,75 +1,64 @@
-// TODO detect chrome binary location, so it isn't hard-coded. We can use
-// browser-launcher to detect browsers.
 
 const CWD = process.cwd()
-const webpackConfig = require('./webpack-test.config.js')
+const glob = require('globby')
+const fs = require('fs')
+const mkdirp = require('mkdirp')
+
+const testFiles = glob.sync([
+    CWD+'/src/**/*.test.js',
+    CWD+'/tests/**/*.js',
+])
+
+testFiles.forEach(file => {
+    const relativeFile = file.replace(CWD, '')
+    const relativePath = dirname(relativeFile)
+
+    mkdirp.sync( CWD + '/.karma-test-build' + relativePath )
+
+    fs.writeFileSync( CWD + '/.karma-test-build' + relativeFile, `
+        require('@babel/register')({
+            presets: [ ['@babel/preset-env', { targets: { node: 9 } }] ],
+            sourceMap: 'inline',
+        })
+
+        require( '${ file }' )
+    ` )
+})
 
 module.exports = function(config) {
 
     config.set({
 
-        frameworks: ['jasmine'],
+        frameworks: ['jasmine', 'stacktrace'],
         reporters: ['spec'],
         port: 9876,  // karma web server port
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: false,
-        // singleRun: false, // Karma captures browsers, runs the tests and exits
+        // singleRun: false,
         concurrency: Infinity,
 
         basePath: CWD,
 
-        // Webpack with ChromeHeadless {
-        browsers: ['ChromeHeadless'],
+        browsers: ['Electron'],
         files: [
-            'node_modules/builder-js-package/test.index.js',
+            '.karma-test-build/**/*.js',
         ],
         preprocessors: {
-            'node_modules/builder-js-package/test.index.js': ['webpack'],
+            '.karma-test-build/**/*.js': ['electron'],
         },
-        webpack: webpackConfig,
-        webpackMiddleware: { // webpack-dev-middleware config
-            stats: webpackConfig.stats,
+        client: {
+            // otherwise "require is not defined"
+            useIframe: false,
+            loadScriptsViaRequire: true,
         },
-        // }
-
-        //// karma-electron + karma-babel-preprocessor {
-        //browsers: ['Electron'],
-        //files: [
-            //{ pattern: 'src/**/!(*.test).js', included: false },
-            //'src/**/*.test.js',
-            //'tests/**/*.js',
-        //],
-        //preprocessors: {
-            //'@(src|test)/**/*.js': ['babel', 'electron'],
-            ////'@(src|test)/**/*.js': ['babel'],
-        //},
-        //client: {
-            //// otherwise "require is not defined"
-            //useIframe: false,
-            //loadScriptsViaRequire: true,
-        //},
-        //babelPreprocessor: {
-            //options: {
-                //presets: [
-                    //['@babel/preset-env', {
-                        //targets: {
-                            //node: 6,
-                        //},
-                        //modules: 'commonjs',
-                    //}],
-                //],
-                //sourceMap: 'inline',
-            //},
-            //filename: function (file) {
-                //return file.originalPath.replace(/\.js$/, '.es5.js');
-            //},
-            //sourceFileName: function (file) {
-                //return file.originalPath;
-            //},
-        //},
-        //// }
 
     })
 
+}
+
+function dirname(fullname) {
+    const parts = fullname.split('/')
+    parts.pop()
+    return parts.join('/')
 }
