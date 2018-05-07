@@ -40,8 +40,8 @@ archetype.
 Requirements
 ------------
 
-- Node v9+
-- NPM v5+
+- Node v9+ (might work with lower versions, not tested)
+- NPM v5+ (might work with lower versions, not tested)
 - If you don't have a graphical display (f.e. in Linux without a desktop)
   install xvfb - see
   https://github.com/electron/electron/blob/v1.4.10/docs/tutorial/testing-on-headless-ci.md
