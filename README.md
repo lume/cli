@@ -37,6 +37,15 @@ archetype.
 > specific cases (f.e. adding babel plugins or webpack loaders and configs).
 > See [TODO](#todos).
 
+Requirements
+------------
+
+- Node v9+
+- NPM v5+
+- If you don't have a graphical display (f.e. in Linux without a desktop)
+  install xvfb - see
+  https://github.com/electron/electron/blob/v1.4.10/docs/tutorial/testing-on-headless-ci.md
+
 Project Structure
 =================
 
