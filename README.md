@@ -131,6 +131,7 @@ for (const [key, value] of Array.from(pairs)) {
 TODOs
 ====
 
+- [ ] Output both a global.js and global.min.js
 - [ ] Source maps! Important! Coming very soon...
 - [ ] Important! Don't run `git stash` during version script if there's nothing
   to stash, otherwise it will pop a previous stash after `npm version` is done.
