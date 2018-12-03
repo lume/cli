@@ -1,4 +1,11 @@
-module.exports = {
+const fs = require('fs')
+const merge = require('lodash.merge')
+
+const CWD = process.cwd()
+const config = fs.existsSync(CWD+'/builder.config.js') ? require(CWD+'/builder.config.js') : {}
+const buble = config.buble || {}
+
+module.exports = merge({
     target: { ie: 10 },
     objectAssign: 'Object.assign',
     transforms: {
@@ -11,4 +18,4 @@ module.exports = {
         // supported by Buble.
         templateString: true,
     },
-}
+}, buble)
