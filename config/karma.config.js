@@ -3,7 +3,7 @@ const CWD = process.cwd()
 const glob = require('globby')
 const fs = require('fs')
 const mkdirp = require('mkdirp')
-const r = require('regexr')
+const r = require('regexr').default
 
 const testFiles = glob.sync([
     CWD+'/src/**/*.test.js',
