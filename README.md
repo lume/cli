@@ -1,6 +1,6 @@
 
 builder-js-package
-========================
+------------------------
 
 A generic build setup for JavaScript packages.
 
@@ -58,33 +58,44 @@ structure. If you have an existing package that you'd like to use this on, then
 you will have to modify it to follow the following structure.
 
 ```js
-src              # all source files go here
-  index.js       # entry point
-  index.test.js  # co-located test files
-  ...            # any other files imported by entry point, and associated test files
-dist             # will contain build output
+src               # all source files go here, as well as test.js files
+  index.js        # entry point
+  index.test.js   # co-located test files
+  ...             # any other files imported by entry point, and associated test files
+tests             # also scanned for test.js files
+.gitignore        # things to ignore
 package.json
-.builderrc
+.builderrc        # required, specify this builder archetype in there (see Builder docs).
+builder.config.js # optional config options
 ```
 
-The name field in package.json (the published npm package name) is assumed to
-be the desired file name of the distribution files and dash-cased.
+This builder archetype will output compiled `.js` files from `src` along with
+`.js.map` source maps into the root  of the repo (yes, you read that correctly,
+you should not have any files at the top level of `src` that are the same name
+as files in the root of the repo).
 
-So, if a package.json has:
+A `global.js` (and source map) is also outputted, containing the global version
+of the lib that can be easily loaded on a website using a script tag.
 
-```json
-{
-  "name": "my-awesome-lib"
+Config
+======
+
+This archetype can be configured with a `builder.config.js` file at the root of
+the project.
+
+Options (so far):
+
+```js
+module.exports = {
+    nodeModulesToCompile: [
+        // list of node module names that should be compiled (at the moment used
+        // only by Karma when running tests)
+    ],
+    buble: {
+        // Buble options. These will be merged into the Buble config used by the
+        // archetype. See Buble docs: https://buble.surge.sh
+    },
 }
-```
-
-The distribution files to output are:
-
-```
-dist/my-awesome-lib.js
-dist/my-awesome-lib.js.map
-dist/my-awesome-lib.min.js
-dist/my-awesome-lib.min.js.map
 ```
 
 Caveat
