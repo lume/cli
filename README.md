@@ -145,6 +145,8 @@ TODOs
 - [ ] Allow override of Babel config
 - [x] Allow override of Buble config
 - [ ] Allow override of Webpack config
+- [ ] Don't commit global.js (and its map) on version changes, we can tell people
+  to get it from unpkg, GitHub, and how to build it.
 - [ ] Output both a global.js and global.min.js
 - [ ] Source maps! Important! (so far exists for global.js, but not the other files)
 - [x] Important! Don't run `git stash` during version script if there's nothing
