@@ -142,19 +142,22 @@ for (const [key, value] of Array.from(pairs)) {
 TODOs
 ====
 
+- [ ] Allow override of Babel config
+- [x] Allow override of Buble config
+- [ ] Allow override of Webpack config
 - [ ] Output both a global.js and global.min.js
-- [ ] Source maps! Important! Coming very soon...
-- [ ] Important! Don't run `git stash` during version script if there's nothing
+- [ ] Source maps! Important! (so far exists for global.js, but not the other files)
+- [x] Important! Don't run `git stash` during version script if there's nothing
   to stash, otherwise it will pop a previous stash after `npm version` is done.
-- [ ] A project template for generating new projects with `builder-init`.
+- [ ] A project template for generating new projects with `builder-init`. Probably a Yeoman generator.
   (update the Project Structure section above accordingly)
-- [x] Testing (added Jest)
-- [ ] Code coverage (Jest is in place, just need to hook up the tasks)
+- [x] Testing (added Karma)
+- [ ] Code coverage (Karma is in place, just need to hook up the tasks)
 - [ ] Continuous integration
 - [ ] Fix the previous caveat in a way that can build for both old and new
-  browsers to that at least new browsers don't have a ton of unnecessary
+  browsers so that at least new browsers don't have a ton of unnecessary
   overhead in build output. We'll probably use `@babel/preset-env` for this.
-- [ ] Maybe we can offer a dev and production server that can automatically
-  detect browsers and serve appropriate builds.
+  - [ ] Maybe we can offer a dev and production server that can automatically
+      detect browsers and serve appropriate builds.
 - [ ] Move babel plugins and transforms to a custom babel preset, so we can
   keep package.json dependencies clean? Other benefits?
