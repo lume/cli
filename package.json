@@ -11,7 +11,7 @@
     },
     "scripts": {
         "show:name": "node ./node_modules/builder-js-package/scripts/name.js",
-        "build:clean": "./node_modules/builder-js-package/scripts/clean.sh",
+        "build:clean": "git clean -xfd -e node_modules",
         "build:prod": "builder run show:name && rm -rf package-lock.json && builder run build:cjs && builder run build:global",
         "build:dev": "builder run show:name && builder run build:dev:cjs",
         "build:dev:umd": "builder run build:umd:watch & P1=$!; builder run build:global:watch & P2=$!; wait $P1 $P2",
