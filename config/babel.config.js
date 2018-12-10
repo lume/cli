@@ -7,6 +7,8 @@ module.exports = {
         // must explicitly specify the classes we extend.
         ['transform-builtin-classes', { globals: [ 'HTMLElement', 'Map' ] }],
 
+        '@babel/plugin-proposal-export-namespace-from',
+        '@babel/plugin-proposal-export-default-from',
         '@babel/plugin-transform-classes',
         '@babel/plugin-transform-object-super',
         '@babel/plugin-proposal-object-rest-spread',
