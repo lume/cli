@@ -33,14 +33,16 @@ module.exports = {
             {
                 test: /\.js$/,
                 use: [
-                    //{
-                        //loader: 'buble-loader',
-                        //options: bubleConfig,
-                    //},
-                    //{
-                        //loader: 'babel-loader',
-                        //options: babelConfig,
-                    //},
+                    // enabling these two transforms causes an error in
+                    // infamous, though it continues to work after the error.
+                    {
+                        loader: 'buble-loader',
+                        options: bubleConfig,
+                    },
+                    {
+                        loader: 'babel-loader',
+                        options: babelConfig,
+                    },
                 ],
             },
         ],
