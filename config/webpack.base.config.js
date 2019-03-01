@@ -3,8 +3,6 @@ const CWD = process.cwd()
 const path = require('path')
 const babelConfig = require('./babel.config')
 const bubleConfig = require('./buble.config')
-// const BabelMinifyPlugin = require('babel-minify-webpack-plugin')
-const UglifyPlugin = require('uglifyjs-webpack-plugin')
 
 let DEV = false
 
