@@ -2,7 +2,8 @@
 const CWD = process.cwd()
 const glob = require('globby')
 const fs = require('fs')
-const mkdirp = require('mkdirp')
+const mkdirp = require('mkdirp') // mkdir -p
+const rmrf = require('rimraf') // rm -rf
 const r = require('regexr').default
 
 const testFiles = glob.sync([
@@ -11,6 +12,8 @@ const testFiles = glob.sync([
 ])
 
 const config = fs.existsSync(CWD+'/builder.config.js') ? require(CWD+'/builder.config.js') : {}
+
+rmrf.sync( CWD + '/.karma-test-build' )
 
 testFiles.forEach(file => {
     const relativeFile = file.replace(CWD, '')
@@ -21,8 +24,15 @@ testFiles.forEach(file => {
     const nodeModulesToCompile = config.nodeModulesToCompile
 
     fs.writeFileSync( CWD + '/.karma-test-build' + relativeFile, `
+        // NOTE, we don't use babel.config.js settings here, we can target a
+        // more modern environment.
         require('@babel/register')({
             presets: [ ['@babel/preset-env', { targets: { node: 9 } }] ],
+            plugins: [
+                // We need to transpile the not-yet-official re-export syntax.
+                '@babel/plugin-proposal-export-namespace-from',
+                '@babel/plugin-proposal-export-default-from',
+            ],
             sourceMap: 'inline',
             ${config.nodeModulesToCompile ? `
                 ignore: [
