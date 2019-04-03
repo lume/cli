@@ -48,6 +48,9 @@ testFiles.forEach(file => {
     ` )
 })
 
+const debugMode = false
+// const debugMode = true
+
 module.exports = function(config) {
 
     config.set({
@@ -58,12 +61,32 @@ module.exports = function(config) {
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: false,
-        // singleRun: false,
+        singleRun: debugMode ? false : true,
         concurrency: Infinity,
 
         basePath: CWD,
 
-        browsers: ['Electron'],
+        // Set up a "CustomElectron" launcher that extends karma-electron's
+        // default "Electron" launcher, so that we can control options
+        // (docs: // https://github.com/twolfson/karma-electron/tree/5.1.1#launcher-configuration)
+        browsers: ['CustomElectron'],
+        customLaunchers: {
+            CustomElectron: {
+                base: 'Electron',
+                
+                flags: debugMode ? [
+                    // If in debug mode, this makes the electron window visible
+                    // so that we can step through tests using devtools
+                    '--show'
+                    
+                    // Alternatively to the --show option, we can use this
+                    // option, then open chrome://inspect in Google Chrome and
+                    // inspect from there.
+                    // '--remote-debugging-port=9222',
+                ] : [],
+            }
+        },
+        
         files: [
             '.karma-test-build/**/*.js',
         ],
