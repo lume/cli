@@ -2,7 +2,6 @@ const CWD = process.cwd()
 
 const path = require('path')
 const babelConfig = require('./babel.config')
-const bubleConfig = require('./buble.config')
 
 let DEV = false
 
@@ -33,12 +32,6 @@ module.exports = {
             {
                 test: /\.js$/,
                 use: [
-                    // enabling these two transforms causes an error in
-                    // infamous, though it continues to work after the error.
-                    {
-                        loader: 'buble-loader',
-                        options: bubleConfig,
-                    },
                     {
                         loader: 'babel-loader',
                         options: babelConfig,
