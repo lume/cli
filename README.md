@@ -91,23 +91,17 @@ module.exports = {
         // list of node module names that should be compiled (at the moment used
         // only by Karma when running tests)
     ],
-    buble: {
-        // Buble options. These will be merged into the Buble config used by the
-        // archetype. See Buble docs: https://buble.surge.sh
-    },
+    // TODO babel option
 }
 ```
 
 Caveat
 ======
 
-This Builder archetype uses a combination of Buble + Babel to build code.
-Specifically, it transpiles `for..of` loops with Buble, which means the result
+This Builder archetype uses a combination of Babel to build code. Specifically,
+it transpiles `for..of` loops with Babel in "loose" mode, which means the result
 is not spec compliant, but leaner and faster in many cases although it will not
 work with Iterators and Generators.
-
-See [here in the Buble
-docs](https://buble.surge.sh/guide/#unsupported-features) for more details.
 
 This means, in projects built with this Builder archetype, you'll have to
 either not iterate on things like `Map` or `Set` using `for..of` directly (f.e.
@@ -143,7 +137,6 @@ TODOs
 ====
 
 - [ ] Allow override of Babel config
-- [x] Allow override of Buble config
 - [ ] Allow override of Webpack config
 - [ ] Don't commit global.js (and its map) on version changes, we can tell people
   to get it from unpkg, GitHub, and how to build it.
