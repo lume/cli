@@ -32,6 +32,7 @@
         "release:minor": "builder run release:pre && npm version minor -m 'v%s'",
         "release:major": "builder run release:pre && npm version major -m 'v%s'",
         "npm:test": "./node_modules/builder-js-package/scripts/run-karma-tests.sh",
+        "npm:test-debug": "KARMA_DEBUG=true ./node_modules/builder-js-package/scripts/run-karma-tests.sh",
         "npm:version": "./node_modules/builder-js-package/scripts/version.sh",
         "npm:postversion": "./node_modules/builder-js-package/scripts/postversion.sh"
     },

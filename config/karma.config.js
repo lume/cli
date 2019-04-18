@@ -6,6 +6,8 @@ const mkdirp = require('mkdirp') // mkdir -p
 const rmrf = require('rimraf') // rm -rf
 const r = require('regexr').default
 
+const debugMode = !!process.env.KARMA_DEBUG
+
 const testFiles = glob.sync([
     CWD+'/src/**/*.test.js',
     CWD+'/tests/**/*.js',
@@ -44,12 +46,31 @@ testFiles.forEach(file => {
             ` : ''}
         })
 
-        require( '${ file }' )
+        ${debugMode
+            
+            // in debug mode, don't catch the errors, and set devtools to pause
+            // on exceptions
+            ? `require( '${ file }' )`
+            
+            // when not in debug mode, log errors to console so that errors are
+            // obvious and well formatted, otherwise they are not formatted and
+            // can be missing stack traces due to
+            // https://github.com/karma-runner/karma/issues/3296
+            : (`
+                try {
+                    
+                    require( '${ file }' )
+                    
+                } catch( e ) {
+                    
+                    console.error( e )
+                    throw e
+                    
+                }
+            `)
+        }
     ` )
 })
-
-const debugMode = false
-// const debugMode = true
 
 module.exports = function(config) {
 
@@ -93,8 +114,8 @@ module.exports = function(config) {
         preprocessors: {
             '.karma-test-build/**/*.js': ['electron'],
         },
-        client: {
-            // otherwise "require is not defined"
+        client: debugMode ? {} : {
+            // otherwise "require is not defined" in karma-electron
             useIframe: false,
             loadScriptsViaRequire: true,
         },
