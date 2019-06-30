@@ -1,7 +1,7 @@
-
 const CWD = process.cwd()
 const glob = require('globby')
 const fs = require('fs')
+const path = require('path')
 const mkdirp = require('mkdirp') // mkdir -p
 const rmrf = require('rimraf') // rm -rf
 const r = require('regexr').default
@@ -10,7 +10,9 @@ const debugMode = !!process.env.KARMA_DEBUG
 
 const testFiles = glob.sync([
     CWD+'/src/**/*.test.js',
+    CWD+'/src/**/*.test.ts',
     CWD+'/tests/**/*.js',
+    CWD+'/tests/**/*.ts',
 ])
 
 const config = fs.existsSync(CWD+'/builder.config.js') ? require(CWD+'/builder.config.js') : {}
@@ -25,7 +27,7 @@ testFiles.forEach(file => {
 
     const nodeModulesToCompile = config.nodeModulesToCompile
 
-    fs.writeFileSync( CWD + '/.karma-test-build' + relativeFile, `
+    fs.writeFileSync( CWD + '/.karma-test-build' + withoutExtention(relativeFile) + '.js', `
         // NOTE, we don't use babel.config.js settings here, we can target a
         // more modern environment.
         require('@babel/register')({
@@ -46,11 +48,28 @@ testFiles.forEach(file => {
             ` : ''}
         })
 
+        // ability to require/import TypeScript files
+        require('ts-node').register({
+            typeCheck: false,
+            transpileOnly: true,
+            files: true,
+            ignore: [
+                ${r`/node_modules\/(?!except-for-this-module)/`}
+            ],
+
+            // manually supply our own compilerOptions, otherwise if we run this file
+            // from another project's location then ts-node will use
+            // the compilerOptions from that other location, which may not work.
+            // TODO augment with custom tsconfig
+            compilerOptions: require('${path.resolve(__dirname)}/tsconfig.json').compilerOptions,
+        })
+
         ${debugMode
             
             // in debug mode, don't catch the errors, and set devtools to pause
             // on exceptions
-            ? `require( '${ file }' )`
+            // ? `require( '${ file }' )`
+            ? `require( '${ withoutExtention(file) }' )`
             
             // when not in debug mode, log errors to console so that errors are
             // obvious and well formatted, otherwise they are not formatted and
@@ -59,7 +78,8 @@ testFiles.forEach(file => {
             : (`
                 try {
                     
-                    require( '${ file }' )
+                    // require( '${ file }' )
+                    require( '${ withoutExtention(file) }' )
                     
                 } catch( e ) {
                     
@@ -110,9 +130,11 @@ module.exports = function(config) {
         
         files: [
             '.karma-test-build/**/*.js',
+            // '.karma-test-build/**/*.ts',
         ],
         preprocessors: {
             '.karma-test-build/**/*.js': ['electron'],
+            // '.karma-test-build/**/*.ts': ['electron'],
         },
         client: debugMode ? {} : {
             // otherwise "require is not defined" in karma-electron
@@ -129,4 +151,10 @@ function dirname(fullname) {
     const parts = fullname.split('/')
     parts.pop()
     return parts.join('/')
+}
+
+function withoutExtention(fileName) {
+    const fileParts = fileName.split('.')
+    fileParts.pop()
+    return fileParts.join('.')
 }
