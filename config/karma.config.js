@@ -6,6 +6,14 @@ const mkdirp = require('mkdirp') // mkdir -p
 const rmrf = require('rimraf') // rm -rf
 const r = require('regexr').default
 
+// disable electron security warnings, because we're loading our own
+// files, nothing from the web.
+// process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+console.log('##################################################################')
+console.log('NOTE: You may see Electron security warnings for local files. These are harmless, as they are not from the web.')
+console.log('##################################################################')
+console.log('')
+
 const debugMode = !!process.env.KARMA_DEBUG
 
 const testFiles = glob.sync([
@@ -54,14 +62,17 @@ testFiles.forEach(file => {
             transpileOnly: true,
             files: true,
             ignore: [
-                ${r`/node_modules\/(?!except-for-this-module)/`}
+                ${r`/node_modules\/(?!TODO-white-list-modules)/`}
             ],
 
             // manually supply our own compilerOptions, otherwise if we run this file
             // from another project's location then ts-node will use
             // the compilerOptions from that other location, which may not work.
             // TODO augment with custom tsconfig
-            compilerOptions: require('${path.resolve(__dirname)}/tsconfig.json').compilerOptions,
+            compilerOptions: {
+                ...require('${path.resolve(__dirname)}/tsconfig.json').compilerOptions,
+                module: "commonjs", // because we're in a Node.js environment (Electron)
+            }
         })
 
         ${debugMode

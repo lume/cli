@@ -29,7 +29,7 @@
 		"strictNullChecks": true,
 		"strictFunctionTypes": true,
 		"target": "es2018",
-		"skipLibCheck": true,
+		"skipLibCheck": false,
 		"paths": {
 			"*": ["*"]
 		}
