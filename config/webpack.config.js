@@ -17,7 +17,7 @@ let DEV = false
 if (
 	process.argv.includes('--watch') ||
 	process.argv.includes('--dev') ||
-	process.env.NODE_ENV.startsWith('dev')
+	(process.env.NODE_ENV && process.env.NODE_ENV.startsWith('dev'))
 ) {
 	DEV = true
 }

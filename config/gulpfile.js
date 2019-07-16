@@ -15,13 +15,7 @@ function transpile() {
 		gulp
 			.src(['src/**/*.{ts,tsx}', '!src/**/*test.{ts,tsx}'])
 			.pipe(cached('ts')) // in watch mode, prevents rebuilding all files
-			.pipe(
-				typescript({
-					...tsConfig.compilerOptions,
-					checkJs: false,
-					allowJs: false,
-				})
-			)
+			.pipe(typescript(tsConfig.compilerOptions))
 			.pipe(babel(babelConfig))
 	)
 }
