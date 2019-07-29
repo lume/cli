@@ -1,5 +1,4 @@
 {
-	"TODOs": "re-enable noImplicitAny",
 	"compilerOptions": {
 		"allowJs": true,
 		"checkJs": false,
