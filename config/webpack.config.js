@@ -3,6 +3,7 @@ const camelcase = require('camelcase')
 const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
+const r = require('regexr').default
 const babelConfig = require('./babel.config')
 const pkg = require(path.resolve(CWD, 'package.json'))
 const foo = 123
@@ -43,6 +44,10 @@ const alsoResolveRelativeToArchetype = () => [
 	'node_modules',
 ]
 
+const allExceptModulesToCompile = builderConfig.nodeModulesToCompile
+	? builderConfig.nodeModulesToCompile.map(mod => r`/node_modules(?!\/${r.escape(mod)}\/)/`)
+	: []
+
 module.exports = {
 	entry: './src/index.js',
 	output: {
@@ -69,6 +74,7 @@ module.exports = {
 					},
 				],
 				include: [path.resolve(CWD, 'src')],
+				exclude: allExceptModulesToCompile,
 			},
 			{
 				test: /\.tsx?$/,
@@ -82,6 +88,7 @@ module.exports = {
 					},
 				],
 				include: [path.resolve(CWD, 'src')],
+				exclude: allExceptModulesToCompile,
 			},
 		],
 	},

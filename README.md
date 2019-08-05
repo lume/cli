@@ -74,9 +74,17 @@ Options (so far):
 
 ```js
 module.exports = {
+	// If set to `false` or an empty string, then the global build will not add a
+	// global variable into the environment. Otherwise, the library's exports will
+	// be assigned onto a global variable of the name defined here. Defaults to
+	// the name of the package if omitted (minus the @scope/ part if the package
+	// names is scoped).
+	globalName: '...', // A string, `false`, or `undefined`
+
+	// a list of node modules (by name) that should be compiled.
 	nodeModulesToCompile: [
-		// list of node module names that should be compiled (at the moment used
-		// only by Karma when running tests)
+		'some-package',
+		// ...
 	],
 
 	// TODO babel option
