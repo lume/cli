@@ -1,15 +1,23 @@
 const CWD = process.cwd()
 const camelcase = require('camelcase')
 const path = require('path')
+const fs = require('fs')
 const webpack = require('webpack')
 const babelConfig = require('./babel.config')
 const pkg = require(path.resolve(CWD, 'package.json'))
 const foo = 123
+const builderConfig = fs.existsSync(CWD + '/builder.config.js')
+	? require(CWD + '/builder.config.js')
+	: {}
 
 // split by '/' in case a name is scoped, f.e. `@awaitbox/document-ready`
-const parts = pkg.name.split('/')
-const lastPart = parts[parts.length - 1]
-const NAME = camelcase(lastPart)
+const pkgNameParts = pkg.name.split('/')
+const lastPkgNamePart = pkgNameParts[pkgNameParts.length - 1]
+const globalName = builderConfig.globalName
+const NAME =
+	globalName === false || globalName === '' ? '' : globalName || camelcase(lastPkgNamePart)
+// ^ Note, and empty string means no global variable will be assigned for the
+// library (as per Webpack's output.library option).
 
 let DEV = false
 
