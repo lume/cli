@@ -8,7 +8,7 @@
 		"alwaysStrict": true,
 		"strict": true,
 		"baseUrl": "./src",
-		"declaration": false,
+		"declaration": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
