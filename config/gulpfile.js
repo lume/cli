@@ -7,20 +7,20 @@ const babelConfig = require('./babel.config')
 const tsConfig = require('./tsconfig.json')
 
 function transpile() {
-	const tsStream = gulp
+	const tsStreams = gulp
 		.src(['src/**/*.{ts,tsx}', '!src/**/*test.{ts,tsx}'])
-		.pipe(cached('ts')) // in watch mode, prevents rebuilding all files
+		// in watch mode, prevents rebuilding all files
+		.pipe(cached('ts'))
 		.pipe(typescript(tsConfig.compilerOptions))
 
+	const jsStream = gulp
+		.src(['src/**/*.{js,jsx}', '!src/**/*test.{js,jsx}'])
+		// in watch mode, prevents rebuilding all files
+		.pipe(cached('js'))
+
 	return {
-		js: mergeStream(
-			gulp
-				.src(['src/**/*.{js,jsx}', '!src/**/*test.{js,jsx}'])
-				.pipe(cached('js')) // in watch mode, prevents rebuilding all files
-				.pipe(babel(babelConfig)),
-			tsStream.js.pipe(babel(babelConfig)),
-		),
-		dts: tsStream.dts,
+		js: mergeStream(jsStream, tsStreams.js).pipe(babel(babelConfig)),
+		dts: tsStreams.dts,
 	}
 }
 
