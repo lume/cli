@@ -7,16 +7,13 @@ const r = require('regexr').default
 const babelConfig = require('./babel.config')
 const pkg = require(path.resolve(CWD, 'package.json'))
 const foo = 123
-const builderConfig = fs.existsSync(CWD + '/builder.config.js')
-	? require(CWD + '/builder.config.js')
-	: {}
+const builderConfig = fs.existsSync(CWD + '/builder.config.js') ? require(CWD + '/builder.config.js') : {}
 
 // split by '/' in case a name is scoped, f.e. `@awaitbox/document-ready`
 const pkgNameParts = pkg.name.split('/')
 const lastPkgNamePart = pkgNameParts[pkgNameParts.length - 1]
 const globalName = builderConfig.globalName
-const NAME =
-	globalName === false || globalName === '' ? '' : globalName || camelcase(lastPkgNamePart)
+const NAME = globalName === false || globalName === '' ? '' : globalName || camelcase(lastPkgNamePart)
 // ^ Note, and empty string means no global variable will be assigned for the
 // library (as per Webpack's output.library option).
 
@@ -34,10 +31,7 @@ if (
 const alsoResolveRelativeToArchetype = () => [
 	// when the ARCHETYPE is `npm link`ed, or in older versions of NPM, loaders
 	// will be found in the ARCHETYPE's node_modules.
-	path.relative(
-		CWD,
-		path.join(path.dirname(require.resolve('builder-js-package')), 'node_modules')
-	),
+	path.relative(CWD, path.join(path.dirname(require.resolve('builder-js-package')), 'node_modules')),
 
 	// otherwise, loaders can also be found in the app's node_modules when deps
 	// are flattened (f.e. when the ARCHETYPE is not `npm link`ed and using NPM v3+).
