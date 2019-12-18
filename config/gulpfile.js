@@ -16,15 +16,15 @@ function transpile() {
 			.src(['src/**/*.{ts,tsx}', '!src/**/*test.{ts,tsx}'])
 			.pipe(cached('ts')) // in watch mode, prevents rebuilding all files
 			.pipe(typescript(tsConfig.compilerOptions))
-			.pipe(babel(babelConfig))
+			.pipe(babel(babelConfig)),
 	)
 }
 
 function watch(task) {
 	return gulp.watch(
 		['src/**/*.{js,jsx,ts,tsx}', '!src/**/*test.{js,jsx,ts,tsx}'],
-		{ ignoreInitial: false },
-		gulp.parallel(task)
+		{ignoreInitial: false},
+		gulp.parallel(task),
 	)
 }
 
@@ -32,14 +32,11 @@ gulp.task('build-cjs', () =>
 	transpile()
 		.pipe(
 			babel({
-				plugins: [
-					'@babel/plugin-transform-modules-commonjs',
-					'babel-plugin-add-module-exports',
-				],
-			})
+				plugins: ['@babel/plugin-transform-modules-commonjs', 'babel-plugin-add-module-exports'],
+			}),
 		)
 		// TODO source maps
-		.pipe(gulp.dest('./'))
+		.pipe(gulp.dest('./')),
 )
 gulp.task('watch-cjs', () => watch('build-cjs'))
 
@@ -48,10 +45,10 @@ gulp.task('build-amd', () =>
 		.pipe(
 			babel({
 				plugins: ['@babel/plugin-transform-modules-amd'],
-			})
+			}),
 		)
 		// TODO source maps
-		.pipe(gulp.dest('./'))
+		.pipe(gulp.dest('./')),
 )
 gulp.task('watch-amd', () => watch('build-amd'))
 
@@ -64,9 +61,9 @@ gulp.task('build-umd', () =>
 					'babel-plugin-add-module-exports',
 					'@babel/plugin-transform-modules-umd',
 				],
-			})
+			}),
 		)
 		// TODO source maps
-		.pipe(gulp.dest('./'))
+		.pipe(gulp.dest('./')),
 )
 gulp.task('watch-umd', () => watch('build-umd'))
