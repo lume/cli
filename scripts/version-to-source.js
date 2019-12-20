@@ -21,10 +21,8 @@ try {
 
 if (!data) {
 	console.error('No index file found, or unable to read index file. Skipping version update in index file.')
-	return
+	process.exit()
 }
-
-process.exit()
 
 const lines = data.trim().split('\n')
 lines.pop() // delete last line
