@@ -7,7 +7,6 @@
 		"esModuleInterop": false,
 		"alwaysStrict": true,
 		"strict": true,
-		"baseUrl": "./src",
 		"declaration": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
@@ -22,18 +21,17 @@
 		"noImplicitThis": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"outDir": "./dist/out",
 		"preserveConstEnums": true,
 		"pretty": true,
 		"sourceMap": true,
-		"strictNullChecks": true,
-		"strictFunctionTypes": true,
 		"target": "es2018",
 		"skipLibCheck": false,
 		"paths": {
 			"*": ["*"]
-		}
+		},
+		"baseUrl": "../../../",
+		"outDir": "../../../dist"
 	},
 	"compileOnSave": false,
-	"include": ["../../../src/**/*", "../../../tests/**/*"]
+	"include": ["../../../src/**/*"]
 }

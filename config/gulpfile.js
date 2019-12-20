@@ -1,45 +1,25 @@
-const gulp = require('gulp')
+// @ts-check
+const {src, dest, watch} = require('gulp')
 const babel = require('gulp-babel')
 const cached = require('gulp-cached')
-const typescript = require('gulp-typescript')
-const mergeStream = require('merge-stream')
 const babelConfig = require('./babel.config')
-const tsConfig = require('./tsconfig.json')
 
-function transpile() {
-	const tsStreams = gulp
-		.src(['src/**/*.{ts,tsx}', '!src/**/*test.{ts,tsx}'])
-		// in watch mode, prevents rebuilding all files
-		.pipe(cached('ts'))
-		.pipe(typescript(tsConfig.compilerOptions))
+const jsSource = 'src/**/*.{js,jsx}'
 
-	const jsStream = gulp
-		.src(['src/**/*.{js,jsx}', '!src/**/*test.{js,jsx}'])
-		// in watch mode, prevents rebuilding all files
-		.pipe(cached('js'))
-
-	return {
-		js: mergeStream(jsStream, tsStreams.js).pipe(babel(babelConfig)),
-		dts: tsStreams.dts,
-	}
-}
-
-function watch(task) {
-	return gulp.watch(
-		['src/**/*.{js,jsx,ts,tsx}', '!src/**/*test.{js,jsx,ts,tsx}'],
-		{ignoreInitial: false},
-		gulp.parallel(task),
+function buildJs() {
+	return (
+		src(jsSource, {sourcemaps: true})
+			// in watch mode, prevents rebuilding all files
+			.pipe(cached('js'))
+			.pipe(babel(babelConfig))
+			.pipe(dest('dist', {sourcemaps: '.'}))
 	)
 }
 
-gulp.task('build-es', () => {
-	const streams = transpile()
+exports.buildJs = buildJs
 
-	return mergeStream(
-		// TODO source maps
-		streams.js,
-		streams.dts,
-	).pipe(gulp.dest('./'))
-})
+function watchJs() {
+	return watch(jsSource, {ignoreInitial: false}, buildJs)
+}
 
-gulp.task('watch-es', () => watch('build-es'))
+exports.watchJs = watchJs

@@ -23,4 +23,5 @@ figlet(name, {
     }
 
     console.log(data)
+    console.log('')
 })

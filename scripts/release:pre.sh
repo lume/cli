@@ -1,9 +1,7 @@
 set -e
 echo '--- PREVERSION --------------------'
-echo ' -- Reset global...'
-git reset global.js
-git checkout -- global.js || ( true && echo '  - No global to reset.' )
 echo ' -- Add any changes to git...'
+# TODO prompt about stashing
 git add .
 echo ' -- Stash any changes...'
 if [ ! -z "$(git status --porcelain)" ]; then

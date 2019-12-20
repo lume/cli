@@ -1,13 +1,16 @@
 const CWD = process.cwd()
+
 const camelcase = require('camelcase')
 const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
 const r = require('regexr').default
 const babelConfig = require('./babel.config')
-const pkg = require(path.resolve(CWD, 'package.json'))
+
+const pkg = require(path.join(CWD, 'package.json'))
 const foo = 123
-const builderConfig = fs.existsSync(CWD + '/builder.config.js') ? require(CWD + '/builder.config.js') : {}
+const builderConfigPath = path.join(CWD, 'builder.config.js')
+const builderConfig = fs.existsSync(builderConfigPath) ? require(builderConfigPath) : {}
 
 // split by '/' in case a name is scoped, f.e. `@awaitbox/document-ready`
 const pkgNameParts = pkg.name.split('/')
@@ -43,16 +46,16 @@ const allExceptModulesToCompile = builderConfig.nodeModulesToCompile
 	: []
 
 module.exports = {
-	entry: './src/index',
+	entry: `.${path.sep}dist${path.sep}index`,
 	output: {
-		path: CWD,
+		path: path.join(CWD, 'dist'),
 		filename: 'global.js',
 		library: NAME,
 		libraryTarget: 'var', // alternative: "window"
 	},
 	resolve: {
 		modules: alsoResolveRelativeToArchetype(),
-		extensions: ['.ts', '.tsx', '.js', '.jsx'],
+		extensions: ['.js', '.jsx'],
 	},
 	resolveLoader: {
 		modules: alsoResolveRelativeToArchetype(),
@@ -67,21 +70,7 @@ module.exports = {
 						options: babelConfig,
 					},
 				],
-				include: [path.resolve(CWD, 'src')],
-				exclude: allExceptModulesToCompile,
-			},
-			{
-				test: /\.tsx?$/,
-				use: [
-					{
-						loader: 'babel-loader',
-						options: babelConfig,
-					},
-					{
-						loader: 'ts-loader',
-					},
-				],
-				include: [path.resolve(CWD, 'src')],
+				include: [path.resolve(CWD, 'dist')],
 				exclude: allExceptModulesToCompile,
 			},
 		],

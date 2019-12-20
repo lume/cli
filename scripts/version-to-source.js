@@ -8,11 +8,11 @@
 
 	const fs = require('fs')
 	const path = require('path')
-	let filePath = null
-	filePath = path.resolve(CWD, 'src', 'index.js')
 	const version = require(path.resolve(CWD, 'package.json')).version
 
 	let data = null
+	let filePath = null
+	filePath = path.resolve(CWD, 'src', 'index.js')
 
 	try {
 		data = fs.readFileSync(filePath).toString()

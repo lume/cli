@@ -17,10 +17,7 @@ console.log('')
 const debugMode = !!process.env.KARMA_DEBUG
 
 const testFiles = glob.sync([
-    CWD+'/src/**/*.test.js',
-    CWD+'/src/**/*.test.ts',
-    CWD+'/tests/**/*.js',
-    CWD+'/tests/**/*.ts',
+    CWD+'/dist/**/*.test.js',
 ])
 
 const config = fs.existsSync(CWD+'/builder.config.js') ? require(CWD+'/builder.config.js') : {}
@@ -43,7 +40,6 @@ testFiles.forEach(file => {
             plugins: [
                 // We need to transpile the not-yet-official re-export syntax.
                 '@babel/plugin-proposal-export-namespace-from',
-                '@babel/plugin-proposal-export-default-from',
             ],
             sourceMap: 'inline',
             ${config.nodeModulesToCompile ? `
@@ -54,25 +50,6 @@ testFiles.forEach(file => {
                     })}
                 ],
             ` : ''}
-        })
-
-        // ability to require/import TypeScript files
-        require('ts-node').register({
-            typeCheck: false,
-            transpileOnly: true,
-            files: true,
-            ignore: [
-                ${r`/node_modules\/(?!TODO-white-list-modules)/`}
-            ],
-
-            // manually supply our own compilerOptions, otherwise if we run this file
-            // from another project's location then ts-node will use
-            // the compilerOptions from that other location, which may not work.
-            // TODO augment with custom tsconfig
-            compilerOptions: {
-                ...require('${path.resolve(__dirname)}/tsconfig.json').compilerOptions,
-                module: "commonjs", // because we're in a Node.js environment (Electron)
-            }
         })
 
         ${debugMode
@@ -141,11 +118,9 @@ module.exports = function(config) {
         
         files: [
             '.karma-test-build/**/*.js',
-            // '.karma-test-build/**/*.ts',
         ],
         preprocessors: {
             '.karma-test-build/**/*.js': ['electron'],
-            // '.karma-test-build/**/*.ts': ['electron'],
         },
         client: debugMode ? {} : {
             // otherwise "require is not defined" in karma-electron

@@ -2,9 +2,7 @@ set -e
 echo '--- VERSION --------------------'
 echo ' -- Add version to source...'
 ./node_modules/builder-js-package/scripts/version-to-source.js
-git add src/index.js
+git add src
 echo ' -- Making production build.'
-builder run build:prod
-echo ' -- Add changes to global.js if any...'
-git add -f global.js global.js.map || true
+builder run build
 echo '--- VERSION DONE --------------------'
