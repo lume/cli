@@ -64,6 +64,11 @@ module.exports = {
 		rules: [
 			{
 				test: /\.jsx?$/,
+				use: ['source-map-loader'],
+				enforce: 'pre',
+			},
+			{
+				test: /\.jsx?$/,
 				use: [
 					{
 						loader: 'babel-loader',
