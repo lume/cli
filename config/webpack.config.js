@@ -80,8 +80,7 @@ module.exports = {
 	// mode: DEV ? 'development' : 'production',
 	mode: 'production',
 	optimization: {
-		// minimize: DEV ? false : true
-		minimize: false,
+		minimize: DEV ? false : true,
 	},
 	stats: {
 		assets: false, // shows all output assets
