@@ -5,10 +5,8 @@ const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
 const r = require('regexr').default
-const babelConfig = require('./babel.config')
 
 const pkg = require(path.join(CWD, 'package.json'))
-const foo = 123
 const builderConfigPath = path.join(CWD, 'builder.config.js')
 const builderConfig = fs.existsSync(builderConfigPath) ? require(builderConfigPath) : {}
 
@@ -41,10 +39,6 @@ const alsoResolveRelativeToArchetype = () => [
 	'node_modules',
 ]
 
-const allExceptModulesToCompile = builderConfig.nodeModulesToCompile
-	? builderConfig.nodeModulesToCompile.map(mod => r`/node_modules(?!\/${r.escape(mod)}\/)/`)
-	: []
-
 module.exports = {
 	entry: `.${path.sep}dist${path.sep}index`,
 	output: {
@@ -55,7 +49,12 @@ module.exports = {
 	},
 	resolve: {
 		modules: alsoResolveRelativeToArchetype(),
-		extensions: ['.js', '.jsx'],
+
+		// for now only bundle JS files
+		// TODO add a separate step for Babel after TypeScript (f.e. for JSX
+		// files). TS can handle only React-form of JSX, but we'll need Babel in
+		// order to compile Solid JSX.
+		extensions: ['.js'],
 	},
 	resolveLoader: {
 		modules: alsoResolveRelativeToArchetype(),
@@ -63,20 +62,9 @@ module.exports = {
 	module: {
 		rules: [
 			{
-				test: /\.jsx?$/,
+				test: /\.js$/,
 				use: ['source-map-loader'],
 				enforce: 'pre',
-			},
-			{
-				test: /\.jsx?$/,
-				use: [
-					{
-						loader: 'babel-loader',
-						options: babelConfig,
-					},
-				],
-				include: [path.resolve(CWD, 'dist')],
-				exclude: allExceptModulesToCompile,
 			},
 		],
 	},
