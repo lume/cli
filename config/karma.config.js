@@ -1,3 +1,4 @@
+// @ts-check
 const CWD = process.cwd()
 const glob = require('globby')
 const fs = require('fs')
@@ -19,7 +20,7 @@ const debugMode = !!process.env.KARMA_DEBUG
 
 const testFiles = glob.sync([CWD + '/dist/**/*.test.js'])
 
-const config = fs.existsSync(CWD + '/builder.config.js') ? require(CWD + '/builder.config.js') : {}
+const builderConfig = require('./getBuilderConfig')
 
 rmrf.sync(CWD + '/.karma-test-build')
 
@@ -29,7 +30,7 @@ testFiles.forEach(file => {
 
 	mkdirp.sync(CWD + '/.karma-test-build' + relativePath)
 
-	const modules = config.nodeModulesToCompile
+	const modules = builderConfig.nodeModulesToCompile
 
 	fs.writeFileSync(
 		CWD + '/.karma-test-build' + withoutExtention(relativeFile) + '.js',
@@ -44,7 +45,7 @@ testFiles.forEach(file => {
                 ],
                 sourceMap: 'inline',
                 ${
-					config.nodeModulesToCompile
+					modules
 						? `
                             ignore: [
                                 // don't compile node_modules except for ones specified in the config

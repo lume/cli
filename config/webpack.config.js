@@ -1,19 +1,12 @@
+// @ts-check
 const CWD = process.cwd()
 
 const camelcase = require('camelcase')
 const path = require('path')
-const fs = require('fs')
 const webpack = require('webpack')
-const r = require('regexr').default
 
 const pkg = require(path.join(CWD, 'package.json'))
-let builderConfigPath = path.join(CWD, 'builder.config.js')
-let builderConfigExists = fs.existsSync(builderConfigPath)
-
-if (!builderConfigExists) builderConfigPath = path.join(CWD, 'builder.config.cjs')
-builderConfigExists = fs.existsSync(builderConfigPath)
-
-const builderConfig = builderConfigExists ? require(builderConfigPath) : {}
+const builderConfig = require('./getBuilderConfig')
 
 // split by '/' in case a name is scoped, f.e. `@awaitbox/document-ready`
 const pkgNameParts = pkg.name.split('/')
