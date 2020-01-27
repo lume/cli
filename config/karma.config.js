@@ -1,7 +1,6 @@
 const CWD = process.cwd()
 const glob = require('globby')
 const fs = require('fs')
-const path = require('path')
 const mkdirp = require('mkdirp') // mkdir -p
 const rmrf = require('rimraf') // rm -rf
 const r = require('regexr').default
@@ -30,7 +29,7 @@ testFiles.forEach(file => {
 
 	mkdirp.sync(CWD + '/.karma-test-build' + relativePath)
 
-	const nodeModulesToCompile = config.nodeModulesToCompile
+	const modules = config.nodeModulesToCompile
 
 	fs.writeFileSync(
 		CWD + '/.karma-test-build' + withoutExtention(relativeFile) + '.js',
@@ -49,9 +48,7 @@ testFiles.forEach(file => {
 						? `
                             ignore: [
                                 // don't compile node_modules except for ones specified in the config
-                                ${nodeModulesToCompile.map(moduleName => {
-									return r`/node_modules(?!\/${r.escape(moduleName)}\/)/`
-								})}
+                                ${r`/node_modules(?!\/(${modules.map(m => r.escape(m) + '|').join('')})\/)/`}
                             ],
                         `
 						: ''
