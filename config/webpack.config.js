@@ -66,19 +66,15 @@ module.exports = {
 			},
 		],
 	},
-	plugins: [
-		// by default, Webpack uses this plugin in production mode. By
-		// specifying it here, we can force it to be used in both dev and prod
-		// modes, so that we can ensure consistency and catch errors while in
-		// dev that we otherwise may not catch if the prod environment is too
-		// different.
-		new webpack.optimize.ModuleConcatenationPlugin(),
-	],
 	devtool: DEV ? 'source-map' : 'source-map',
 	// mode: DEV ? 'development' : 'production',
 	mode: 'production',
 	optimization: {
 		minimize: DEV ? false : true,
+		// default is false in dev, true in prod, but let's keep them the same
+		// so we can detect the same errors in both environments because module
+		// concantenation can change code meaning sometimes.
+		concatenateModules: true,
 	},
 	stats: {
 		assets: false, // shows all output assets
