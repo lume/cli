@@ -1,6 +1,5 @@
 .DS_Store
 node_modules
-npm-debug.log
 __tmp_stash__
 
 *.log

@@ -3,6 +3,11 @@
 	"version": "0.0.0",
 	"description": "A generic build setup for JavaScript packages.",
 	"homepage": "https://github.com/trusktr/builder-js-packages",
+	"files": [
+		"./config/**/*",
+		"./scripts/**/*",
+		"./index.js"
+	],
 	"repository": {
 		"type": "git",
 		"url": "git@github.com:trusktr/builder-js-packages.git"
