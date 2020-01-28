@@ -1,6 +1,6 @@
 {
 	"name": "builder-js-package",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"description": "A generic build setup for JavaScript packages.",
 	"homepage": "https://github.com/trusktr/builder-js-packages",
 	"files": [
