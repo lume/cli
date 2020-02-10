@@ -29,9 +29,11 @@
 		"paths": {
 			"*": ["*"]
 		},
+		"rootDir": "../../../src",
 		"baseUrl": "../../../",
 		"outDir": "../../../dist"
 	},
 	"compileOnSave": false,
-	"include": ["../../../src/**/*"]
+	"include": ["../../../src/**/*"],
+	"exclude": ["../../../src/**/*.test.ts", "../../../src/**/*.test.common.ts", "../../../src/**/tests/*"]
 }
