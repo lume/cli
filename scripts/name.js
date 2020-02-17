@@ -11,17 +11,31 @@ let {name} = pkg
 
 name = name || 'yet-to-be-named-project'
 
-figlet(name, {
+exports.showName = async function showName() {
+	return new Promise((resolve, _reject) => {
+		figlet(
+			name,
+			{
+				// TODO configurable
+				font: 'Calvin S',
+			},
+			function(err, data) {
+				if (err) {
+					console.log(` --- ${name} --- `)
+					resolve()
+					return
+				}
 
-    // TODO configurable
-    font: 'Calvin S',
+				console.log(data)
+				console.log('')
+				resolve()
+			},
+		)
+	})
+}
 
-}, function(err, data) {
-    if (err) {
-        console.log(` --- ${name} --- `)
-        return
-    }
-
-    console.log(data)
-    console.log('')
-})
+// if not called with require(), but directly with `node` (for backwards compatibility)
+const executedDirectly = require.main === module
+if (executedDirectly) {
+	exports.showName()
+}

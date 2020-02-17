@@ -30,7 +30,7 @@ if (
 const alsoResolveRelativeToArchetype = () => [
 	// when the ARCHETYPE is `npm link`ed, or in older versions of NPM, loaders
 	// will be found in the ARCHETYPE's node_modules.
-	path.relative(CWD, path.join(path.dirname(require.resolve('builder-js-package')), 'node_modules')),
+	path.relative(CWD, path.join(path.resolve(__dirname, '..'), 'node_modules')),
 
 	// otherwise, loaders can also be found in the app's node_modules when deps
 	// are flattened (f.e. when the ARCHETYPE is not `npm link`ed and using NPM v3+).

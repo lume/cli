@@ -3,6 +3,9 @@
 	"version": "1.0.0",
 	"description": "A generic build setup for JavaScript packages.",
 	"homepage": "https://github.com/trusktr/builder-js-packages",
+	"bin": {
+		"lume": "bin/cli.js"
+	},
 	"files": [
 		"./config/**/*",
 		"./scripts/**/*",
@@ -70,6 +73,7 @@
 		"@zoltu/typescript-transformer-append-js-extension": "^1.0.1",
 		"babel-loader": "8.0.0-beta.2",
 		"babel-plugin-add-module-exports": "0.2.1",
+		"commander": "^4.1.1",
 		"electron": "^2.0.0",
 		"figlet": "^1.2.0",
 		"globby": "^8.0.1",
