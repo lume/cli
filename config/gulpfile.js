@@ -36,6 +36,18 @@ async function watchTs() {
 	await spawnWithEnv('tsc -p ./tsconfig.json --watch')
 }
 
+exports.typecheck = typecheck
+async function typecheck() {
+	console.log('running typecheck')
+	await spawnWithEnv('tsc -p ./tsconfig.json --noEmit')
+}
+
+exports.typecheckWatch = typecheckWatch
+async function typecheckWatch() {
+	console.log('running typecheckWatch')
+	await spawnWithEnv('tsc -p ./tsconfig.json --noEmit --watch')
+}
+
 exports.buildGlobal = buildGlobal
 async function buildGlobal() {
 	await spawnWithEnv(`webpack --color --config ${path.resolve(__dirname, 'webpack.config.js')}`)
@@ -73,6 +85,29 @@ async function watchJs() {
 		watcher.on('close', resolve)
 		watcher.on('error', e => reject(e))
 	})
+}
+
+exports.releasePre = releasePre
+async function releasePre() {
+	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'release:pre.sh'))
+}
+
+exports.releasePatch = releasePatch
+async function releasePatch() {
+	await releasePre()
+	await spawnWithEnv('npm version patch -m v%s')
+}
+
+exports.releaseMinor = releaseMinor
+async function releaseMinor() {
+	await releasePre()
+	await spawnWithEnv('npm version minor -m v%s')
+}
+
+exports.releaseMajor = releaseMajor
+async function releaseMajor() {
+	await releasePre()
+	await spawnWithEnv('npm version major -m v%s')
 }
 
 const execOptions = {

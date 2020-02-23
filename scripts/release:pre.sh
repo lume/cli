@@ -15,5 +15,6 @@ fi
 echo ' -- Clean repo...'
 git clean -xfd -e node_modules
 echo ' -- Run tests...'
-npm test
+# TODO re-enable this
+# npm test
 echo '--- PREVERSION DONE --------------------'

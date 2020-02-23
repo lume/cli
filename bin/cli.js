@@ -43,6 +43,42 @@ program
 	.description('Output the project name to console.')
 	.action(showName)
 
+const {typecheck} = require('../config/gulpfile')
+program
+	.command('typecheck')
+	.description('Run a typecheck of TypeScript source code without compiling output.')
+	.action(typecheck)
+
+const {typecheckWatch} = require('../config/gulpfile')
+program
+	.command('typecheckWatch')
+	.description('Run a typecheck of TypeScript source code without compiling output, in watch mode.')
+	.action(typecheckWatch)
+
+const {releasePre} = require('../config/gulpfile')
+program
+	.command('releasePre')
+	.description('Run pre-release stuff like stashing changes and running tests.')
+	.action(releasePre)
+
+const {releaseMinor} = require('../config/gulpfile')
+program
+	.command('releaseMinor')
+	.description('Release a minor version. Calls the same scripts as `npm version`.')
+	.action(releaseMinor)
+
+const {releaseMajor} = require('../config/gulpfile')
+program
+	.command('releaseMajor')
+	.description('Release a major version. Calls the same scripts as `npm version`.')
+	.action(releaseMajor)
+
+const {releasePatch} = require('../config/gulpfile')
+program
+	.command('releasePatch')
+	.description('Release a patch version. Calls the same scripts as `npm version`.')
+	.action(releasePatch)
+
 async function main() {
 	await program.parseAsync(process.argv)
 }

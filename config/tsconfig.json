@@ -3,16 +3,19 @@
 	"compilerOptions": {
 		"allowJs": true,
 		"checkJs": false,
+		// TODO update this comment to document exactly why we need this set to false. It has to do with Node.js ESM.
 		"allowSyntheticDefaultImports": false,
 		"esModuleInterop": false,
 		"alwaysStrict": true,
 		"strict": true,
 		"declaration": true,
 		"emitDecoratorMetadata": true,
+		"noEmitOnError": false,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
 		"jsx": "react",
 		"lib": ["es2018", "dom"],
+		"target": "es2018",
 		"module": "esnext",
 		"moduleResolution": "node",
 		"noFallthroughCasesInSwitch": true,
@@ -24,7 +27,6 @@
 		"preserveConstEnums": true,
 		"pretty": true,
 		"sourceMap": true,
-		"target": "es2018",
 		"skipLibCheck": false,
 		"paths": {
 			"*": ["*"]
