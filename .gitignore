@@ -4,4 +4,3 @@ package-lock.json
 __tmp_stash__
 
 *.log
-.rush/temp

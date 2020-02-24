@@ -19,8 +19,6 @@
 		"url": "https://github.com/trusktr/builder-js-packages/issues"
 	},
 	"scripts": {
-		"build COMMENT": "build does nothing because there's nothing to build in this project, and we use rush.js to automatically run build in many projects at once including this one. See https://rushjs.io/pages/maintainer/add_to_repo/#step-6-verify-that-the-new-project-builds",
-		"build": "",
 		"clean": "git clean -xfd -e node_modules",
 		"build:prod": "builder run show:name && rm -rf dist && builder run build:ts && builder run build:global",
 		"build:dev": "builder run show:name && rm -rf dist && builder run build:ts && (builder run build:ts:watch & P1=$!; builder run build:global:watch & P3=$!; wait $P1 $P3)",
