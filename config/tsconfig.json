@@ -33,9 +33,9 @@
 		},
 		"rootDir": "../../../src",
 		"baseUrl": "../../../",
-		"outDir": "../../../dist"
+		"outDir": "../../../dist",
+		"typeRoots": ["../../../node_modules/@types", "../../../node_modules/builder-js-package/node_modules/@types"]
 	},
 	"compileOnSave": false,
-	"include": ["../../../src/**/*"],
-	"exclude": ["../../../src/**/*.test.ts", "../../../src/**/*.test.common.ts", "../../../src/**/tests/*"]
+	"include": ["../../../src/**/*"]
 }
