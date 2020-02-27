@@ -1,92 +1,134 @@
 #!/usr/bin/env node
 
-const program = require('caporal')
-const {version} = require('../package.json')
+const cli = require('sywac')
+const commands = require('./gulpfile')
 
-program.version(version)
+let c
+function chalk() {
+	// lazily load chalk, only used if help text displayed
+	if (!c) c = require('chalk')
+	return c
+}
 
-const {clean} = require('./gulpfile')
-program.command('clean', 'Remove all build outputs.').action(clean)
+cli.version('-v, --version')
+cli.help('-h, --help')
 
-const {build} = require('./gulpfile')
-program.command('build', 'Build the project in which this command is being ran.').action(build)
+const {clean} = commands
+cli.command('clean', {desc: 'Remove all build outputs.', run: clean})
 
-const {dev} = require('./gulpfile')
-program.command('dev', 'Run the project in watch mode where file changes trigger automatic rebuilds.').action(dev)
+const {build} = commands
+cli.command('build', {desc: 'Build the project in which this command is being ran.', run: build})
 
-const {buildTs} = require('./gulpfile')
-program.command('buildTs', 'Build only TypeScript sources.').action(buildTs)
+const {dev} = commands
+cli.command('dev', {desc: 'Run the project in watch mode where file changes trigger automatic rebuilds.', run: dev})
 
-const {buildJs} = require('./gulpfile')
-program.command('buildJs', 'Build JavaScript files.').action(buildJs)
+const {buildTs} = commands
+cli.command('buildTs', {desc: 'Build only TypeScript sources.', run: buildTs})
 
-const {buildJsWatch} = require('./gulpfile')
-program.command('buildJsWatch', 'Build JavaScript files in watch mode any time the files change.').action(buildJsWatch)
+const {buildJs} = commands
+cli.command('buildJs', {desc: 'Build JavaScript files.', run: buildJs})
 
-const {buildGlobal} = require('./gulpfile')
-program
-	.command('buildGlobal', 'Build the global version of the project for simple usage with browser script tags.')
-	.action(buildGlobal)
+const {buildJsWatch} = commands
+cli.command('buildJsWatch', {
+	desc: 'Build JavaScript files in watch mode any time the files change.',
+	run: buildJsWatch,
+})
 
-const {buildGlobalWatch} = require('./gulpfile')
-program
-	.command('buildGlobalWatch', 'Build the global version of the project in watch mode any time files change.')
-	.action(buildGlobalWatch)
+const {buildGlobal} = commands
+cli.command('buildGlobal', {
+	desc: 'Build the global version of the project for simple usage with browser script tags.',
+	run: buildGlobal,
+})
 
-const {showName} = require('./gulpfile')
-program.command('showName', 'Output the project name to console.').action(showName)
+const {buildGlobalWatch} = commands
+cli.command('buildGlobalWatch', {
+	desc: 'Build the global version of the project in watch mode any time files change.',
+	run: buildGlobalWatch,
+})
 
-const {typecheck} = require('./gulpfile')
-program.command('typecheck', 'Run a typecheck of TypeScript source code without compiling output.').action(typecheck)
+const {showName} = commands
+cli.command('showName', {dec: 'Output the project name to console.', run: showName})
 
-const {typecheckWatch} = require('./gulpfile')
-program
-	.command('typecheckWatch', 'Run a typecheck of TypeScript source code without compiling output, in watch mode.')
-	.action(typecheckWatch)
+const {typecheck} = commands
+cli.command('typecheck', {
+	desc: 'Run a typecheck of TypeScript source code without compiling output.',
+	run: typecheck,
+})
 
-const {test} = require('./gulpfile')
-program.command('test', 'Run tests.').action(test)
+const {typecheckWatch} = commands
+cli.command('typecheckWatch', {
+	desc: 'Run a typecheck of TypeScript source code without compiling output, in watch mode.',
+	run: typecheckWatch,
+})
 
-const {testDebug} = require('./gulpfile')
-program.command('testDebug', 'Run tests with GUI debugger.').action(testDebug)
+const {test} = commands
+cli.command('test', {desc: 'Run tests.', run: test})
 
-const {releasePre} = require('./gulpfile')
-program.command('releasePre', 'Run pre-release stuff like stashing changes and running tests.').action(releasePre)
+const {testDebug} = commands
+cli.command('testDebug', {desc: 'Run tests with GUI debugger.', run: testDebug})
 
-const {releasePatch} = require('./gulpfile')
-program
-	.command('releasePatch', 'Release a patch version. Calls the same scripts as `npm version`.')
-	.action(releasePatch)
+const {releasePre} = commands
+cli.command('releasePre', {desc: 'Run pre-release stuff like stashing changes and running tests.', run: releasePre})
 
-const {releaseMinor} = require('./gulpfile')
-program
-	.command('releaseMinor', 'Release a minor version. Calls the same scripts as `npm version`.')
-	.action(releaseMinor)
+const {releasePatch} = commands
+cli.command('releasePatch', {
+	desc: 'Release a patch version. Calls the same scripts as `npm version`.',
+	run: releasePatch,
+})
 
-const {releaseMajor} = require('./gulpfile')
-program
-	.command('releaseMajor', 'Release a major version. Calls the same scripts as `npm version`.')
-	.action(releaseMajor)
+const {releaseMinor} = commands
+cli.command('releaseMinor', {
+	desc: 'Release a minor version. Calls the same scripts as `npm version`.',
+	run: releaseMinor,
+})
 
-const {versionHook} = require('./gulpfile')
-program
-	.command('versionHook', 'Your package.json "version" script should run this. Used by "npm version".')
-	.action(versionHook)
+const {releaseMajor} = commands
+cli.command('releaseMajor', {
+	desc: 'Release a major version. Calls the same scripts as `npm version`.',
+	run: releaseMajor,
+})
 
-const {postVersionHook} = require('./gulpfile')
-program
-	.command('postVersionHook', 'Your package.json "postversion" script should run this. Used by "npm version".')
-	.action(postVersionHook)
+const {versionHook} = commands
+cli.command('versionHook', {
+	desc: 'Your package.json "version" script should run this. Used by "npm version".',
+	run: versionHook,
+})
 
-const {prettier} = require('./gulpfile')
-program.command('prettier', 'Format the code base with Prettier.').action(prettier)
+const {postVersionHook} = commands
+cli.command('postVersionHook', {
+	desc: 'Your package.json "postversion" script should run this. Used by "npm version".',
+	run: postVersionHook,
+})
 
-const {prettierCheck} = require('./gulpfile')
-program.command('prettierCheck', 'List which files would be formatted by Prettier.').action(prettierCheck)
+const {prettier} = commands
+cli.command('prettier', {desc: 'Format the code base with Prettier.', run: prettier})
+
+const {prettierCheck} = commands
+cli.command('prettierCheck', {desc: 'List which files would be formatted by Prettier.', run: prettierCheck})
+
+cli.style({
+	usagePrefix: str => chalk().yellow(str.slice(0, 6)) + ' ' + chalk().bold(str.slice(7)),
+	usageCommandPlaceholder: str => chalk().bold(str),
+	usagePositionals: str => chalk().bold(str),
+	usageArgsPlaceholder: str => chalk().bold(str),
+	usageOptionsPlaceholder: str => chalk().bold(str),
+	group: str => chalk().yellow(str),
+	flags: str => chalk().bold(str),
+	desc: str => chalk().cyan(str),
+	hints: str => chalk().gray.dim(str),
+	groupError: str => chalk().red.bold(str),
+	flagsError: str => chalk().red.bold(str),
+	descError: str => chalk().red.bold(str),
+	hintsError: str => chalk().red(str),
+	messages: str => chalk().red.bold(str), // these are error messages
+})
+
+// display help unless a command with "run" method is called
+cli.showHelpByDefault()
 
 async function main() {
-	// await program.parseAsync(process.argv)
-	await program.parse(process.argv)
+	// await cli.parse(process.argv)
+	await cli.parseAndExit()
 }
 
 main()
