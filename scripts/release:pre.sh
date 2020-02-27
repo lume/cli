@@ -6,15 +6,14 @@ git add .
 echo ' -- Stash any changes...'
 if [ ! -z "$(git status --porcelain)" ]; then
 	git stash
-	touch ./node_modules/builder-js-package/__tmp_stash__
+	touch ./node_modules/.__tmp_stash__
 	echo '  - Stashed changes.'
 else
 	echo '  - No changes to stash.'
-	rm -f ./node_modules/builder-js-package/__tmp_stash__
+	rm -f ./node_modules/.__tmp_stash__
 fi
 echo ' -- Clean repo...'
-git clean -xfd -e node_modules
+npm run clean
 echo ' -- Run tests...'
-# TODO re-enable this
-# npm test
+npm test
 echo '--- PREVERSION DONE --------------------'

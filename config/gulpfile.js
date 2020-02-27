@@ -2,11 +2,13 @@
 const {src, dest, watch} = require('gulp')
 const babel = require('gulp-babel')
 const cached = require('gulp-cached')
+const _prettier = require('prettier')
 const babelConfig = require('./babel.config')
 const rmrf = require('rimraf')
 const {spawn} = require('child_process')
 const path = require('path')
 const {promisify} = require('util')
+const builderConfig = require('./getBuilderConfig')
 
 const jsSource = 'src/**/*.{js,jsx}'
 
@@ -15,12 +17,18 @@ async function build() {
 	await Promise.all([clean(), showName()])
 
 	await buildTs()
-	await buildGlobal()
+	if (!builderConfig.skipGlobal) await buildGlobal()
 }
 
 exports.clean = clean
 async function clean() {
 	await promisify(rmrf)('dist')
+}
+
+exports.dev = dev
+async function dev() {
+	await build()
+	await Promise.all([watchTs(), buildGlobalWatch()])
 }
 
 const {showName} = require('../scripts/name.js')
@@ -53,15 +61,9 @@ async function buildGlobal() {
 	await spawnWithEnv(`webpack --color --config ${path.resolve(__dirname, 'webpack.config.js')}`)
 }
 
-exports.watchGlobal = watchGlobal
-async function watchGlobal() {
+exports.buildGlobalWatch = buildGlobalWatch
+async function buildGlobalWatch() {
 	await spawnWithEnv(`webpack --color --config ${path.resolve(__dirname, 'webpack.config.js')} --watch`)
-}
-
-exports.dev = dev
-async function dev() {
-	await build()
-	await Promise.all([watchTs(), watchGlobal()])
 }
 
 exports.buildJs = buildJs
@@ -74,16 +76,29 @@ async function buildJs() {
 			.pipe(dest('dist', {sourcemaps: '.'}))
 
 		stream.on('end', resolve)
-		stream.on('error', e => reject(e))
+		stream.on('error', reject)
 	})
 }
 
-exports.watchJs = watchJs
-async function watchJs() {
+exports.buildJsWatch = buildJsWatch
+async function buildJsWatch() {
 	await new Promise((resolve, reject) => {
 		const watcher = watch(jsSource, {ignoreInitial: false}, buildJs)
 		watcher.on('close', resolve)
-		watcher.on('error', e => reject(e))
+		watcher.on('error', reject)
+	})
+}
+
+exports.test = test
+async function test() {
+	await build()
+	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+}
+
+exports.testDebug = testDebug
+async function testDebug() {
+	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'), {
+		KARMA_DEBUG: 'true',
 	})
 }
 
@@ -110,6 +125,30 @@ async function releaseMajor() {
 	await spawnWithEnv('npm version major -m v%s')
 }
 
+exports.versionHook = versionHook
+async function versionHook() {
+	await spawnWithEnv('./node_modules/builder-js-package/scripts/version.sh')
+}
+
+exports.postVersionHook = postVersionHook
+async function postVersionHook() {
+	await spawnWithEnv('./node_modules/builder-js-package/scripts/postversion.sh')
+}
+
+const prettierConfig = '--config ./node_modules/builder-js-package/.prettierrc.js'
+const prettierIgnore = '--ignore-path ./node_modules/builder-js-package/.prettierignore'
+const prettierFiles = './**/*.{js,json,ts,tsx,md}'
+
+exports.prettier = prettier
+async function prettier() {
+	await spawnWithEnv(`prettier ${prettierConfig} ${prettierIgnore} --write ${prettierFiles}`)
+}
+
+exports.prettierList = prettierList
+async function prettierList() {
+	await spawnWithEnv(`prettier ${prettierConfig} ${prettierIgnore} --list-different ${prettierFiles}`)
+}
+
 const execOptions = {
 	env: {
 		...process.env,
@@ -124,13 +163,16 @@ const execOptions = {
 	},
 }
 
-/** @param {string} cmd */
-async function spawnWithEnv(cmd) {
+/**
+ * @param {string} cmd
+ * @param {{[k:string]: string}} [env]
+ */
+async function spawnWithEnv(cmd, env) {
 	let parts = cmd.trim().split(/\s+/)
 	const bin = parts.shift()
 
 	await new Promise(resolve => {
-		const child = spawn(bin, parts, execOptions)
+		const child = spawn(bin, parts, {...execOptions, env: {...execOptions.env, ...env}})
 
 		child.stdout.on('data', data => {
 			console.log(data.toString())

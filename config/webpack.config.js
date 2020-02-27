@@ -3,7 +3,6 @@ const CWD = process.cwd()
 
 const camelcase = require('camelcase')
 const path = require('path')
-const webpack = require('webpack')
 
 const pkg = require(path.join(CWD, 'package.json'))
 const builderConfig = require('./getBuilderConfig')
