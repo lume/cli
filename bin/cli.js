@@ -70,18 +70,12 @@ program
 
 const {versionHook} = require('./gulpfile')
 program
-	.command(
-		'versionHook',
-		'This should be executed in a package.json "version" script which itself is automatically called by running `npm version` after the version number has been bumped. This is not intended for direct use.',
-	)
+	.command('versionHook', 'Your package.json "version" script should run this. Used by "npm version".')
 	.action(versionHook)
 
 const {postVersionHook} = require('./gulpfile')
 program
-	.command(
-		'postVersionHook',
-		'This is called automatically by the `npm version` command after a version has been committed and tagged. This is not intended for direct use.',
-	)
+	.command('postVersionHook', 'Your package.json "postversion" script should run this. Used by "npm version".')
 	.action(postVersionHook)
 
 const {prettier} = require('./gulpfile')
