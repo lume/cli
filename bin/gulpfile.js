@@ -53,12 +53,14 @@ async function typecheckWatch() {
 
 exports.buildGlobal = buildGlobal
 async function buildGlobal() {
-	await spawnWithEnv(`webpack --color --config ${path.resolve(__dirname, 'webpack.config.js')}`)
+	await spawnWithEnv(`webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')}`)
 }
 
 exports.buildGlobalWatch = buildGlobalWatch
 async function buildGlobalWatch() {
-	await spawnWithEnv(`webpack --color --config ${path.resolve(__dirname, 'webpack.config.js')} --watch`)
+	await spawnWithEnv(
+		`webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} --watch`,
+	)
 }
 
 exports.buildJs = buildJs
