@@ -5,6 +5,7 @@ const CWD = process.cwd()
 
 const path = require('path')
 const figlet = require('figlet')
+const chalk = require('chalk')
 
 const pkg = require(path.resolve(CWD, 'package.json'))
 let {name} = pkg
@@ -16,17 +17,31 @@ exports.showName = async function showName() {
 		figlet(
 			name,
 			{
-				// TODO configurable
-				font: 'Calvin S',
+				// TODO make this configurable
+				// font: 'Calvin S',
+				// font: 'Big',
+				// font: 'Small',
+				// font: 'Small Slant',
+				// font: 'Graffiti',
+				// font: 'ANSI Shadow',
+				font: 'Bigfig',
+				// font: 'Mini',
+				// font: 'Rounded',
+				// font: 'Script',
+				// font: 'Shimrod',
+				// font: 'Short',
+				// font: 'Thin',
+				// font: 'Three Point',
 			},
 			function(err, data) {
 				if (err) {
-					console.log(` --- ${name} --- `)
+					console.log(chalk.bold.blue(` --- ${name} --- `))
 					resolve()
 					return
 				}
 
-				console.log(data)
+				console.log('')
+				console.log(chalk.bold.blue(data))
 				console.log('')
 				resolve()
 			},
