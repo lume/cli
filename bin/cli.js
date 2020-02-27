@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require('sywac')
-const commands = require('./gulpfile')
+const commands = require('./commands')
 
 let c
 function chalk() {
