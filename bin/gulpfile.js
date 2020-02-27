@@ -1,19 +1,11 @@
 // @ts-check
-const {src, dest, watch} = require('gulp')
-const babel = require('gulp-babel')
-const cached = require('gulp-cached')
-const _prettier = require('prettier')
-const babelConfig = require('../config/babel.config')
-const rmrf = require('rimraf')
-const {spawn} = require('child_process')
 const path = require('path')
-const {promisify} = require('util')
-const builderConfig = require('../config/getBuilderConfig')
-
 const jsSource = 'src/**/*.{js,jsx}'
 
 exports.build = build
 async function build() {
+	const builderConfig = require('../config/getBuilderConfig')
+
 	await Promise.all([clean(), showName()])
 
 	await buildTs()
@@ -22,6 +14,9 @@ async function build() {
 
 exports.clean = clean
 async function clean() {
+	const rmrf = require('rimraf')
+	const {promisify} = require('util')
+
 	await promisify(rmrf)('dist')
 }
 
@@ -68,6 +63,11 @@ async function buildGlobalWatch() {
 
 exports.buildJs = buildJs
 async function buildJs() {
+	const {src, dest} = require('gulp')
+	const babel = require('gulp-babel')
+	const cached = require('gulp-cached')
+	const babelConfig = require('../config/babel.config')
+
 	await new Promise((resolve, reject) => {
 		const stream = src(jsSource, {sourcemaps: true})
 			// in watch mode, prevents rebuilding all files
@@ -82,6 +82,8 @@ async function buildJs() {
 
 exports.buildJsWatch = buildJsWatch
 async function buildJsWatch() {
+	const {watch} = require('gulp')
+
 	await new Promise((resolve, reject) => {
 		const watcher = watch(jsSource, {ignoreInitial: false}, buildJs)
 		watcher.on('close', resolve)
@@ -178,6 +180,7 @@ const execOptions = {
 async function spawnWithEnv(cmd, env) {
 	let parts = cmd.trim().split(/\s+/)
 	const bin = parts.shift()
+	const {spawn} = require('child_process')
 
 	await new Promise(resolve => {
 		const child = spawn(bin, parts, {...execOptions, env: {...execOptions.env, ...env}})
