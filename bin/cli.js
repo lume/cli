@@ -1,149 +1,106 @@
 #!/usr/bin/env node
 
-const {Command} = require('commander')
+const program = require('caporal')
 const {version} = require('../package.json')
-
-const program = new Command()
 
 program.version(version)
 
-const {clean} = require('../config/gulpfile')
-program
-	.command('clean')
-	.description('Remove all build outputs.')
-	.action(clean)
+const {clean} = require('./gulpfile')
+program.command('clean', 'Remove all build outputs.').action(clean)
 
-const {build} = require('../config/gulpfile')
-program
-	.command('build')
-	.description('Build the project in which this command is being ran.')
-	.action(build)
+const {build} = require('./gulpfile')
+program.command('build', 'Build the project in which this command is being ran.').action(build)
 
-const {dev} = require('../config/gulpfile')
-program
-	.command('dev')
-	.description('Run the project in watch mode where file changes trigger automatic rebuilds.')
-	.action(dev)
+const {dev} = require('./gulpfile')
+program.command('dev', 'Run the project in watch mode where file changes trigger automatic rebuilds.').action(dev)
 
-const {buildTs} = require('../config/gulpfile')
-program
-	.command('buildTs')
-	.description('Build only TypeScript sources.')
-	.action(buildTs)
+const {buildTs} = require('./gulpfile')
+program.command('buildTs', 'Build only TypeScript sources.').action(buildTs)
 
-const {buildJs} = require('../config/gulpfile')
-program
-	.command('buildJs')
-	.description('Build JavaScript files.')
-	.action(buildJs)
+const {buildJs} = require('./gulpfile')
+program.command('buildJs', 'Build JavaScript files.').action(buildJs)
 
-const {buildJsWatch} = require('../config/gulpfile')
-program
-	.command('buildJsWatch')
-	.description('Build JavaScript files in watch mode any time the files change.')
-	.action(buildJsWatch)
+const {buildJsWatch} = require('./gulpfile')
+program.command('buildJsWatch', 'Build JavaScript files in watch mode any time the files change.').action(buildJsWatch)
 
-const {buildGlobal} = require('../config/gulpfile')
+const {buildGlobal} = require('./gulpfile')
 program
-	.command('buildGlobal')
-	.description('Build the global version of the project for simple usage with browser script tags.')
+	.command('buildGlobal', 'Build the global version of the project for simple usage with browser script tags.')
 	.action(buildGlobal)
 
-const {buildGlobalWatch} = require('../config/gulpfile')
+const {buildGlobalWatch} = require('./gulpfile')
 program
-	.command('buildGlobalWatch')
-	.description('Build the global version of the project in watch mode any time files change.')
+	.command('buildGlobalWatch', 'Build the global version of the project in watch mode any time files change.')
 	.action(buildGlobalWatch)
 
-const {showName} = require('../config/gulpfile')
-program
-	.command('showName')
-	.description('Output the project name to console.')
-	.action(showName)
+const {showName} = require('./gulpfile')
+program.command('showName', 'Output the project name to console.').action(showName)
 
-const {typecheck} = require('../config/gulpfile')
-program
-	.command('typecheck')
-	.description('Run a typecheck of TypeScript source code without compiling output.')
-	.action(typecheck)
+const {typecheck} = require('./gulpfile')
+program.command('typecheck', 'Run a typecheck of TypeScript source code without compiling output.').action(typecheck)
 
-const {typecheckWatch} = require('../config/gulpfile')
+const {typecheckWatch} = require('./gulpfile')
 program
-	.command('typecheckWatch')
-	.description('Run a typecheck of TypeScript source code without compiling output, in watch mode.')
+	.command('typecheckWatch', 'Run a typecheck of TypeScript source code without compiling output, in watch mode.')
 	.action(typecheckWatch)
 
-const {test} = require('../config/gulpfile')
-program
-	.command('test')
-	.description('Run tests.')
-	.action(test)
+const {test} = require('./gulpfile')
+program.command('test', 'Run tests.').action(test)
 
-const {testDebug} = require('../config/gulpfile')
-program
-	.command('testDebug')
-	.description('Run tests with GUI debugger.')
-	.action(testDebug)
+const {testDebug} = require('./gulpfile')
+program.command('testDebug', 'Run tests with GUI debugger.').action(testDebug)
 
-const {releasePre} = require('../config/gulpfile')
-program
-	.command('releasePre')
-	.description('Run pre-release stuff like stashing changes and running tests.')
-	.action(releasePre)
+const {releasePre} = require('./gulpfile')
+program.command('releasePre', 'Run pre-release stuff like stashing changes and running tests.').action(releasePre)
 
-const {releasePatch} = require('../config/gulpfile')
+const {releasePatch} = require('./gulpfile')
 program
-	.command('releasePatch')
-	.description('Release a patch version. Calls the same scripts as `npm version`.')
+	.command('releasePatch', 'Release a patch version. Calls the same scripts as `npm version`.')
 	.action(releasePatch)
 
-const {releaseMinor} = require('../config/gulpfile')
+const {releaseMinor} = require('./gulpfile')
 program
-	.command('releaseMinor')
-	.description('Release a minor version. Calls the same scripts as `npm version`.')
+	.command('releaseMinor', 'Release a minor version. Calls the same scripts as `npm version`.')
 	.action(releaseMinor)
 
-const {releaseMajor} = require('../config/gulpfile')
+const {releaseMajor} = require('./gulpfile')
 program
-	.command('releaseMajor')
-	.description('Release a major version. Calls the same scripts as `npm version`.')
+	.command('releaseMajor', 'Release a major version. Calls the same scripts as `npm version`.')
 	.action(releaseMajor)
 
-const {versionHook} = require('../config/gulpfile')
+const {versionHook} = require('./gulpfile')
 program
-	.command('versionHook')
-	.description(
+	.command(
+		'versionHook',
 		'This should be executed in a package.json "version" script which itself is automatically called by running `npm version` after the version number has been bumped. This is not intended for direct use.',
 	)
 	.action(versionHook)
 
-const {postVersionHook} = require('../config/gulpfile')
+const {postVersionHook} = require('./gulpfile')
 program
-	.command('postVersionHook')
-	.description(
+	.command(
+		'postVersionHook',
 		'This is called automatically by the `npm version` command after a version has been committed and tagged. This is not intended for direct use.',
 	)
 	.action(postVersionHook)
 
-const {prettier} = require('../config/gulpfile')
-program
-	.command('prettier')
-	.description('Format the code base with Prettier.')
-	.action(prettier)
+const {prettier} = require('./gulpfile')
+program.command('prettier', 'Format the code base with Prettier.').action(prettier)
 
-const {prettierList} = require('../config/gulpfile')
-program
-	.command('prettierList')
-	.description('List which files would be formatted by Prettier.')
-	.action(prettierList)
+const {prettierCheck} = require('./gulpfile')
+program.command('prettierCheck', 'List which files would be formatted by Prettier.').action(prettierCheck)
 
 async function main() {
-	await program.parseAsync(process.argv)
+	// await program.parseAsync(process.argv)
+	await program.parse(process.argv)
 }
 
 main()
 
-// Make the process exit with a non-zero exit code on unhandle promise rejections.
+// Make sure the process exits with a non-zero exit code on unhandle promise
+// rejections. This won't be necessary in an upcoming release of Node.js, in
+// which case it'll exit non-zero automatically. Time of writing this comment:
+// Node 13.8.
 process.on('unhandledRejection', reason => {
 	console.error(reason)
 	process.exit(1)

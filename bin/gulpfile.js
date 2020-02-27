@@ -3,12 +3,12 @@ const {src, dest, watch} = require('gulp')
 const babel = require('gulp-babel')
 const cached = require('gulp-cached')
 const _prettier = require('prettier')
-const babelConfig = require('./babel.config')
+const babelConfig = require('../config/babel.config')
 const rmrf = require('rimraf')
 const {spawn} = require('child_process')
 const path = require('path')
 const {promisify} = require('util')
-const builderConfig = require('./getBuilderConfig')
+const builderConfig = require('../config/getBuilderConfig')
 
 const jsSource = 'src/**/*.{js,jsx}'
 
@@ -141,12 +141,20 @@ const prettierFiles = './**/*.{js,json,ts,tsx,md}'
 
 exports.prettier = prettier
 async function prettier() {
-	await spawnWithEnv(`prettier ${prettierConfig} ${prettierIgnore} --write ${prettierFiles}`)
+	const command = `prettier ${prettierConfig} ${prettierIgnore} --write ${prettierFiles}`
+	// TODO debug output in verbose mode
+	// console.log(`Running '${command}'`)
+	// console.log('')
+	await spawnWithEnv(command)
 }
 
-exports.prettierList = prettierList
-async function prettierList() {
-	await spawnWithEnv(`prettier ${prettierConfig} ${prettierIgnore} --list-different ${prettierFiles}`)
+exports.prettierCheck = prettierCheck
+async function prettierCheck() {
+	const command = `prettier ${prettierConfig} ${prettierIgnore} --check ${prettierFiles}`
+	// TODO debug output in verbose mode
+	// console.log(`Running '${command}'`)
+	// console.log('')
+	await spawnWithEnv(command)
 }
 
 const execOptions = {
