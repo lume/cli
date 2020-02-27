@@ -106,6 +106,7 @@ cli.command('prettier', {desc: 'Format the code base with Prettier.', run: prett
 const {prettierCheck} = commands
 cli.command('prettierCheck', {desc: 'List which files would be formatted by Prettier.', run: prettierCheck})
 
+// General example os Sywac with colored help text: https://github.com/sywac/sywac/issues/46
 cli.style({
 	usagePrefix: str => chalk().yellow(str.slice(0, 6)) + ' ' + chalk().bold(str.slice(7)),
 	usageCommandPlaceholder: str => chalk().bold(str),
