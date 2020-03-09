@@ -40,9 +40,15 @@ exports.showName = async function showName() {
 					return
 				}
 
-				console.log('')
-				console.log(chalk.bold.blue(data))
-				console.log('')
+				console.log(
+					trimEachLine(`
+
+                        ${chalk.bold.blue(data)}
+
+
+
+                    `),
+				)
 				resolve()
 			},
 		)
@@ -53,4 +59,11 @@ exports.showName = async function showName() {
 const executedDirectly = require.main === module
 if (executedDirectly) {
 	exports.showName()
+}
+
+function trimEachLine(s) {
+	return s
+		.split('\n')
+		.map(s => s.trim())
+		.join('\n')
 }

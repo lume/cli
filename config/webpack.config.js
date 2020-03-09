@@ -3,6 +3,7 @@ const CWD = process.cwd()
 
 const camelcase = require('camelcase')
 const path = require('path')
+const utils = require('./utils')
 
 const pkg = require(path.join(CWD, 'package.json'))
 const builderConfig = require('./getBuilderConfig')
@@ -26,16 +27,6 @@ if (
 	DEV = true
 }
 
-const alsoResolveRelativeToArchetype = () => [
-	// when the ARCHETYPE is `npm link`ed, or in older versions of NPM, loaders
-	// will be found in the ARCHETYPE's node_modules.
-	path.relative(CWD, path.join(path.resolve(__dirname, '..'), 'node_modules')),
-
-	// otherwise, loaders can also be found in the app's node_modules when deps
-	// are flattened (f.e. when the ARCHETYPE is not `npm link`ed and using NPM v3+).
-	'node_modules',
-]
-
 module.exports = {
 	entry: `.${path.sep}dist${path.sep}index`,
 	output: {
@@ -45,7 +36,7 @@ module.exports = {
 		libraryTarget: 'var', // alternative: "window"
 	},
 	resolve: {
-		modules: alsoResolveRelativeToArchetype(),
+		modules: utils.alsoResolveRelativeToArchetype(),
 
 		// for now only bundle JS files
 		// TODO add a separate step for Babel after TypeScript (f.e. for JSX
@@ -54,7 +45,7 @@ module.exports = {
 		extensions: ['.js'],
 	},
 	resolveLoader: {
-		modules: alsoResolveRelativeToArchetype(),
+		modules: utils.alsoResolveRelativeToArchetype(),
 	},
 	module: {
 		rules: [

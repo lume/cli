@@ -25,15 +25,6 @@ cli.command('dev', {desc: 'Run the project in watch mode where file changes trig
 const {buildTs} = commands
 cli.command('buildTs', {desc: 'Build only TypeScript sources.', run: buildTs})
 
-const {buildJs} = commands
-cli.command('buildJs', {desc: 'Build JavaScript files.', run: buildJs})
-
-const {buildJsWatch} = commands
-cli.command('buildJsWatch', {
-	desc: 'Build JavaScript files in watch mode any time the files change.',
-	run: buildJsWatch,
-})
-
 const {buildGlobal} = commands
 cli.command('buildGlobal', {
 	desc: 'Build the global version of the project for simple usage with browser script tags.',

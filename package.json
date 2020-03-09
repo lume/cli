@@ -47,6 +47,7 @@
 		"karma-sourcemap-loader": "^0.3.7",
 		"karma-spec-reporter": "0.0.32",
 		"karma-stacktrace": "^1.0.3",
+		"karma-webpack": "^4.0.2",
 		"lodash.merge": "^4.6.1",
 		"prettier": "^1.19.1",
 		"rimraf": "^2.6.3",
@@ -56,6 +57,7 @@
 		"webpack": "4.27.1",
 		"webpack-cli": "3.2.3",
 		"webpack-merge": "4.1.2",
+		"webpack-node-externals": "^1.7.2",
 		"xvfb-maybe": "^0.2.1"
 	},
 	"keywords": [

@@ -63,44 +63,16 @@ async function buildGlobalWatch() {
 	)
 }
 
-exports.buildJs = buildJs
-async function buildJs() {
-	const {src, dest} = require('gulp')
-	const babel = require('gulp-babel')
-	const cached = require('gulp-cached')
-	const babelConfig = require('../config/babel.config')
-
-	await new Promise((resolve, reject) => {
-		const stream = src(jsSource, {sourcemaps: true})
-			// in watch mode, prevents rebuilding all files
-			.pipe(cached('js'))
-			.pipe(babel(babelConfig))
-			.pipe(dest('dist', {sourcemaps: '.'}))
-
-		stream.on('end', resolve)
-		stream.on('error', reject)
-	})
-}
-
-exports.buildJsWatch = buildJsWatch
-async function buildJsWatch() {
-	const {watch} = require('gulp')
-
-	await new Promise((resolve, reject) => {
-		const watcher = watch(jsSource, {ignoreInitial: false}, buildJs)
-		watcher.on('close', resolve)
-		watcher.on('error', reject)
-	})
-}
-
 exports.test = test
 async function test() {
-	await build()
+	// we don't need to build the global for testing, so it isn't being ran here. TODO Maybe we should test that too?
+	await Promise.all([buildTs(), showName()])
 	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
 }
 
 exports.testDebug = testDebug
 async function testDebug() {
+	await Promise.all([buildTs(), showName()])
 	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'), {
 		KARMA_DEBUG: 'true',
 	})

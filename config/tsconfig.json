@@ -1,10 +1,18 @@
+// TODO rename this tsconfig.json file to something other than tsconfig.json
+// (and update all consuming projects) so that VS Code doesn't attempt to use it
+// as the local configuration when working in this project.
 {
 	"TODOs": "re-enable noImplicitAny",
 	"compilerOptions": {
 		"allowJs": true,
 		"checkJs": false,
-		// TODO update this comment to document exactly why we need this set to false. It has to do with Node.js ESM.
-		"allowSyntheticDefaultImports": false,
+		// The allowSyntheticDefaultImports option needs to be set to true for
+		// TypeScript code to be compatible with Node.js ES Modules, which
+		// expect ES Modules to `import` the `module.exports` of a CommonJS
+		// module as the `default` import. F.e. This means CommonJS modules must
+		// be imported as `import foo from 'commonjs-module'` instead of `import
+		// * as foo from 'commonjs-module'`.
+		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": false,
 		"alwaysStrict": true,
 		"strict": true,
