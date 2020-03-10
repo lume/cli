@@ -8,7 +8,7 @@ module.exports = {
 	 * also resolve node_modules of the package this code is in, not just the
 	 * project node_modules.
 	 */
-	alsoResolveRelativeToArchetype() {
+	alsoResolveRelativeToThisPackage() {
 		return [
 			// when the ARCHETYPE is `npm link`ed, or in older versions of NPM, loaders
 			// will be found in the ARCHETYPE's node_modules.

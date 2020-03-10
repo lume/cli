@@ -71,13 +71,20 @@ module.exports = function(config) {
 			// it to the browser.
 			mode: 'development',
 
-			// if we don't specify this, the default is a devtool that uses
-			// eval(), which can be a pain to debug with (but faster). The
-			// 'source-map' option makes the debugging experience better.
-			devtool: 'source-map',
+			// Note, the source map must be inline for karma-sourcemap-loader to
+			// pick it up from karma-webpack.
+			//
+			// If we don't specify this, the default is a devtool that uses
+			// eval(), which can be a difficult to debug with (but faster to
+			// build). A non-eval option, like 'inline-source-map' option makes
+			// the debugging experience better.
+			devtool: 'inline-source-map',
 
 			resolve: {
-				modules: utils.alsoResolveRelativeToArchetype(),
+				modules: utils.alsoResolveRelativeToThisPackage(),
+			},
+			resolveLoader: {
+				modules: utils.alsoResolveRelativeToThisPackage(),
 			},
 
 			output: {
@@ -178,6 +185,23 @@ module.exports = function(config) {
 				})(),
 			],
 
+			module: {
+				rules: [
+					{
+						// The source-map-loader tells Webpack to load source
+						// maps for any input files. This way the output that
+						// Karma will read has source maps that map back to our
+						// original source files. Karma-sourcemap-loader will
+						// finally read the source maps so that error messages
+						// and stack traces from test code shows the correct
+						// line numbers.
+						test: /\.js$/,
+						use: ['source-map-loader'],
+						enforce: 'pre',
+					},
+				],
+			},
+
 			// do not shim node globals like 'process', otherwise the result of
 			// things like `process.cwd()` will be '/' instead of the actual
 			// working directory.
@@ -204,7 +228,7 @@ module.exports = function(config) {
 		// because it imports only the built-in 'module' module, and otherwise
 		// does not benefit from the electron or webpack preprocessors.
 		preprocessors: {
-			'dist/**/*.test.js': ['electron', 'webpack'],
+			'dist/**/*.test.js': ['electron', 'webpack', 'sourcemap'],
 		},
 
 		client: debugMode
