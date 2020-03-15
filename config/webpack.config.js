@@ -36,7 +36,7 @@ module.exports = {
 		libraryTarget: 'var', // alternative: "window"
 	},
 	resolve: {
-		modules: utils.alsoResolveRelativeToArchetype(),
+		modules: utils.alsoResolveRelativeToThisPackage(),
 
 		// for now only bundle JS files
 		// TODO add a separate step for Babel after TypeScript (f.e. for JSX
@@ -45,7 +45,7 @@ module.exports = {
 		extensions: ['.js'],
 	},
 	resolveLoader: {
-		modules: utils.alsoResolveRelativeToArchetype(),
+		modules: utils.alsoResolveRelativeToThisPackage(),
 	},
 	module: {
 		rules: [
