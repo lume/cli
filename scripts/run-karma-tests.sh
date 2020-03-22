@@ -12,7 +12,7 @@
 NODE_PATH=`pwd`/node_modules:$NODE_PATH \
 	ELECTRON_DISABLE_SECURITY_WARNINGS=true \
 	xvfb-maybe \
-	karma start ./node_modules/builder-js-package/config/karma.config.js
+	karma start ./node_modules/@lume/cli/config/karma.config.js
 
 RESULT=$?
 

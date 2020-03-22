@@ -39,11 +39,11 @@
 		"paths": {
 			"*": ["*"]
 		},
-		"rootDir": "../../../src",
-		"baseUrl": "../../../",
-		"outDir": "../../../dist",
-		"typeRoots": ["../../../node_modules/@types", "../../../node_modules/builder-js-package/node_modules/@types"]
+		"rootDir": "../../../../src",
+		"baseUrl": "../../../../",
+		"outDir": "../../../../dist",
+		"typeRoots": ["../../../../node_modules/@types", "../../../../node_modules/@lume/cli/node_modules/@types"]
 	},
 	"compileOnSave": false,
-	"include": ["../../../src/**/*"]
+	"include": ["../../../../src/**/*"]
 }

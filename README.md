@@ -1,29 +1,58 @@
-## builder-js-package
+# @lume/cli
 
-A generic build setup for JavaScript packages.
+A command line tool for building, testing, and publishing JavaScript/TypeScript packages.
 
-#### `npm i builder-js-package --save-dev`
+Write source code (with tests) and don't worry about the specifics of package
+management.
 
-**Short version:** Write source code and don't worry about how make it work everywhere.
+NOTE! This is designed with Node.js 13 and native ES Modules in mind.
 
-**Long version:** A [Builder archetype](https://github.com/FormidableLabs/builder) (i.e. shared
-project structure, shared build configuration, and shared tasks and procedures) for making,
-building, and publishing JS-only packages in a way that makes them:
+#### `npm install @lume/cli --global`
 
--   compatible in many different build systems and environments (f.e. Webpack, Rollup, Babel,
-    Meteor, RequireJS, globals, Node.js)
--   consumable in with different module formats like AMD, UMD, CommonJS, and ES Modules
--   publishable to different registries like NPM, Bower, and JSPM
+## Current Features
 
-Example projects using this Builder archetype are:
+-   Build a project's [TypeScript](https://www.typescriptlang.org) source code
+    its `src/` folder to a `dist/` output folder.
+    -   The output code is in standard ES Module format.
+-   Bundle a project's output code into `dist/global.js` for use in
+    browser script tags.
+    -   The `dist/global.js` file assings the exports of the project entrypoint
+        onto a global object with the same name as the project, but camelCased, and
+        without the package scope. For example, a package named
+        `@foo/something-useful` would result in a global variable named
+        `somethingUseful` containing the package exports.
+-   Format all code in a project with [`prettier`](https://prettier.io).
+-   Run a project's tests (any files ending with `.test.ts` in the project's src/ folder).
+    -   Tests use [Jasmine](https://jasmine.github.io)'s `describe()`/`it()` functions for describing unit tests.
+    -   Tests run in Karma with karma-electron, so all tests have access to
+        Node.js, Electron, and Browser APIs.
+-   Publish a project to NPM.
 
--   [trusktr/lowclass](https://github.com/trusktr/lowclass)
--   [trusktr/perfect](https://github.com/trusktr/perfect)
+For more details, see `lume --help`.
 
-Notice in those projects that they have no dependencies on any build tools and no build
-configurations, and that they reference only this shared Builder archetype.
+## Future Features
 
-> **NOTE:** This project initially meets needs for my own JavaScript packages, and as such may not
+-   Specify configuration overrides (Webpack options, Karma
+    options, etc).
+-   Scaffold LUME-based applications.
+-   Scaffold LUME elements.
+-   Scaffold generic TypeScript packages.
+-   Support plain JavaScript, not just TypeScript.
+
+## Projects using LUME CLI
+
+[lume/element](https://github.com/infamous/element),
+[lume/variable](https://github.com/infamous/variable),
+[lume/element-behaviors](https://github.com/infamous/element-behaviors),
+[lume/infamous](https://github.com/infamous/infamous),
+[lume/lowclass](https://github.com/infamous/lowclass),
+[trusktr/perfect](https://github.com/trusktr/perfect)
+
+Notice in those projects that they have no dependencies on any build tools
+and no build configurations; they use `lume` commands for building, testing,
+formatting, and publishing packages.
+
+> **NOTE:** This project initially meets needs for my own packages, and as such may not
 > be a perfect fit for your needs.
 >
 > I'd like to make this easy to extend and even more generic to fit any needs, so that only few
@@ -32,120 +61,322 @@ configurations, and that they reference only this shared Builder archetype.
 
 ## Requirements
 
--   Node v9+ (might work with lower versions, not tested)
+-   A Unix-like OS (not tested in Windows).
+-   Node v13.2+ (might work with lower versions, not tested)
 -   NPM v5+ (might work with lower versions, not tested)
--   If you don't have a graphical display (f.e. in Linux without a desktop) install xvfb - see
+-   If you don't have a graphical display (f.e. in Linux without a desktop on a
+    continuous integration server) install xvfb for tests to run headlessly
+    without issues - see
     https://github.com/electron/electron/blob/v1.4.10/docs/tutorial/testing-on-headless-ci.md
 
-# Project Structure
+## Getting Started
 
-(**Note!** This part is TODO, but shared configs and procedures work. For now, see the above example
-projects, which all share a similar structure, to get an idea of how to structure a project in order
-to use this Builder archetype)
+There are two ways to install LUME cli.
 
-`build-init builder-js-package` will create a new project with the following structure. If you have
-an existing package that you'd like to use this on, then you will have to modify it to follow the
-following structure.
+### Local Install (recommended)
 
-```js
-src               # all source files go here, as well as test.js files
-  index.js        # entry point
-  index.test.js   # co-located test files
-  ...             # any other files imported by entry point, and associated test files
-tests             # also scanned for test.js files
-.gitignore        # things to ignore
-package.json
-.builderrc        # required, specify this builder archetype in there (see Builder docs).
-builder.config.js # optional config options
+Install the cli as a dev dependency of your project, so you can rely on a
+specific version of it with confidence.
+
+**`npm install @lume/cli --save-dev`**
+
+Then use the `npx` command (which ships with `npm` and is used to run local
+executables) to run the cli and show the help menu:
+
+**`npx lume --help`**
+
+### Global Install
+
+Install the `lume` command to globally so it is available in any shell:
+
+**`npm install @lume/cli --global`**
+
+If the above fails with permissions errors, you may need to run it with `sudo` (depending on your OS):
+
+**`sudo npm install @lume/cli --global`**
+
+Then run the cli and show the help menu:
+
+**`lume --help`**
+
+> NOTE! Installing `lume` globally may work up to a certain point (at least
+> the way the cli currently works, where it does not yet manage internal
+> versioning). If you have multiple projects that depend on different versions
+> of the `lume` cli with differing and incompatible features, you'll want to
+> install specific versions locally in each project instead. In the future,
+> the LUME cli will have internal version management.
+
+### No Install (easiest)
+
+Using `npx`, we can also skip installing the LUME cli at all. If `npx` does
+not detect a locally-installed version of an executable in a project, it will
+default to downloading the latest version of the executable and running it.
+
+Use the `npx` command (which ships with `npm` and is used to run local
+executables) to run the cli and show the help menu:
+
+**`npx lume --help`**
+
+> NOTE! This poses a problem similar to the global install option: the latest
+> version of the cli downloaded by `npx` may not be the version of LUME cli
+> that your project works with. In the future, the LUME cli will have internal
+> version management.
+
+## Project setup
+
+### File structure
+
+The general structure of a project mananaged with the `lume` cli is as follows:
+
+```sh
+src/              # All source files go here, as well as `.test.ts` files.
+  index.ts        # The project's entry point.
+  index.test.ts   # A co-located test file.
+  ...             # Other files imported by entry point, and associated test files.
+dist/             # The folder where build output goes, ignored by version control.
+.gitignore        # Things to ignore, like the `dist/` output folder, are listed in here.
+package.json      # The project meta file, listing dependencies, scripts, etc.
+builder.config.js # Optional config options read by `lume` cli, see below.
+tsconfig.json     # Optional, TypeScript configuration overrides. Extend from ./node_modules/@lume/cli/config/tsconfig.json.
+.npmrc            # Used to configure NPM to not use package-lock.json (see why below)
 ```
 
-This builder archetype will output compiled `.js` files from `src` along with `.js.map` source maps
-into the root of the repo (yes, you read that correctly, you should not have any files at the top
-level of `src` that are the same name as files in the root of the repo).
+The `lume build` command will compile `.ts` files from the `src/` folder,
+outputting them as `.js` files along with `.js.map` [source map
+files](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map)
+into the `dist/` folder.
 
-A `global.js` (and source map) is also outputted, containing the global version of the lib that can
-be easily loaded on a website using a script tag.
+A `dist/global.js` (and its source map file) is also outputted, containing
+the global version of the lib that can be easily loaded on a website using a
+script tag.
 
-# Config
+### Set up files
 
-This archetype can be configured with a `builder.config.js` file at the root of the project.
+Let's set up `package.json`, `.gitignore`, `.npmrc`, `src/index.ts`, and `src/index.test.ts`.
 
-Options (so far):
+> NOTE, in the near future we'll add command to LUME cli to scaffold these
+> files.
+
+We'll want to have the following things in our `package.json` (not all
+`scripts` are required, but this makes them convenient to call with `npm run`
+and documents their existence to anyone looking in `package.json` to
+understand available actions).
+
+**`package.json`**
+
+```json
+{
+	"name": "PACKAGE-NAME",
+	"version": "0.0.0",
+	"license": "MIT",
+	"type": "module",
+	"main": "dist/index.js",
+	"types": "src/index.ts",
+	"exports COMMENT:": "This removes 'dist' from import statements, as well as replaces the 'main' field. See https://github.com/nodejs/node/issues/14970#issuecomment-571887546",
+	"exports": {
+		".": "./dist/index.js",
+		"./": "./dist/"
+	},
+	"scripts": {
+		"clean": "lume clean",
+		"build": "lume build",
+		"dev": "lume dev",
+		"typecheck": "lume typecheck",
+		"typecheck:watch": "lume typecheckWatch",
+		"test": "lume test",
+		"test:debug": "lume testDebug",
+		"prettier": "lume prettier",
+		"prettier:check": "lume prettierCheck",
+		"release:patch": "lume releasePatch",
+		"release:minor": "lume releaseMinor",
+		"release:major": "lume releaseMajor",
+		"version": "lume versionHook",
+		"postversion": "lume postVersionHook",
+		"prepack": "npm run build"
+	}
+}
+```
+
+Where `PACKAGE-NAME` would be the actual name of our package.
+
+We should ignore some things in a `.gitignore` file.
+
+**`.gitignore`**
+
+```sh
+node_modules/ # project dependencies
+package-lock.json # ignore package-lock.json files.
+dist/ # build output
+*.log # log files in case of errors, etc
+```
+
+If we're making a package, and not an application, then we'll make sure
+`.npmrc` tells `npm` not to create `package-lock.json` files. NPM packages do
+not use package-lock files (`npm publish` will not publish them), while
+applications do. By not having lock files during package development, it
+becomes easier to catch in-range breaking changes that may affect end users,
+and we'll be more prepared to act on it.
+
+**`.npmrc`**
+
+```conf
+package-lock=false
+```
+
+Note, although this `.npmrc` config causes `npm` not to make the files, we
+still add it to `.gitignore` because popular tools like
+[Lerna](https://lerna.js.org) still output lock files regardless.
+
+Lastly, let's create `src/index.ts` with some sample code and ensure that it
+exports the project's version number at the very bottom:
+
+**`src/index.ts`**
+
+```ts
+export function isAwesome(thing: string) {
+	return `${thing} is awesome.`
+}
+
+export const version = '0.0.0'
+```
+
+The `lume release*` commands will automatically update both the exported
+`version` variable in `src/index.ts` and the `version` field in
+`package.json`.
+
+> NOTE! At the moment the release commands will throw an error if they don't
+> find this line at the bottom of the entrypoint.
+
+Finally lets write a test file to test our nifty `isAwesome` function.
+
+**`src/index.test.ts`**
+
+```ts
+import {isAwesome} from './index'
+
+describe('isAwesome', () => {
+	it('is a function', () => {
+		expect(isAwesome).toBeInstanceOf(Function)
+	})
+
+	it('says things are awesome', () => {
+		expect(isAwesome('Code')).toBe('Code is awesome.')
+	})
+})
+```
+
+This is enough to get a project bootstrapped. There will be more on how to
+configure build and test settings below using `builder.config.js` and
+`tsconfig.json` files.
+
+## Managing a project
+
+Now that we've bootstrapped our project, the following are the basic commands
+we'll want to run to manage the life cycle of our project. For sake of
+simplicity, the following examples assume that `lume` was installed globally
+as per the "Global Install" option above.
+
+-   `lume test`
+    -   Run tests (all `.test.ts` files).
+    -   Exits with a non-zero error code if any test fails
+-   `lume dev`
+    -   "dev" for "development mode"
+    -   Builds all code, and rebuilds it automatically if any file changes.
+    -   This is useful while developing a project, so that any time we edit
+        files, the project will automatically rebuild.
+-   `lume build`
+    -   Does a production build, and does not watch for file changes.
+    -   Generally you don't need to run this unless you need to debug production
+        code, which isn't common but sometimes there can be issues with
+        minification.
+-   `lume releasePatch`, `lume releaseMinor`, `lume releaseMajor`
+    -   Updates the version of the project in `package.json` and `src/index.ts`.
+    -   Publishes the project to NPM under the new version number only if build
+        and tests pass. It basically runs `lume build` and `lume test`
+        internally.
+    -   Pushes the a version commit and tag to the remote git repo.
+
+For more commands and details, run `lume --help`.
+
+## Configuration
+
+The `builder.config.js` and `tsconfig.json` files can be used for
+configuration.
+
+Various parts of the build/test/publish process can be configured with a
+`builder.config.js` file at the root of the project. The following example
+shows the available options (so far) with their defaults.
+
+**`builder.config.js`**
 
 ```js
 module.exports = {
-	// If set to `false` or an empty string, then the global build will not add a
-	// global variable into the environment. Otherwise, the library's exports will
-	// be assigned onto a global variable of the name defined here. Defaults to
-	// the name of the package if omitted (minus the @scope/ part if the package
-	// names is scoped).
-	globalName: '...', // A string, `false`, or `undefined`
+    // If set to a truthy value, the global build will be skipped. This is
+    // useful for packages that are meant only for Node.js and not intended for
+    // use in brosers.
+    //
+    // Default: undefined
+    skipGlobal: ,
 
-	// a list of node modules (by name) that should be compiled.
-	nodeModulesToCompile: [
-		'some-package',
-		// ...
-	],
-
-	// TODO babel option
+	// If set to `false` or an empty string, then the global build will not add
+	// a global variable into the environment, which is useful for libraries
+	// that may instead expose their own globals in a custom way, or some other
+	// sideeffects.
+	//
+	// Otherwise, the library's exports will be assigned onto a global variable
+	// of the name defined here.
+	//
+	// If omitted, this defaults to the name of the package (minus the @scope/
+	// part if the package name is scoped and converted to camelCase if the name
+    // has dashes).
+    //
+    // Default: undefined (uses the name of the package)
+	globalName: 'example', // A string, `false`, or `undefined`
 }
 ```
 
-# Caveat
+To configure (override) TypeScript compiler options, create a `tsconfig.json`
+file at the root of your project that extends from
+`./node_modules/@lume/cli/config/tsconfig.json`, and override any settings as
+needed (to know the default settings see that
+[file](./config/tsconfig.json)).
 
-This Builder archetype uses a combination of Babel to build code. Specifically, it transpiles
-`for..of` loops with Babel in "loose" mode, which means the result is not spec compliant, but leaner
-and faster in many cases although it will not work with Iterators and Generators.
+**`tsconfig.json`**
 
-This means, in projects built with this Builder archetype, you'll have to either not iterate on
-things like `Map` or `Set` using `for..of` directly (f.e. use `Array`s instead), or use
-`Array.from`. For example:
-
-```js
-const items = new Set(...)
-
-// will NOT work
-for (const item of items) {
-    console.log(item)
-}
-
-// works
-for (const item of Array.from(items)) {
-    console.log(item)
-}
-
-const pairs = new Map(...)
-
-// will NOT work
-for (const [key, value] of pairs) {
-    console.log(key, value)
-}
-
-// works
-for (const [key, value] of Array.from(pairs)) {
-    console.log(ikey, value)
+```jsonc
+{
+	"extends": "./node_modules/@lume/cli/config/tsconfig.json",
+	"compilerOptions": {
+		"target": "es5"
+	}
 }
 ```
 
-# TODOs
+## Caveats
 
--   [ ] Allow override of Babel config
+This uses TypeScript for transpiling all code. To customize build options,
+you will need to get familiar with TypeScript's [compiler
+options](https://www.typescriptlang.org/docs/handbook/compiler-options.html).
+
+If you lower TypeScript's compiler `target` to ES5 or lower, you may need to
+enable the `downlevelIteration` option if you need spec-compliant for..of
+loops (for example if you depend on in-place modification of iterables like
+Set while iterating on them, etc).
+
+## TODOs
+
+-   [ ] Add support for JSX (specifically Solid JSX expressions which requires Babel).
 -   [ ] Allow override of Webpack config
--   [ ] Don't commit global.js (and its map) on version changes, we can tell people to get it from
+-   [x] Don't commit global.js (and its map) on version changes, we can tell people to get it from
         unpkg, GitHub, and how to build it.
 -   [ ] Output both a global.js and global.min.js
--   [ ] Source maps! Important! (so far exists for global.js, but not the other files)
+-   [x] Source maps! Important!
 -   [x] Important! Don't run `git stash` during version script if there's nothing to stash,
         otherwise it will pop a previous stash after `npm version` is done.
--   [ ] A project template for generating new projects with `builder-init`. Probably a Yeoman
-        generator. (update the Project Structure section above accordingly)
+-   [ ] Ability to scaffold applications.
+-   [ ] Ability to scaffold packages.
 -   [x] Testing (added Karma)
--   [ ] Code coverage (Karma is in place, just need to hook up the tasks)
--   [ ] Continuous integration
--   [ ] Fix the previous caveat in a way that can build for both old and new browsers so that at
-        least new browsers don't have a ton of unnecessary overhead in build output. We'll probably
-        use `@babel/preset-env` for this.
-    -   [ ] Maybe we can offer a dev and production server that can automatically detect browsers
-            and serve appropriate builds.
--   [ ] Move babel plugins and transforms to a custom babel preset, so we can keep package.json
-        dependencies clean? Other benefits?
+-   [ ] Code coverage (Karma is in place, we just need to hook up a code coverage tool)
+-   [ ] GitHub Actions configuration for scaffolded apps and packages.
+-   [ ] Detect the entrypoint's `version` export, and skip updating it if not
+        found (instead of exiting with an error).

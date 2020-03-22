@@ -1,8 +1,8 @@
 {
-	"name": "builder-js-package",
+	"name": "@lume/cli",
 	"version": "1.0.0",
-	"description": "A generic build setup for JavaScript packages.",
-	"homepage": "https://github.com/trusktr/builder-js-packages",
+	"description": "A CLI for managing JavaScript/TypeScript packages.",
+	"homepage": "https://github.com/infamous/cli",
 	"bin": {
 		"lume": "bin/cli.js"
 	},
@@ -13,10 +13,10 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:trusktr/builder-js-packages.git"
+		"url": "git@github.com:infamous/cli.git"
 	},
 	"bugs": {
-		"url": "https://github.com/trusktr/builder-js-packages/issues"
+		"url": "https://github.com/infamous/cli/issues"
 	},
 	"scripts": {},
 	"dependencies": {
@@ -61,6 +61,7 @@
 		"xvfb-maybe": "^0.2.1"
 	},
 	"keywords": [
+		"typescript",
 		"build",
 		"babel",
 		"webpack",

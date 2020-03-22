@@ -103,16 +103,16 @@ async function releaseMajor() {
 
 exports.versionHook = versionHook
 async function versionHook() {
-	await spawnWithEnv('./node_modules/builder-js-package/scripts/version.sh')
+	await spawnWithEnv('./node_modules/@lume/cli/scripts/version.sh')
 }
 
 exports.postVersionHook = postVersionHook
 async function postVersionHook() {
-	await spawnWithEnv('./node_modules/builder-js-package/scripts/postversion.sh')
+	await spawnWithEnv('./node_modules/@lume/cli/scripts/postversion.sh')
 }
 
-const prettierConfig = '--config ./node_modules/builder-js-package/.prettierrc.js'
-const prettierIgnore = '--ignore-path ./node_modules/builder-js-package/.prettierignore'
+const prettierConfig = '--config ./node_modules/@lume/cli/.prettierrc.js'
+const prettierIgnore = '--ignore-path ./node_modules/@lume/cli/.prettierignore'
 const prettierFiles = './**/*.{js,json,ts,tsx,md}'
 
 exports.prettier = prettier
