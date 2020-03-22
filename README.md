@@ -129,16 +129,16 @@ executables) to run the cli and show the help menu:
 The general structure of a project mananaged with the `lume` cli is as follows:
 
 ```sh
-src/              # All source files go here, as well as `.test.ts` files.
-  index.ts        # The project's entry point.
-  index.test.ts   # A co-located test file.
-  ...             # Other files imported by entry point, and associated test files.
-dist/             # The folder where build output goes, ignored by version control.
-.gitignore        # Things to ignore, like the `dist/` output folder, are listed in here.
-package.json      # The project meta file, listing dependencies, scripts, etc.
-builder.config.js # Optional config options read by `lume` cli, see below.
-tsconfig.json     # Optional, TypeScript configuration overrides. Extend from ./node_modules/@lume/cli/config/tsconfig.json.
-.npmrc            # Used to configure NPM to not use package-lock.json (see why below)
+src/               # All source files go here, as well as `.test.ts` files.
+  index.ts         # The project's entry point.
+  index.test.ts    # A co-located test file.
+  ...              # Other files imported by entry point, and associated test files.
+dist/              # The folder where build output goes, ignored by version control.
+.gitignore         # Things to ignore, like the `dist/` output folder, are listed in here.
+package.json       # The project meta file, listing dependencies, scripts, etc.
+builder.config.cjs # Optional config options read by `lume` cli, see below.
+tsconfig.json      # Optional, TypeScript configuration overrides. Extend from ./node_modules/@lume/cli/config/tsconfig.json.
+.npmrc             # Used to configure NPM to not use package-lock.json (see why below)
 ```
 
 The `lume build` command will compile `.ts` files from the `src/` folder,
@@ -266,7 +266,7 @@ describe('isAwesome', () => {
 ```
 
 This is enough to get a project bootstrapped. There will be more on how to
-configure build and test settings below using `builder.config.js` and
+configure build and test settings below using `builder.config.cjs` and
 `tsconfig.json` files.
 
 ## Managing a project
@@ -300,14 +300,14 @@ For more commands and details, run `lume --help`.
 
 ## Configuration
 
-The `builder.config.js` and `tsconfig.json` files can be used for
+The `builder.config.cjs` and `tsconfig.json` files can be used for
 configuration.
 
 Various parts of the build/test/publish process can be configured with a
-`builder.config.js` file at the root of the project. The following example
+`builder.config.cjs` file at the root of the project. The following example
 shows the available options (so far) with their defaults.
 
-**`builder.config.js`**
+**`builder.config.cjs`**
 
 ```js
 module.exports = {
