@@ -136,7 +136,7 @@ src/               # All source files go here, as well as `.test.ts` files.
 dist/              # The folder where build output goes, ignored by version control.
 .gitignore         # Things to ignore, like the `dist/` output folder, are listed in here.
 package.json       # The project meta file, listing dependencies, scripts, etc.
-builder.config.cjs # Optional config options read by `lume` cli, see below.
+lume.config.cjs # Optional config options read by `lume` cli, see below.
 tsconfig.json      # Optional, TypeScript configuration overrides. Extend from ./node_modules/@lume/cli/config/tsconfig.json.
 .npmrc             # Used to configure NPM to not use package-lock.json (see why below)
 ```
@@ -266,7 +266,7 @@ describe('isAwesome', () => {
 ```
 
 This is enough to get a project bootstrapped. There will be more on how to
-configure build and test settings below using `builder.config.cjs` and
+configure build and test settings below using `lume.config.cjs` and
 `tsconfig.json` files.
 
 ## Managing a project
@@ -300,14 +300,14 @@ For more commands and details, run `lume --help`.
 
 ## Configuration
 
-The `builder.config.cjs` and `tsconfig.json` files can be used for
+The `lume.config.cjs` and `tsconfig.json` files can be used for
 configuration.
 
 Various parts of the build/test/publish process can be configured with a
-`builder.config.cjs` file at the root of the project. The following example
+`lume.config.cjs` file at the root of the project. The following example
 shows the available options (so far) with their defaults.
 
-**`builder.config.cjs`**
+**`lume.config.cjs`**
 
 ```js
 module.exports = {

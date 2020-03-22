@@ -4,7 +4,7 @@ const jsSource = 'src/**/*.{js,jsx}'
 
 exports.build = build
 async function build() {
-	const builderConfig = require('../config/getBuilderConfig')
+	const builderConfig = require('../config/getUserConfig')
 
 	await Promise.all([clean(), showName()])
 

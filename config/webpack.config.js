@@ -6,7 +6,7 @@ const path = require('path')
 const utils = require('./utils')
 
 const pkg = require(path.join(CWD, 'package.json'))
-const builderConfig = require('./getBuilderConfig')
+const builderConfig = require('./getUserConfig')
 
 // split by '/' in case a name is scoped, f.e. `@awaitbox/document-ready`
 const pkgNameParts = pkg.name.split('/')
