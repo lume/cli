@@ -6,12 +6,12 @@ const path = require('path')
 const utils = require('./utils')
 
 const pkg = require(path.join(CWD, 'package.json'))
-const builderConfig = require('./getUserConfig')
+const userConfig = require('./getUserConfig')
 
 // split by '/' in case a name is scoped, f.e. `@awaitbox/document-ready`
 const pkgNameParts = pkg.name.split('/')
 const lastPkgNamePart = pkgNameParts[pkgNameParts.length - 1]
-const globalName = builderConfig.globalName
+const globalName = userConfig.globalName
 const NAME = globalName === false || globalName === '' ? '' : globalName || camelcase(lastPkgNamePart)
 // ^ Note, and empty string means no global variable will be assigned for the
 // library (as per Webpack's output.library option).

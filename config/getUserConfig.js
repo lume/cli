@@ -3,14 +3,14 @@ const fs = require('fs')
 const path = require('path')
 const CWD = process.cwd()
 
-let builderConfigPath = path.join(CWD, 'lume.config.js')
-let builderConfigExists = fs.existsSync(builderConfigPath)
+let userConfigPath = path.join(CWD, 'lume.config.js')
+let userConfigExists = fs.existsSync(userConfigPath)
 
-if (!builderConfigExists) {
-	builderConfigPath = path.join(CWD, 'lume.config.cjs')
-	builderConfigExists = fs.existsSync(builderConfigPath)
+if (!userConfigExists) {
+	userConfigPath = path.join(CWD, 'lume.config.cjs')
+	userConfigExists = fs.existsSync(userConfigPath)
 }
 
-const builderConfig = builderConfigExists ? require(builderConfigPath) : {}
+const userConfig = userConfigExists ? require(userConfigPath) : {}
 
-module.exports = builderConfig
+module.exports = userConfig

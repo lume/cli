@@ -4,12 +4,12 @@ const jsSource = 'src/**/*.{js,jsx}'
 
 exports.build = build
 async function build() {
-	const builderConfig = require('../config/getUserConfig')
+	const userConfig = require('../config/getUserConfig')
 
 	await Promise.all([clean(), showName()])
 
 	await buildTs()
-	if (!builderConfig.skipGlobal) await buildGlobal()
+	if (!userConfig.skipGlobal) await buildGlobal()
 }
 
 exports.clean = clean
