@@ -6,11 +6,6 @@
 	"bin": {
 		"lume": "bin/cli.js"
 	},
-	"files": [
-		"./config/**/*",
-		"./scripts/**/*",
-		"./index.js"
-	],
 	"repository": {
 		"type": "git",
 		"url": "git@github.com:infamous/cli.git"
