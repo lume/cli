@@ -133,3 +133,12 @@ process.on('unhandledRejection', reason => {
 	console.error(reason)
 	process.exit(1)
 })
+
+// Explicitly handle SIGINT (ctrl+c), because for some strange reason, if this
+// script is wrapped in two layers of npm scripts in package.json, then it
+// will randomly exit 0 or 130 instead of always exiting with a 130 code.
+// See: https://github.com/npm/cli/issues/1072
+process.on('SIGINT', () => {
+	console.log('\nInterrupted. Exiting.\n')
+	process.exit(130) // 130 is the standard exit code for interruptions.
+})
