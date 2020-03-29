@@ -134,6 +134,7 @@ async function prettierCheck() {
 }
 
 const execOptions = {
+	shell: true,
 	env: {
 		...process.env,
 
