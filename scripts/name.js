@@ -34,13 +34,7 @@ exports.showName = async function showName() {
 				// font: 'Three Point',
 			},
 			function(err, data) {
-				if (err) {
-					console.log(chalk.bold.blue(` --- ${name} --- `))
-					resolve()
-					return
-				}
-
-				console.log(`\n\n${chalk.bold.blue(data)}\n\n\n\n`)
+				console.log(`\n\n${chalk.bold.blue(err ? ` --- ${name} --- ` : data)}\n\n\n\n`)
 				resolve()
 			},
 		)
