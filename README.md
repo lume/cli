@@ -137,7 +137,7 @@ dist/              # The folder where build output goes, ignored by version cont
 .gitignore         # Things to ignore, like the `dist/` output folder, are listed in here.
 package.json       # The project meta file, listing dependencies, scripts, etc.
 lume.config.cjs # Optional config options read by `lume` cli, see below.
-tsconfig.json      # Optional, TypeScript configuration overrides. Extend from ./node_modules/@lume/cli/config/tsconfig.json.
+tsconfig.json      # Optional, TypeScript configuration overrides. Extend from ./node_modules/@lume/cli/config/ts.config.json.
 .npmrc             # Used to configure NPM to not use package-lock.json (see why below)
 ```
 
@@ -337,15 +337,15 @@ module.exports = {
 
 To configure (override) TypeScript compiler options, create a `tsconfig.json`
 file at the root of your project that extends from
-`./node_modules/@lume/cli/config/tsconfig.json`, and override any settings as
+`./node_modules/@lume/cli/config/ts.config.json`, and override any settings as
 needed (to know the default settings see that
-[file](./config/tsconfig.json)).
+[file](./config/ts.config.json)).
 
 **`tsconfig.json`**
 
 ```jsonc
 {
-	"extends": "./node_modules/@lume/cli/config/tsconfig.json",
+	"extends": "./node_modules/@lume/cli/config/ts.config.json",
 	"compilerOptions": {
 		"target": "es5"
 	}

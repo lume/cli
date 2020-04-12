@@ -1,6 +1,3 @@
-// TODO rename this tsconfig.json file to something other than tsconfig.json
-// (and update all consuming projects) so that VS Code doesn't attempt to use it
-// as the local configuration when working in this project.
 {
 	"TODOs": "re-enable noImplicitAny",
 	"compilerOptions": {
