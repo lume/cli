@@ -4,12 +4,12 @@ const jsSource = 'src/**/*.{js,jsx}'
 
 exports.build = build
 async function build() {
-	const userConfig = require('../config/getUserConfig')
+	const {skipGlobal} = require('../config/getUserConfig')
 
 	await Promise.all([clean(), showName()])
 
 	await buildTs()
-	if (!userConfig.skipGlobal) await buildGlobal()
+	if (!skipGlobal) await buildGlobal()
 }
 
 exports.clean = clean
@@ -23,7 +23,14 @@ async function clean() {
 exports.dev = dev
 async function dev() {
 	await build()
-	await Promise.all([watchTs(), buildGlobalWatch()])
+
+	const {skipGlobal} = require('../config/getUserConfig')
+	const promises = []
+
+	promises.push(watchTs())
+	if (!skipGlobal) promises.push(buildGlobalWatch())
+
+	await Promise.all(promises)
 }
 
 const {showName} = require('../scripts/name.js')
