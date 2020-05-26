@@ -1,6 +1,5 @@
 // @ts-check
 const path = require('path')
-const jsSource = 'src/**/*.{js,jsx}'
 
 exports.build = build
 async function build() {
