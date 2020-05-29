@@ -2,16 +2,16 @@
 	"name": "@lume/cli",
 	"version": "2.1.1",
 	"description": "A CLI for managing JavaScript/TypeScript packages.",
-	"homepage": "https://github.com/infamous/cli",
+	"homepage": "https://github.com/lume/cli",
 	"bin": {
 		"lume": "bin/cli.js"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:infamous/cli.git"
+		"url": "git@github.com:lume/cli.git"
 	},
 	"bugs": {
-		"url": "https://github.com/infamous/cli/issues"
+		"url": "https://github.com/lume/cli/issues"
 	},
 	"scripts": {},
 	"dependencies": {
@@ -36,7 +36,7 @@
 		"gulp-babel": "8.0.0-beta.2",
 		"gulp-cached": "1.1.1",
 		"jasmine-core": "^3.1.0",
-		"karma": "infamous/karma#disable-ts-node",
+		"karma": "lume/karma#disable-ts-node",
 		"karma-electron": "^6.0.0",
 		"karma-jasmine": "^1.1.1",
 		"karma-sourcemap-loader": "^0.3.7",

@@ -41,11 +41,11 @@ For more details, see `lume --help`.
 
 ## Projects using LUME CLI
 
-[lume/element](https://github.com/infamous/element),
-[lume/variable](https://github.com/infamous/variable),
-[lume/element-behaviors](https://github.com/infamous/element-behaviors),
-[lume/infamous](https://github.com/infamous/infamous),
-[lume/lowclass](https://github.com/infamous/lowclass),
+[lume/element](https://github.com/lume/element),
+[lume/variable](https://github.com/lume/variable),
+[lume/element-behaviors](https://github.com/lume/element-behaviors),
+[lume/lume](https://github.com/lume/lume),
+[trusktr/lowclass](https://github.com/trusktr/lowclass),
 [trusktr/perfect](https://github.com/trusktr/perfect)
 
 Notice in those projects that they have no dependencies on any build tools
