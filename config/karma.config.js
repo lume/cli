@@ -186,6 +186,7 @@ module.exports = function(config) {
 			],
 
 			module: {
+				// TODO Add rule to compile Solid JSX with Babel.
 				rules: [
 					{
 						// The source-map-loader tells Webpack to load source
