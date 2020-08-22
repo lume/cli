@@ -13,7 +13,11 @@
 	"bugs": {
 		"url": "https://github.com/lume/cli/issues"
 	},
-	"scripts": {},
+	"scripts": {
+		"release:patch": "npm version patch --message 'v%s' && npm publish && git push --follow-tags",
+		"release:minor": "npm version minor --message 'v%s' && npm publish && git push --follow-tags",
+		"release:major": "npm version major --message 'v%s' && npm publish && git push --follow-tags"
+	},
 	"dependencies": {
 		"@babel/cli": "7.0.0-beta.46",
 		"@babel/core": "7.0.0-beta.46",
