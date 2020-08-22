@@ -2,10 +2,10 @@
 const path = require('path')
 
 exports.build = build
-async function build() {
+async function build({skipClean = false}) {
 	const {skipGlobal} = require('../config/getUserConfig')
 
-	await Promise.all([clean(), showName()])
+	await Promise.all([!skipClean && clean(), showName()])
 
 	await buildTs()
 	if (!skipGlobal) await buildGlobal()
@@ -21,7 +21,9 @@ async function clean() {
 
 exports.dev = dev
 async function dev() {
-	await build()
+	// Skip cleaning in dev mode, makes things easier like not breaking an
+	// active type check process or webpack build.
+	await build({skipClean: true})
 
 	const {skipGlobal} = require('../config/getUserConfig')
 	const promises = []
