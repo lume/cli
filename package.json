@@ -45,6 +45,7 @@
 		"karma-webpack": "^4.0.2",
 		"lodash.merge": "^4.6.1",
 		"prettier": "^1.19.1",
+		"resolve-package-path": "^2.0.0",
 		"rimraf": "^2.6.3",
 		"source-map-loader": "^0.2.4",
 		"sywac": "^1.2.2",

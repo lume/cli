@@ -93,14 +93,22 @@ module.exports = function(config) {
 				libraryTarget: 'commonjs2',
 			},
 
-			// ignore Node libs that don't need to be bundled, as well as
-			// anything in node_modules, because they'll be require'd. We want
-			// to bundle only our code.
-			// TODO set this if user config option "node" is true
 			externals: [
+				// Ignore Node libs that don't need to be bundled, as well as
+				// anything in node_modules, because they'll be require'd. We want
+				// to bundle only our code.
+				// TODO Set this if user config option "node" is true.
 				...require('module').builtinModules,
 
-				// immediately-invoked function, to enclose cache variables
+				// The only reason we use this is so that karma-webpack won't
+				// bundle dependencies (which may perform better if there are
+				// otherwise a lot of module to bundle) except the ones that are
+				// in ES Module format because otherwise the current version of
+				// Electron/Node can not understand those. Later on, once
+				// karma-electron is updated and support native Node ESM, then
+				// we might not need this (assuming all dependencies that use
+				// ESM follow the Node ESM guidelines in package.json).
+				// TODO Allow this to be enabled ot disabled with a lume.config option.
 				(function() {
 					// this caches any modules (positively matched to be ES
 					// Module packages) that have already been handled by the
@@ -111,6 +119,8 @@ module.exports = function(config) {
 					 * This checks if a module is an ES Module package, and if it is then
 					 * does not treat it as an external, otherwise it treats
 					 * everything else as an external with webpack-node-externals.
+					 *
+					 * The reason we use this is Electron's Node version doesn't support ES Modules yet, so we bundle ES Modules.
 					 *
 					 * @param {any} context
 					 * @param {string} request
@@ -130,7 +140,13 @@ module.exports = function(config) {
 								return
 							}
 
-							const moduleName = request.split('/')[0]
+							const isScopedModule = request.startsWith('@')
+							const moduleName = isScopedModule
+								? request
+										.split('/')
+										.slice(0, 2)
+										.join('/')
+								: request.split('/')[0]
 
 							// If the module name is empty...
 							if (!moduleName) {
@@ -139,31 +155,31 @@ module.exports = function(config) {
 								return
 							}
 
-							let resolvedPath = ''
+							let pkgPath = ''
 
 							// If the module doesn't exist...
 							try {
-								resolvedPath = require.resolve(moduleName)
+								const resolvePkg = require('resolve-package-path')
+								pkgPath = resolvePkg(moduleName, context)
 							} catch (e) {
 								// ...pass through to nodeExternals.
 								nodeExternals(context, request, callback)
 								return
 							}
 
-							// TODO, on Windows this will start with a backslash. Does it need the C: prefix too?
-							const resolvedPathAllPlatforms = path.sep + path.join(...resolvedPath.split('/'))
-
-							// In case the require.resolve path is something like
-							// /path/to/node_modules/moduleName/dist/foo.js, we just
-							// want /path/to/node_modules/moduleName.
-							const modulePath = path.join(resolvedPathAllPlatforms.split(moduleName)[0], moduleName)
-
-							const pkgPath = path.join(modulePath, 'package.json')
 							const fs = require('fs').promises
 							const pkg = JSON.parse((await fs.readFile(pkgPath)).toString())
 
 							// If we encounter a package published as ES Modules...
-							if (pkg.type === 'module') {
+							if (
+								// This is a new Node ESM field that specifies
+								// the code is in ESM format.
+								pkg.type === 'module' ||
+								// This is a non-standard community driven field
+								// that Weback understands for finding ES
+								// Modules.
+								pkg.module
+							) {
 								// ...tell Webpack to skip it with no callback args.
 								// It will not be treated as an external module,
 								// therefore it will be bundled, and therefore the
