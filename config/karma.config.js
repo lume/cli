@@ -145,6 +145,8 @@ module.exports = function(config) {
 			// https://github.com/twolfson/karma-electron/issues/44.
 			path.resolve(__dirname, 'karma-augment-node-path.js'),
 
+			path.resolve(__dirname, 'karma-helpful-error-output.js'),
+
 			// Include all the test files *after* augment-node-path.js.
 			{pattern: 'dist/**/*.test.js', watched: false},
 		],
