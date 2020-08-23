@@ -100,105 +100,13 @@ module.exports = function(config) {
 				// TODO Set this if user config option "node" is true.
 				...require('module').builtinModules,
 
-				// The only reason we use this is so that karma-webpack won't
-				// bundle dependencies (which may perform better if there are
-				// otherwise a lot of module to bundle) except the ones that are
-				// in ES Module format because otherwise the current version of
-				// Electron/Node can not understand those. Later on, once
-				// karma-electron is updated and support native Node ESM, then
-				// we might not need this (assuming all dependencies that use
-				// ESM follow the Node ESM guidelines in package.json).
-				// TODO Allow this to be enabled ot disabled with a lume.config option.
-				(function() {
-					// this caches any modules (positively matched to be ES
-					// Module packages) that have already been handled by the
-					// following externals function.
-					const cache = new Set()
+				// XXX We only mark builtin modules as external. karma-webpack
+				// will otherwise bundle code for each test file.
 
-					/**
-					 * This checks if a module is an ES Module package, and if it is then
-					 * does not treat it as an external, otherwise it treats
-					 * everything else as an external with webpack-node-externals.
-					 *
-					 * The reason we use this is Electron's Node version doesn't support ES Modules yet, so we bundle ES Modules.
-					 *
-					 * @param {any} context
-					 * @param {string} request
-					 * @param {{ (): void; (error: any, result: any): void; }} callback
-					 */
-					async function nodeExternalsExceptESModules(context, request, callback) {
-						try {
-							if (cache.has(request)) {
-								callback()
-								return
-							}
-
-							// If the path is relative or absolute...
-							if (['.', '/'].some(c => request.startsWith(c))) {
-								// ...pass through to nodeExternals.
-								nodeExternals(context, request, callback)
-								return
-							}
-
-							const isScopedModule = request.startsWith('@')
-							const moduleName = isScopedModule
-								? request
-										.split('/')
-										.slice(0, 2)
-										.join('/')
-								: request.split('/')[0]
-
-							// If the module name is empty...
-							if (!moduleName) {
-								// ...pass through to nodeExternals.
-								nodeExternals(context, request, callback)
-								return
-							}
-
-							let pkgPath = ''
-
-							// If the module doesn't exist...
-							try {
-								const resolvePkg = require('resolve-package-path')
-								pkgPath = resolvePkg(moduleName, context)
-							} catch (e) {
-								// ...pass through to nodeExternals.
-								nodeExternals(context, request, callback)
-								return
-							}
-
-							const fs = require('fs').promises
-							const pkg = JSON.parse((await fs.readFile(pkgPath)).toString())
-
-							// If we encounter a package published as ES Modules...
-							if (
-								// This is a new Node ESM field that specifies
-								// the code is in ESM format.
-								pkg.type === 'module' ||
-								// This is a non-standard community driven field
-								// that Weback understands for finding ES
-								// Modules.
-								pkg.module
-							) {
-								// ...tell Webpack to skip it with no callback args.
-								// It will not be treated as an external module,
-								// therefore it will be bundled, and therefore the
-								// ES Module syntax will be handled by Webpack
-								// instead of tripping karma-electron.
-								cache.add(request)
-								callback()
-								return
-							}
-
-							nodeExternals(context, request, callback)
-						} catch (e) {
-							console.error(e)
-							throw e
-						}
-					}
-
-					return nodeExternalsExceptESModules
-				})(),
+				// TODO Once Electron supports native Node ESM and
+				// karma-electron catches up to that, we should ideally be able
+				// to remove karma-webpack and run all tests without a build
+				// step.
 			],
 
 			module: {
@@ -235,7 +143,7 @@ module.exports = function(config) {
 			// node_modules folder even when karma-eletron in symlinked into the
 			// project. See
 			// https://github.com/twolfson/karma-electron/issues/44.
-			path.resolve(__dirname, 'augment-node-path.js'),
+			path.resolve(__dirname, 'karma-augment-node-path.js'),
 
 			// Include all the test files *after* augment-node-path.js.
 			{pattern: 'dist/**/*.test.js', watched: false},
