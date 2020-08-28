@@ -7,7 +7,13 @@ async function build({skipClean = false}) {
 
 	await Promise.all([!skipClean && clean(), showName()])
 
-	await buildTs()
+	const builtTs = await buildTs()
+
+	if (!builtTs) {
+		console.log('No sources to build.')
+		return
+	}
+
 	if (!skipGlobal) await buildGlobal()
 }
 
@@ -39,7 +45,17 @@ exports.showName = showName
 
 exports.buildTs = buildTs
 async function buildTs() {
+	const fs = require('fs')
+
+	try {
+		await fs.promises.access(path.resolve(process.cwd(), 'tsconfig.json'), fs.constants.F_OK)
+	} catch (e) {
+		// Don't try to run TypeScript build if no tsconfig.json file is present.
+		return false
+	}
+
 	await spawnWithEnv('tsc -p ./tsconfig.json')
+	return true
 }
 
 exports.watchTs = watchTs
@@ -74,13 +90,21 @@ async function buildGlobalWatch() {
 exports.test = test
 async function test() {
 	// we don't need to build the global for testing, so it isn't being ran here. TODO Maybe we should test that too?
-	await Promise.all([buildTs(), showName()])
+	const [builtTs] = await Promise.all([buildTs(), showName()])
+
+	// TODO if sources found, but no tests files, also skip instead of error.
+	if (!builtTs) return console.log('No sources found, skipping tests.')
+
 	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
 }
 
 exports.testDebug = testDebug
 async function testDebug() {
-	await Promise.all([buildTs(), showName()])
+	const [builtTs] = await Promise.all([buildTs(), showName()])
+
+	// TODO if sources found, but no tests files, also skip instead of error.
+	if (!builtTs) return console.log('No sources found, skipping tests.')
+
 	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'), {
 		KARMA_DEBUG: 'true',
 	})

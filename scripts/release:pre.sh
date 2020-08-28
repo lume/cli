@@ -13,6 +13,7 @@ else
 	rm -f ./node_modules/.__tmp_stash__
 fi
 echo ' -- Clean repo...'
+# TODO don't run clean if there's no clean script.
 npm run clean
 echo ' -- Run tests...'
 npm test

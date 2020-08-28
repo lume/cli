@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+// TODO instead of writing to the last line of the index file, write to a single
+// file (if present) that exports only the version number.
+
 const CWD = process.cwd()
 
 const fs = require('fs')
@@ -20,7 +23,9 @@ try {
 }
 
 if (!data) {
-	console.error('No index file found, or unable to read index file. Skipping version update in index file.')
+	console.error(
+		'No JavaScript or TypeScript index file found, or unable to read the file. Skipping update of version number in index file.',
+	)
 	process.exit()
 }
 
