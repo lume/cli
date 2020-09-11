@@ -44,17 +44,30 @@ const {showName} = require('../scripts/name.js')
 exports.showName = showName
 
 exports.buildTs = buildTs
-async function buildTs() {
+async function buildTs({babelConfig = undefined, tsConfig2 = undefined} = {}) {
 	const fs = require('fs')
 
-	try {
-		await fs.promises.access(path.resolve(process.cwd(), 'tsconfig.json'), fs.constants.F_OK)
-	} catch (e) {
-		// Don't try to run TypeScript build if no tsconfig.json file is present.
-		return false
+	if (!babelConfig) {
+		try {
+			// TODO If there's no user tsconfig fall back to cli's tsconfig. We
+			// might need to temporarily write it to the project root.
+			await fs.promises.access(path.resolve(process.cwd(), 'tsconfig.json'), fs.constants.F_OK)
+		} catch (e) {
+			// Don't try to run TypeScript build if no tsconfig.json file is present.
+			return false
+		}
+
+		// The use of tsConfig2 here is namely to test @lume/element and
+		// @lume/variable decorators with TypeScript useDefineForClassFields
+		// true and false to ensure they work in both cases.
+		if (tsConfig2) await spawnWithEnv('tsc -p ./tsconfig2.json')
+		else await spawnWithEnv('tsc -p ./tsconfig.json')
+	} else {
+		// This is used while testing with all the possible Babel decorator
+		// configs (namely for @lume/element and @lume/variable).
+		await spawnWithEnv(`babel --config-file ${babelConfig} --extensions .ts,.tsx src --out-dir ./dist`)
 	}
 
-	await spawnWithEnv('tsc -p ./tsconfig.json')
 	return true
 }
 
@@ -89,10 +102,56 @@ async function buildGlobalWatch() {
 
 exports.test = test
 async function test() {
+	// This option was made mainly with @lume/variable and @lume/element, to
+	// test the code with all TypeScript and Babel decorator configs.
+	const {testWithAllTSAndBabelDecoratorBuildConfigurations} = require('../config/getUserConfig')
+
+	if (testWithAllTSAndBabelDecoratorBuildConfigurations) {
+		let builtTs = (
+			await Promise.all([
+				buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.1.js'}),
+				showName(),
+			])
+		)[0]
+		if (!builtTs) return console.log('No sources found, skipping tests.')
+		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+
+		builtTs = (
+			await Promise.all([
+				buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.2.js'}),
+				showName(),
+			])
+		)[0]
+		if (!builtTs) return console.log('No sources found, skipping tests.')
+		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+
+		builtTs = (
+			await Promise.all([
+				buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.3.js'}),
+				showName(),
+			])
+		)[0]
+		if (!builtTs) return console.log('No sources found, skipping tests.')
+		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+
+		builtTs = (
+			await Promise.all([
+				buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.4.js'}),
+				showName(),
+			])
+		)[0]
+		if (!builtTs) return console.log('No sources found, skipping tests.')
+		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+
+		builtTs = (await Promise.all([buildTs({tsConfig2: true}), showName()]))[0]
+		if (!builtTs) return console.log('No sources found, skipping tests.')
+		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+	}
+
 	// we don't need to build the global for testing, so it isn't being ran here. TODO Maybe we should test that too?
 	const [builtTs] = await Promise.all([buildTs(), showName()])
 
-	// TODO if sources found, but no tests files, also skip instead of error.
+	// TODO if sources found, but no test files, also skip instead of error.
 	if (!builtTs) return console.log('No sources found, skipping tests.')
 
 	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
