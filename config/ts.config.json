@@ -1,8 +1,8 @@
 {
-	"TODOs": "re-enable noImplicitAny",
 	"compilerOptions": {
 		"allowJs": true,
 		"checkJs": false,
+
 		// The allowSyntheticDefaultImports option needs to be set to true for
 		// TypeScript code to be compatible with Node.js ES Modules, which
 		// expect ES Modules to `import` the `module.exports` of a CommonJS
@@ -11,31 +11,38 @@
 		// * as foo from 'commonjs-module'`.
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": false,
-		"alwaysStrict": true,
-		"strict": true,
-		"declaration": true,
-		"emitDecoratorMetadata": true,
-		"noEmitOnError": false,
-		"experimentalDecorators": true,
-		"forceConsistentCasingInFileNames": true,
-		"jsx": "preserve",
+
 		"lib": ["es2018", "dom"],
+		"skipLibCheck": false,
 		"target": "es2018",
 		"module": "esnext",
 		"moduleResolution": "node",
+
+		// Code strictness
+		"strict": true,
+		"importsNotUsedAsValues": "error",
 		"noFallthroughCasesInSwitch": true,
-		"noImplicitReturns": false,
-		"noImplicitAny": true,
-		"noImplicitThis": true,
+		"noImplicitReturns": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
+		"forceConsistentCasingInFileNames": true,
+
+		// Language feature options
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"useDefineForClassFields": false,
 		"preserveConstEnums": true,
+		// JSX is preserved so that we can handle JSX with babel-preset-solid
+		// (for use with @lume/element).
+		"jsx": "preserve",
+
 		"pretty": true,
+		"declaration": true,
+		"noEmitOnError": false,
 		"sourceMap": true,
-		"skipLibCheck": false,
-		"paths": {
-			"*": ["*"]
-		},
+		"removeComments": true,
+
+		"paths": {"*": ["*"]},
 		"rootDir": "../../../../src",
 		"baseUrl": "../../../../",
 		"outDir": "../../../../dist",
