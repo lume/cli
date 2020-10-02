@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # NOTE_PATH: We set NODE_PATH to also include the node_modules of the current
 # working directory, in case that the CLI is symlinked into a project
 # (otherwise Karma or other tooling may not be able to import those
@@ -14,6 +16,8 @@ NODE_PATH=`pwd`/node_modules:$NODE_PATH \
 	xvfb-maybe \
 	karma start ./node_modules/@lume/cli/config/karma.config.js
 
-RESULT=$?
-
-exit $RESULT
+NODE_PATH=`pwd`/node_modules:$NODE_PATH \
+	ELECTRON_DISABLE_SECURITY_WARNINGS=true \
+	TEST_GLOBALS=true \
+	xvfb-maybe \
+	karma start ./node_modules/@lume/cli/config/karma.config.js

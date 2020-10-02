@@ -1,9 +1,8 @@
 // @ts-check
 const CWD = process.cwd()
-const debugMode = !!process.env.KARMA_DEBUG
+const debugMode = !!(process.env.KARMA_DEBUG && process.env.KARMA_DEBUG !== 'false')
+const testGlobals = !!(process.env.TEST_GLOBALS && process.env.TEST_GLOBALS !== 'false')
 const path = require('path')
-const makeNodeExternalsFunction = require('webpack-node-externals')
-const nodeExternals = makeNodeExternalsFunction()
 const utils = require('./utils')
 
 // TODO, once Electron supports native Node ES Modules, then we should remove
@@ -146,8 +145,15 @@ module.exports = function(config) {
 			path.resolve(__dirname, 'karma-augment-node-path.js'),
 
 			// Include all the test files *after* augment-node-path.js.
-			{pattern: 'dist/**/*.test.js', watched: false},
+			...(testGlobals
+				? [
+						{pattern: 'dist/global*.js', watched: false},
+						{pattern: 'dist/global/*.js', watched: false},
+				  ]
+				: [{pattern: 'dist/**/*.test.js', watched: false}]),
 		],
+
+		exclude: testGlobals ? [] : ['dist/global.test.js', 'dist/global/*.test.js'],
 
 		// The augment-node-path.js file does not need to be included here,
 		// because it imports only the built-in 'module' module, and otherwise
