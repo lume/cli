@@ -41,6 +41,7 @@
 		"karma-spec-reporter": "0.0.32",
 		"karma-stacktrace": "^1.0.3",
 		"karma-webpack": "^4.0.2",
+		"last-call-webpack-plugin": "^3.0.0",
 		"lodash.merge": "^4.6.1",
 		"prettier": "^1.19.1",
 		"resolve-package-path": "^2.0.0",

@@ -1,17 +1,20 @@
 // @ts-check
-const CWD = process.cwd()
-
 const camelcase = require('camelcase')
 const path = require('path')
 const utils = require('./utils')
+const LastCallWebpackPlugin = require('last-call-webpack-plugin')
 
+const CWD = process.cwd()
 const pkg = require(path.join(CWD, 'package.json'))
-const userConfig = require('./getUserConfig')
+const userLumeConfig = require('./getUserConfig')
+
+/** @type {string[] | undefined} */
+const entrypoints = userLumeConfig.globalEntrypoints
 
 // split by '/' in case a name is scoped, f.e. `@awaitbox/document-ready`
 const pkgNameParts = pkg.name.split('/')
 const lastPkgNamePart = pkgNameParts[pkgNameParts.length - 1]
-const globalName = userConfig.globalName
+const globalName = userLumeConfig.globalName
 const NAME = globalName === false || globalName === '' ? '' : globalName || camelcase(lastPkgNamePart)
 // ^ Note, and empty string means no global variable will be assigned for the
 // library (as per Webpack's output.library option).
@@ -27,13 +30,10 @@ if (
 	DEV = true
 }
 
-module.exports = {
-	entry: `.${path.sep}dist${path.sep}index`,
+const baseConfig = {
 	output: {
-		path: path.join(CWD, 'dist'),
-		filename: 'global.js',
 		library: NAME,
-		libraryTarget: 'var', // alternative: "window"
+		libraryTarget: 'assign',
 	},
 	resolve: {
 		modules: utils.alsoResolveRelativeToThisPackage(),
@@ -69,4 +69,54 @@ module.exports = {
 	stats: {
 		assets: false, // shows all output assets
 	},
+	plugins: [
+		// This plugin allows us to modify output source before it is finalized.
+		new LastCallWebpackPlugin({
+			assetProcessors: [
+				// This adds code to the top of the output bundles, which allows
+				// us to create the LUME global object if it doesn't exist yet,
+				// so that each bundle will assign its exports to it instead of
+				// overriding it.
+				{
+					regExp: /\.js$/,
+					processor: async (assetName, asset) => /* js */ `
+                        if (!('${NAME}' in window)) {
+                            __${NAME}__ = window.__${NAME}__ || {}
+                            Object.defineProperty(window, '${NAME}', {
+                                get() { return __${NAME}__ },
+                                set(val) { Object.assign(__${NAME}__, val) },
+                            });
+                        }
+                        ${asset.source()}
+                    `,
+				},
+			],
+		}),
+	],
 }
+
+module.exports = [
+	// Keep backwards compat with the old global generation. TODO remove this in
+	// breaking version bump.
+	{
+		...baseConfig,
+		entry: `./dist/index`,
+		output: {
+			...baseConfig.output,
+			path: path.join(CWD, 'dist'),
+			filename: 'global.js',
+		},
+	},
+	// This is the new way: the cli user specifies one or more entry points.
+	...(entrypoints
+		? entrypoints.map(fileNameWithoutExtension => ({
+				...baseConfig,
+				entry: `./dist/${fileNameWithoutExtension}`,
+				output: {
+					...baseConfig.output,
+					path: path.join(CWD, 'dist', 'globals'),
+					filename: fileNameWithoutExtension + '.js',
+				},
+		  }))
+		: []),
+]
