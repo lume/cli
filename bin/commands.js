@@ -2,17 +2,22 @@
 const path = require('path')
 
 exports.build = build
-async function build({skipClean = false}) {
-	await Promise.all([!skipClean && clean(), showName()])
+async function build({skipClean = false} = {}) {
+	await Promise.all([
+		showName(),
+		(async function() {
+			if (!skipClean) await clean()
 
-	const builtTs = await buildTs()
+			const builtTs = await buildTs()
 
-	if (!builtTs) {
-		console.log('No sources to build.')
-		return
-	}
+			if (!builtTs) {
+				console.log('No sources to build.')
+				return
+			}
 
-	await buildGlobal()
+			await buildGlobal()
+		})(),
+	])
 }
 
 exports.clean = clean
