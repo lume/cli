@@ -103,55 +103,42 @@ async function test() {
 	// test the code with all TypeScript and Babel decorator configs.
 	const {testWithAllTSAndBabelDecoratorBuildConfigurations} = require('../config/getUserConfig')
 
-	if (testWithAllTSAndBabelDecoratorBuildConfigurations) {
-		let builtTs = (
-			await Promise.all([
-				buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.1.js'}),
-				showName(),
-			])
-		)[0]
-		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+	await Promise.all([
+		showName(),
+		(async function() {
+			if (testWithAllTSAndBabelDecoratorBuildConfigurations) {
+				let builtTs = false
 
-		builtTs = (
-			await Promise.all([
-				buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.2.js'}),
-				showName(),
-			])
-		)[0]
-		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+				builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.1.js'})
+				if (!builtTs) return console.log('No sources found, skipping tests.')
+				await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
 
-		builtTs = (
-			await Promise.all([
-				buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.3.js'}),
-				showName(),
-			])
-		)[0]
-		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+				builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.2.js'})
+				if (!builtTs) return console.log('No sources found, skipping tests.')
+				await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
 
-		builtTs = (
-			await Promise.all([
-				buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.4.js'}),
-				showName(),
-			])
-		)[0]
-		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+				builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.3.js'})
+				if (!builtTs) return console.log('No sources found, skipping tests.')
+				await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
 
-		builtTs = (await Promise.all([buildTs({tsConfig2: true}), showName()]))[0]
-		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
-	}
+				builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.4.js'})
+				if (!builtTs) return console.log('No sources found, skipping tests.')
+				await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
 
-	// we don't need to build the global for testing, so it isn't being ran here. TODO Maybe we should test that too?
-	const [builtTs] = await Promise.all([buildTs(), showName()])
+				builtTs = await buildTs({tsConfig2: true})
+				if (!builtTs) return console.log('No sources found, skipping tests.')
+				await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+			}
 
-	// TODO if sources found, but no test files, also skip instead of error.
-	if (!builtTs) return console.log('No sources found, skipping tests.')
+			// we don't need to build the global for testing, so it isn't being ran here. TODO Maybe we should test that too?
+			const builtTs = await buildTs()
 
-	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+			// TODO if sources found, but no test files, also skip instead of error.
+			if (!builtTs) return console.log('No sources found, skipping tests.')
+
+			await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+		})(),
+	])
 }
 
 exports.testDebug = testDebug

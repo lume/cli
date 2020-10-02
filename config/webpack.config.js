@@ -47,6 +47,9 @@ const baseConfig = {
 	},
 	module: {
 		rules: [
+			// TODO seems source maps aren't feeding to Karma correctly, so
+			// errors in test files don't always point to src files but to lines
+			// in the webpack bundle.
 			{
 				test: /\.js$/,
 				use: ['source-map-loader'],
