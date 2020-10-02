@@ -311,12 +311,12 @@ shows the available options (so far) with their defaults.
 
 ```js
 module.exports = {
-    // If set to a truthy value, the global build will be skipped. This is
-    // useful for packages that are meant only for Node.js and not intended for
-    // use in brosers.
-    //
-    // Default: undefined
-    skipGlobal: ,
+	// If set to a truthy value, the global build will be skipped. This is
+	// useful for packages that are meant only for Node.js and not intended for
+	// use in brosers.
+	//
+	// Default: false
+	skipGlobal: false,
 
 	// If set to `false` or an empty string, then the global build will not add
 	// a global variable into the environment, which is useful for libraries
@@ -328,10 +328,30 @@ module.exports = {
 	//
 	// If omitted, this defaults to the name of the package (minus the @scope/
 	// part if the package name is scoped and converted to camelCase if the name
-    // has dashes).
-    //
-    // Default: undefined (uses the name of the package)
+	// has dashes).
+	//
+	// Default: undefined (uses the name of the package)
 	globalName: 'example', // A string, `false`, or `undefined`
+
+	// This is an array of entrypoints that global builds will be made from, and
+	// the output bundles will be placed in `dist/global/`. These should
+	// correspond to files at the top level of src. For example, the following
+	// will build a take `src/one.ts` and `src/two.ts` and output
+	// `dist/global/one.js` and `dist/global/two.js`
+	//
+	// These entry points are built into global scripts in addition to the
+	// default one built from `src/index.ts`.
+	//
+	// Default: []
+	globalEntrypoints: ['one', 'two'],
+
+	// Run all tests 6 times instead of once, each time using one of the six
+	// possible TypeScript and Babel decorator configurations. Packages that
+	// export decorators would want to use this option to ensure that the
+	// decorators work in every TS/Babel build configuration.
+	//
+	// Default: false
+	testWithAllTSAndBabelDecoratorBuildConfigurations: true,
 }
 ```
 

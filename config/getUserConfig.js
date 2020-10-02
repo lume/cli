@@ -11,6 +11,14 @@ if (!userConfigExists) {
 	userConfigExists = fs.existsSync(userConfigPath)
 }
 
+/**
+ * @type {{
+ *   skipGlobal?: boolean
+ *   globalName?: string | false
+ *   globalEntrypoints?: string[]
+ *   testWithAllTSAndBabelDecoratorBuildConfigurations?: boolean
+ * }}
+ */
 const userConfig = userConfigExists ? require(userConfigPath) : {}
 
 module.exports = userConfig

@@ -3,8 +3,6 @@ const path = require('path')
 
 exports.build = build
 async function build({skipClean = false}) {
-	const {skipGlobal} = require('../config/getUserConfig')
-
 	await Promise.all([!skipClean && clean(), showName()])
 
 	const builtTs = await buildTs()
@@ -14,7 +12,7 @@ async function build({skipClean = false}) {
 		return
 	}
 
-	if (!skipGlobal) await buildGlobal()
+	await buildGlobal()
 }
 
 exports.clean = clean
@@ -31,11 +29,10 @@ async function dev() {
 	// active type check process or webpack build.
 	await build({skipClean: true})
 
-	const {skipGlobal} = require('../config/getUserConfig')
 	const promises = []
 
 	promises.push(watchTs())
-	if (!skipGlobal) promises.push(buildGlobalWatch())
+	promises.push(buildGlobalWatch())
 
 	await Promise.all(promises)
 }

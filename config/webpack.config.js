@@ -8,13 +8,11 @@ const CWD = process.cwd()
 const pkg = require(path.join(CWD, 'package.json'))
 const userLumeConfig = require('./getUserConfig')
 
-/** @type {string[] | undefined} */
-const entrypoints = userLumeConfig.globalEntrypoints
+const {globalEntrypoints: entrypoints, skipGlobal, globalName} = userLumeConfig
 
 // split by '/' in case a name is scoped, f.e. `@awaitbox/document-ready`
 const pkgNameParts = pkg.name.split('/')
 const lastPkgNamePart = pkgNameParts[pkgNameParts.length - 1]
-const globalName = userLumeConfig.globalName
 const NAME = globalName === false || globalName === '' ? '' : globalName || camelcase(lastPkgNamePart)
 // ^ Note, and empty string means no global variable will be assigned for the
 // library (as per Webpack's output.library option).
@@ -95,28 +93,46 @@ const baseConfig = {
 	],
 }
 
-module.exports = [
-	// Keep backwards compat with the old global generation. TODO remove this in
-	// breaking version bump.
-	{
+if (skipGlobal && !(entrypoints && entrypoints.length)) {
+	console.log('No global scripts to build, skipping.')
+	process.exit(0)
+}
+
+const configs = []
+
+// Keep backwards compat with the old global build based on src/index.ts.
+if (!skipGlobal) {
+	configs.push({
 		...baseConfig,
+		// TODO skip this global build if there's no dist/index
 		entry: `./dist/index`,
 		output: {
 			...baseConfig.output,
+			// TODO in a breaking change, also output this to dist/global
 			path: path.join(CWD, 'dist'),
 			filename: 'global.js',
 		},
-	},
-	// This is the new way: the cli user specifies one or more entry points.
-	...(entrypoints
-		? entrypoints.map(fileNameWithoutExtension => ({
-				...baseConfig,
-				entry: `./dist/${fileNameWithoutExtension}`,
-				output: {
-					...baseConfig.output,
-					path: path.join(CWD, 'dist', 'globals'),
-					filename: fileNameWithoutExtension + '.js',
-				},
-		  }))
-		: []),
-]
+	})
+}
+
+// This is the new way: the cli user specifies one or more entry points.
+if (entrypoints && entrypoints.length) {
+	entrypoints.forEach(fileNameWithoutExtension => {
+		configs.push({
+			...baseConfig,
+			entry: `./dist/${fileNameWithoutExtension}`,
+			output: {
+				...baseConfig.output,
+				path: path.join(CWD, 'dist', 'global'),
+				filename: fileNameWithoutExtension + '.js',
+			},
+		})
+	})
+}
+
+if (!configs.length) {
+	console.log('No global scripts to build, skipping.')
+	process.exit(0)
+}
+
+module.exports = configs
