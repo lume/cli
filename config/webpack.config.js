@@ -30,8 +30,12 @@ if (
 
 const baseConfig = {
 	output: {
-		library: NAME,
-		libraryTarget: 'assign',
+		// The conditional checks of `NAME` cause Webpack to either not assign
+		// entrypoint exports to any variable if NAME is empty, or to otherwise
+		// assign exports to the variable with name NAME.
+		library: NAME || '',
+		// If `libraryTarget` is 'var' and `library` empty, then no assignment happens.
+		libraryTarget: NAME ? 'assign' : 'var',
 	},
 	resolve: {
 		modules: utils.alsoResolveRelativeToThisPackage(),
