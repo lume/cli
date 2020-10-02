@@ -1,9 +1,12 @@
 // @ts-check
-const CWD = process.cwd()
-const debugMode = !!(process.env.KARMA_DEBUG && process.env.KARMA_DEBUG !== 'false')
-const testGlobals = !!(process.env.TEST_GLOBALS && process.env.TEST_GLOBALS !== 'false')
 const path = require('path')
 const utils = require('./utils')
+
+const {skipGlobal, globalEntrypoints} = require('./getUserConfig')
+const CWD = process.cwd()
+const debugMode = !!(process.env.KARMA_DEBUG && process.env.KARMA_DEBUG !== 'false')
+const skipGlobalBuild = skipGlobal && !(globalEntrypoints && globalEntrypoints.length)
+const testGlobals = !!(process.env.TEST_GLOBALS && process.env.TEST_GLOBALS !== 'false' && !skipGlobalBuild)
 
 // TODO, once Electron supports native Node ES Modules, then we should remove
 // all the Webpack stuff from here and loade ES Modules natively.
@@ -18,6 +21,8 @@ module.exports = function(config) {
 		autoWatch: false,
 		singleRun: debugMode ? false : true,
 		concurrency: Infinity,
+		// Exit with exit code zero if there are no tests to run. Makes testing opt-in.
+		failOnEmptyTestSuite: false,
 
 		basePath: CWD,
 
