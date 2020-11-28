@@ -1,6 +1,7 @@
 // @ts-check
 const path = require('path')
 const utils = require('./utils')
+const webpack = require('webpack')
 
 const {skipGlobal, globalEntrypoints} = require('./getUserConfig')
 const CWD = process.cwd()
@@ -11,7 +12,7 @@ const testGlobals = !!(process.env.TEST_GLOBALS && process.env.TEST_GLOBALS !== 
 // TODO, once Electron supports native Node ES Modules, then we should remove
 // all the Webpack stuff from here and loade ES Modules natively.
 
-module.exports = function(config) {
+module.exports = function (config) {
 	config.set({
 		frameworks: ['jasmine', 'stacktrace'],
 		reporters: ['spec'],
@@ -138,6 +139,16 @@ module.exports = function(config) {
 			// is set to true. We may have to see how this works once we upgrade
 			// to native ESM when Electron supports that.
 			node: false,
+
+			plugins: [
+				new webpack.DefinePlugin({
+					...(process.env.DECORATOR_CAUSES_NONWRITABLE_ERROR !== undefined
+						? {
+								DECORATOR_CAUSES_NONWRITABLE_ERROR: 'true',
+						  }
+						: {}),
+				}),
+			],
 		},
 
 		// The order of items in this array matters!

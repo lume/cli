@@ -5,7 +5,7 @@ exports.build = build
 async function build({skipClean = false} = {}) {
 	await Promise.all([
 		showName(),
-		(async function() {
+		(async function () {
 			if (!skipClean) await clean()
 
 			const builtTs = await buildTs()
@@ -115,11 +115,15 @@ async function test() {
 
 		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.1.js'})
 		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'), {
+			DECORATOR_CAUSES_NONWRITABLE_ERROR: 'true',
+		})
 
 		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.2.js'})
 		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
+		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'), {
+			DECORATOR_CAUSES_NONWRITABLE_ERROR: 'true',
+		})
 
 		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.3.js'})
 		if (!builtTs) return console.log('No sources found, skipping tests.')
@@ -129,6 +133,10 @@ async function test() {
 		if (!builtTs) return console.log('No sources found, skipping tests.')
 		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
 
+		// TODO The tsConfig2 option here requires the dependent app to have a
+		// tsconfig2.json file. The CLI should not require any tsconfig files,
+		// they should be optional. We should look for those files, and fall
+		// back to files here in the CLI.
 		builtTs = await buildTs({tsConfig2: true})
 		if (!builtTs) return console.log('No sources found, skipping tests.')
 		await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh'))
