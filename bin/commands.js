@@ -5,6 +5,7 @@ exports.build = build
 async function build({skipClean = false} = {}) {
 	await Promise.all([
 		showName(),
+		copyAssets(),
 		(async function () {
 			if (!skipClean) await clean()
 
@@ -45,6 +46,11 @@ async function dev() {
 const {showName} = require('../scripts/name.js')
 exports.showName = showName
 
+exports.copyAssets = copyAssets
+async function copyAssets() {
+	await spawnWithEnv(`gulp --cwd ${process.cwd()} --gulpfile ./node_modules/@lume/cli/config/gulpfile.js copyAssets`)
+}
+
 exports.buildTs = buildTs
 async function buildTs({babelConfig = undefined, tsConfig2 = undefined} = {}) {
 	const fs = require('fs')
@@ -53,7 +59,7 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined} = {}) {
 		try {
 			// TODO If there's no user tsconfig fall back to cli's tsconfig. We
 			// might need to temporarily write it to the project root.
-			await fs.promises.access(path.resolve(process.cwd(), 'tsconfig.json'), fs.constants.F_OK)
+			await fs.promises.access(path.resolve(process.cwd(), 'tsconfig.json'))
 		} catch (e) {
 			// Don't try to run TypeScript build if no tsconfig.json file is present.
 			return false

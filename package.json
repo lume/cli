@@ -33,6 +33,7 @@
 		"chalk": "^3.0.0",
 		"electron": "^2.0.0",
 		"figlet": "^1.2.0",
+		"gulp": "^4.0.2",
 		"jasmine-core": "^3.1.0",
 		"karma": "lume/karma#disable-ts-node",
 		"karma-electron": "^6.0.0",

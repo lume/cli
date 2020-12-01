@@ -22,6 +22,12 @@ cli.command('build', {desc: 'Build the project in which this command is being ra
 const {dev} = commands
 cli.command('dev', {desc: 'Run the project in watch mode where file changes trigger automatic rebuilds.', run: dev})
 
+const {copyAssets} = commands
+cli.command('copyAssets', {
+	desc: 'Copy any assets from src/ into dist/, mirroring the same folder structure in dist/ as in src/.',
+	run: copyAssets,
+})
+
 const {buildTs} = commands
 cli.command('buildTs', {desc: 'Build only TypeScript sources.', run: buildTs})
 
