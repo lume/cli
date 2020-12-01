@@ -10,13 +10,13 @@ module.exports = {
 	 */
 	alsoResolveRelativeToThisPackage() {
 		return [
-			// when the ARCHETYPE is `npm link`ed, or in older versions of NPM, loaders
-			// will be found in the ARCHETYPE's node_modules.
-			path.relative(CWD, path.join(path.resolve(__dirname, '..'), 'node_modules')),
-
-			// otherwise, loaders can also be found in the app's node_modules when deps
-			// are flattened (f.e. when the ARCHETYPE is not `npm link`ed and using NPM v3+).
+			// loaders can be found in the app's node_modules when deps
+			// are flattened.
 			'node_modules',
+
+			// Modules can also be found in cli's node_modules.
+			// path.relative(CWD, path.resolve(__dirname, '..', 'node_modules')),
+			path.resolve(__dirname, '..', 'node_modules'),
 		]
 	},
 }
