@@ -2,6 +2,7 @@
 const path = require('path')
 const utils = require('./utils')
 const webpack = require('webpack')
+const babelConfig = require('./babel.config.base')
 
 const {skipGlobal, globalEntrypoints} = require('./getUserConfig')
 const CWD = process.cwd()
@@ -87,6 +88,7 @@ module.exports = function (config) {
 
 			resolve: {
 				modules: utils.alsoResolveRelativeToThisPackage(),
+				extensions: ['.js', '.jsx'],
 			},
 			resolveLoader: {
 				modules: utils.alsoResolveRelativeToThisPackage(),
@@ -125,9 +127,17 @@ module.exports = function (config) {
 						// finally read the source maps so that error messages
 						// and stack traces from test code shows the correct
 						// line numbers.
-						test: /\.js$/,
+						test: /\.jsx?$/,
 						use: ['source-map-loader'],
 						enforce: 'pre',
+					},
+					{
+						test: /\.jsx?$/,
+						use: [{loader: 'babel-loader', options: babelConfig}],
+					},
+					{
+						test: /\.(png|jpe?g|gif|svg|obj|mtl|gltf|ya?ml)$/,
+						use: [{loader: 'file-loader'}],
 					},
 				],
 			},
@@ -166,7 +176,10 @@ module.exports = function (config) {
 						{pattern: 'dist/global*.js', watched: false},
 						{pattern: 'dist/global/*.js', watched: false},
 				  ]
-				: [{pattern: 'dist/**/*.test.js', watched: false}]),
+				: [
+						{pattern: 'dist/**/*.test.js', watched: false},
+						{pattern: 'dist/**/*.test.jsx', watched: false},
+				  ]),
 		],
 
 		exclude: testGlobals ? [] : ['dist/global.test.js', 'dist/global/*.test.js'],
