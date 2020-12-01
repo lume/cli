@@ -158,6 +158,22 @@ module.exports = function (config) {
 						  }
 						: {}),
 				}),
+
+				// This is needed because if Webpack fails to build test code,
+				// Karma still keeps running, and exits with code 0 instead of
+				// non-zero, making it seem that everything passed.
+				// https://github.com/ryanclark/karma-webpack/issues/66
+				new (class ExitOnErrorWebpackPlugin {
+					apply(compiler) {
+						compiler.hooks.done.tap('ExitOnErrorWebpackPlugin', stats => {
+							if (stats && stats.hasErrors()) {
+								// Exit in the next microtask, so that Webpack
+								// has a chance to write error output to stderr.
+								Promise.resolve().then(() => process.exit(1))
+							}
+						})
+					}
+				})(),
 			],
 		},
 

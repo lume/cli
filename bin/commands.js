@@ -260,7 +260,7 @@ async function spawnWithEnv(cmd, env) {
 		})
 
 		child.on('close', exitCode => {
-			if (exitCode > 0) process.exit(exitCode)
+			if (exitCode !== 0) process.exit(exitCode)
 			resolve()
 		})
 
