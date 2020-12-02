@@ -186,6 +186,9 @@ module.exports = function (config) {
 			// https://github.com/twolfson/karma-electron/issues/44.
 			path.resolve(__dirname, 'karma-augment-node-path.js'),
 
+			// Polyfill for `globalThis`
+			path.resolve(__dirname, 'karma-globalThis.js'),
+
 			// Include all the test files *after* augment-node-path.js.
 			...(testGlobals
 				? [
