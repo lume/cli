@@ -14,6 +14,8 @@
 		"url": "https://github.com/lume/cli/issues"
 	},
 	"scripts": {
+		"build": "npm rebuild",
+		"// ^ build": "Sometimes an npm rebuild is needed in order to make sure electron binaries are up to date. This will make lerna bootstrap run it just in case.",
 		"release:patch": "npm version patch --message 'v%s' && npm publish && git push --follow-tags",
 		"release:minor": "npm version minor --message 'v%s' && npm publish && git push --follow-tags",
 		"release:major": "npm version major --message 'v%s' && npm publish && git push --follow-tags"
@@ -23,14 +25,14 @@
 		"@babel/core": "7.11.6",
 		"@babel/plugin-proposal-class-properties": "7.10.4",
 		"@babel/plugin-proposal-decorators": "7.10.5",
-		"@babel/plugin-proposal-nullish-coalescing-operator": "^7.10.4",
-		"@babel/plugin-proposal-optional-chaining": "^7.11.0",
-		"@babel/preset-typescript": "7.10.4",
+		"@babel/plugin-proposal-nullish-coalescing-operator": "7.10.4",
+		"@babel/plugin-proposal-optional-chaining": "7.11.0",
+		"@babel/preset-typescript": "7.12.7",
 		"@babel/runtime": "7.11.2",
 		"@types/jasmine": "^3.3.13",
 		"@zoltu/typescript-transformer-append-js-extension": "^1.0.1",
-		"babel-loader": "^8.2.2",
-		"babel-preset-solid": "0.22.0",
+		"babel-loader": "8.2.2",
+		"babel-preset-solid": "0.23.0",
 		"chalk": "^3.0.0",
 		"electron": "^2.0.0",
 		"figlet": "^1.2.0",
