@@ -26,7 +26,9 @@ async function clean() {
 	const rmrf = require('rimraf')
 	const {promisify} = require('util')
 
-	await promisify(rmrf)('dist')
+	await spawnWithEnv('tsc --build --clean')
+
+	await Promise.all([promisify(rmrf)('dist'), promisify(rmrf)('tsconfig.tsbuildinfo')])
 }
 
 exports.dev = dev
@@ -65,11 +67,16 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined} = {}) {
 			return false
 		}
 
+		const {tsProjectReferenceMode} = require('../config/getUserConfig')
+
 		// The use of tsConfig2 here is namely to test @lume/element and
 		// @lume/variable decorators with TypeScript useDefineForClassFields
 		// true and false to ensure they work in both cases.
-		if (tsConfig2) await spawnWithEnv('tsc -p ./tsconfig2.json')
-		else await spawnWithEnv('tsc -p ./tsconfig.json')
+		let file = 'tsconfig.json'
+		if (tsConfig2) file = 'tsconfig2.json'
+
+		if (tsProjectReferenceMode) await spawnWithEnv('tsc --build --incremental ' + file)
+		else await spawnWithEnv('tsc -p ./' + file)
 	} else {
 		// This is used while testing with all the possible Babel decorator
 		// configs (namely for @lume/element and @lume/variable).

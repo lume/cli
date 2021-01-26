@@ -17,6 +17,7 @@ if (!userConfigExists) {
  *   globalName?: string | false
  *   globalEntrypoints?: string[]
  *   testWithAllTSAndBabelDecoratorBuildConfigurations?: boolean
+ *   tsProjectReferenceMode?: boolean
  * }}
  */
 const userConfig = userConfigExists ? require(userConfigPath) : {}

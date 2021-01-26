@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// TODO: Move to something better documented. I literally have no clue how to read options with Sywac.
+
 const cli = require('sywac')
 const commands = require('./commands')
 
@@ -12,6 +14,8 @@ function chalk() {
 
 cli.version('-v, --version')
 cli.help('-h, --help')
+
+cli.boolean('--verbose', {desc: 'Show verbose output.'})
 
 const {clean} = commands
 cli.command('clean', {desc: 'Remove all build outputs.', run: clean})
@@ -128,8 +132,7 @@ cli.style({
 cli.showHelpByDefault()
 
 async function main() {
-	// await cli.parse(process.argv)
-	await cli.parseAndExit()
+	const argv = await cli.parseAndExit()
 }
 
 main()
