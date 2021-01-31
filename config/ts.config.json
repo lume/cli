@@ -38,6 +38,7 @@
 
 		"pretty": true,
 		"declaration": true,
+		"declarationMap": true,
 		"noEmitOnError": false,
 		"sourceMap": true,
 		"removeComments": true,
