@@ -18,6 +18,7 @@ if (!userConfigExists) {
  *   globalEntrypoints?: string[]
  *   testWithAllTSAndBabelDecoratorBuildConfigurations?: boolean
  *   tsProjectReferenceMode?: boolean
+ *   figletFont?: string
  * }}
  */
 const userConfig = userConfigExists ? require(userConfigPath) : {}
