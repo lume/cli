@@ -121,7 +121,7 @@ async function test() {
 	// test the code with all TypeScript and Babel decorator configs.
 	const {testWithAllTSAndBabelDecoratorBuildConfigurations} = require('../config/getUserConfig')
 
-	await build()
+	await Promise.all([build(), prettierCheck()])
 
 	if (testWithAllTSAndBabelDecoratorBuildConfigurations) {
 		let builtTs = false
