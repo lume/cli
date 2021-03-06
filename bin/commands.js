@@ -209,9 +209,13 @@ async function postVersionHook() {
 	await spawnWithEnv('./node_modules/@lume/cli/scripts/postversion.sh')
 }
 
+// TODO Prefer the user's .prettierignore if it is present.
 const prettierConfig = '--config ./node_modules/@lume/cli/.prettierrc.js'
+// TODO Prefer the user's .prettierignore if it is present.
 const prettierIgnore = '--ignore-path ./node_modules/@lume/cli/.prettierignore'
-const prettierFiles = './**/*.{js,json,ts,tsx,md}'
+// Check formatting of all supported file types in the project.
+// TODO allow user to override this.
+const prettierFiles = './'
 
 exports.prettier = prettier
 async function prettier() {
@@ -248,14 +252,19 @@ const execOptions = {
 
 /**
  * @param {string} cmd
- * @param {{[k:string]: string}} [env]
+ * @param {{[k:string]: string} | undefined} env - Variables to set in the child process env.
+ * @param {{exitOnFail?: boolean} | undefined} options - Options. If
+ * .exitOnFail is not true (true is default), then the process that called
+ * spawnWithEnv will exit if the spawned child process exits non-zero.
  */
-async function spawnWithEnv(cmd, env) {
+async function spawnWithEnv(cmd, env = {}, options = {}) {
+	const {exitOnFail = true} = options
+
 	let parts = cmd.trim().split(/\s+/)
 	const bin = parts.shift()
 	const {spawn} = require('child_process')
 
-	await new Promise(resolve => {
+	await new Promise((resolve, reject) => {
 		const child = spawn(bin, parts, {...execOptions, env: {...execOptions.env, ...env}})
 
 		child.stdout.on('data', data => {
@@ -267,7 +276,10 @@ async function spawnWithEnv(cmd, env) {
 		})
 
 		child.on('close', exitCode => {
-			if (exitCode !== 0) process.exit(exitCode)
+			if (exitCode !== 0) {
+				if (exitOnFail) process.exit(exitCode)
+				else reject(exitCode)
+			}
 			resolve()
 		})
 
