@@ -178,7 +178,7 @@ async function testDebug() {
 
 exports.releasePre = releasePre
 async function releasePre() {
-	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'release:pre.sh'))
+	await spawnWithEnv(path.resolve(__dirname, '..', 'scripts', 'release-pre.sh'))
 }
 
 exports.releasePatch = releasePatch
