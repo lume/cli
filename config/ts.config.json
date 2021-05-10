@@ -26,6 +26,7 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"forceConsistentCasingInFileNames": true,
+		// "noImplicitOverride": true, // TODO, many type errors will result (f.e. in the lume package)
 
 		// Language feature options
 		"experimentalDecorators": true,
