@@ -89,6 +89,42 @@ cli.command('releaseMajor', {
 	run: releaseMajor,
 })
 
+const {releaseAlphaMajor} = commands
+cli.command('releaseAlphaMajor', {
+	desc: 'Release an alpha major version. Calls the same npm hooks as `npm version`.',
+	run: releaseAlphaMajor,
+})
+
+const {releaseAlphaMinor} = commands
+cli.command('releaseAlphaMinor', {
+	desc: 'Release an alpha minor version. Calls the same npm hooks as `npm version`.',
+	run: releaseAlphaMinor,
+})
+
+const {releaseAlphaPatch} = commands
+cli.command('releaseAlphaPatch', {
+	desc: 'Release an alpha patch version. Calls the same npm hooks as `npm version`.',
+	run: releaseAlphaPatch,
+})
+
+const {releaseBetaMajor} = commands
+cli.command('releaseBetaMajor', {
+	desc: 'Release a beta major version. Calls the same npm hooks as `npm version`.',
+	run: releaseBetaMajor,
+})
+
+const {releaseBetaMinor} = commands
+cli.command('releaseBetaMinor', {
+	desc: 'Release a beta minor version. Calls the same npm hooks as `npm version`.',
+	run: releaseBetaMinor,
+})
+
+const {releaseBetaPatch} = commands
+cli.command('releaseBetaPatch', {
+	desc: 'Release a beta patch version. Calls the same npm hooks as `npm version`.',
+	run: releaseBetaPatch,
+})
+
 const {versionHook} = commands
 cli.command('versionHook', {
 	desc: 'Your package.json "version" script should run this. Used by "npm version".',

@@ -110,9 +110,7 @@ async function buildGlobal() {
 
 exports.buildGlobalWatch = buildGlobalWatch
 async function buildGlobalWatch() {
-	await spawnWithEnv(
-		`webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} --watch`,
-	)
+	await spawnWithEnv(`webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} --watch`)
 }
 
 exports.test = test
@@ -197,6 +195,42 @@ exports.releaseMajor = releaseMajor
 async function releaseMajor() {
 	await releasePre()
 	await spawnWithEnv('npm version major -m v%s')
+}
+
+exports.releaseAlphaMajor = releaseAlphaMajor
+async function releaseAlphaMajor() {
+	await releasePre()
+	await spawnWithEnv('npm version premajor --preid alpha -m v%s')
+}
+
+exports.releaseAlphaMinor = releaseAlphaMinor
+async function releaseAlphaMinor() {
+	await releasePre()
+	await spawnWithEnv('npm version preminor --preid alpha -m v%s')
+}
+
+exports.releaseAlphaPatch = releaseAlphaPatch
+async function releaseAlphaPatch() {
+	await releasePre()
+	await spawnWithEnv('npm version prepatch --preid alpha -m v%s')
+}
+
+exports.releaseBetaMajor = releaseBetaMajor
+async function releaseBetaMajor() {
+	await releasePre()
+	await spawnWithEnv('npm version premajor --preid beta -m v%s')
+}
+
+exports.releaseBetaMinor = releaseBetaMinor
+async function releaseBetaMinor() {
+	await releasePre()
+	await spawnWithEnv('npm version preminor --preid beta -m v%s')
+}
+
+exports.releaseBetaPatch = releaseBetaPatch
+async function releaseBetaPatch() {
+	await releasePre()
+	await spawnWithEnv('npm version prepatch --preid beta -m v%s')
 }
 
 exports.versionHook = versionHook
