@@ -1,177 +1,134 @@
 #!/usr/bin/env node
+// @ts-check
 
 // TODO: Move to something better documented. I literally have no clue how to read options with Sywac.
 
-const cli = require('sywac')
+const commander = require('commander')
 const commands = require('./commands')
+const {version} = require('../package.json')
 
-let c
-function chalk() {
-	// lazily load chalk, only used if help text displayed
-	if (!c) c = require('chalk')
-	return c
-}
+const cli = commander.createCommand()
 
-cli.version('-v, --version')
-cli.help('-h, --help')
+globalThis.cli = cli
 
-cli.boolean('--verbose', {desc: 'Show verbose output.'})
+cli.version(version, '-v, --version')
+cli.helpOption('-h, --help')
 
-const {clean} = commands
-cli.command('clean', {desc: 'Remove all build outputs.', run: clean})
+cli.option('-V, --verbose', 'Show verbose output.')
 
-const {build} = commands
-cli.command('build', {desc: 'Build the project in which this command is being ran.', run: build})
+cli.command('clean').description('Remove all build outputs.').action(commands.clean)
 
-const {dev} = commands
-cli.command('dev', {desc: 'Run the project in watch mode where file changes trigger automatic rebuilds.', run: dev})
+cli.command('build').description('Build the project in which this command is being ran.').action(commands.build)
 
-const {copyAssets} = commands
-cli.command('copyAssets', {
-	desc: 'Copy any assets from src/ into dist/, mirroring the same folder structure in dist/ as in src/.',
-	run: copyAssets,
-})
+cli
+	.command('dev')
+	.description('Run the project in watch mode where file changes trigger automatic rebuilds.')
+	.action(commands.dev)
 
-const {buildTs} = commands
-cli.command('buildTs', {desc: 'Build only TypeScript sources.', run: buildTs})
+cli
+	.command('copyAssets')
+	.description('Copy any assets from src/ into dist/, mirroring the same folder structure in dist/ as in src/.')
+	.action(commands.copyAssets)
 
-const {buildGlobal} = commands
-cli.command('buildGlobal', {
-	desc: 'Build the global version of the project for simple usage with browser script tags.',
-	run: buildGlobal,
-})
+cli
+	.command('buildTs')
+	.description('Build only TypeScript sources.')
+	.action(async () => {
+		await commands.buildTs()
+	})
 
-const {buildGlobalWatch} = commands
-cli.command('buildGlobalWatch', {
-	desc: 'Build the global version of the project in watch mode any time files change.',
-	run: buildGlobalWatch,
-})
+cli
+	.command('buildGlobal')
+	.description('Build the global version of the project for simple usage with browser script tags.')
+	.action(commands.buildGlobal)
 
-const {showName} = commands
-cli.command('showName', {dec: 'Output the project name to console.', run: showName})
+cli
+	.command('buildGlobalWatch')
+	.description('Build the global version of the project in watch mode any time files change.')
+	.action(commands.buildGlobalWatch)
 
-const {typecheck} = commands
-cli.command('typecheck', {
-	desc: 'Run a typecheck of TypeScript source code without compiling output.',
-	run: typecheck,
-})
+cli.command('showName').description('Output the project name to console.').action(commands.showName)
 
-const {typecheckWatch} = commands
-cli.command('typecheckWatch', {
-	desc: 'Run a typecheck of TypeScript source code without compiling output, in watch mode.',
-	run: typecheckWatch,
-})
+cli
+	.command('typecheck')
+	.description('Run a typecheck of TypeScript source code without compiling output.')
+	.action(commands.typecheck)
 
-const {test} = commands
-cli.command('test', {desc: 'Run tests.', run: test})
+cli
+	.command('typecheckWatch')
+	.description('Run a typecheck of TypeScript source code without compiling output, in watch mode.')
+	.action(commands.typecheckWatch)
 
-const {testDebug} = commands
-cli.command('testDebug', {desc: 'Run tests with GUI debugger.', run: testDebug})
+cli.command('test').description('Run tests.').action(commands.test)
 
-const {releasePre} = commands
-cli.command('releasePre', {desc: 'Run pre-release stuff like stashing changes and running tests.', run: releasePre})
+cli.command('testDebug').description('Run tests with GUI debugger.').action(commands.testDebug)
 
-const {releasePatch} = commands
-cli.command('releasePatch', {
-	desc: 'Release a patch version. Calls the same scripts as `npm version`.',
-	run: releasePatch,
-})
+cli
+	.command('releasePre')
+	.description('Run pre-release stuff like stashing changes and running tests.')
+	.action(commands.releasePre)
 
-const {releaseMinor} = commands
-cli.command('releaseMinor', {
-	desc: 'Release a minor version. Calls the same scripts as `npm version`.',
-	run: releaseMinor,
-})
+cli
+	.command('releasePatch')
+	.description('Release a patch version. Calls the same scripts as `npm version`.')
+	.action(commands.releasePatch)
 
-const {releaseMajor} = commands
-cli.command('releaseMajor', {
-	desc: 'Release a major version. Calls the same scripts as `npm version`.',
-	run: releaseMajor,
-})
+cli
+	.command('releaseMinor')
+	.description('Release a minor version. Calls the same scripts as `npm version`.')
+	.action(commands.releaseMinor)
 
-const {releaseAlphaMajor} = commands
-cli.command('releaseAlphaMajor', {
-	desc: 'Release an alpha major version. Calls the same npm hooks as `npm version`.',
-	run: releaseAlphaMajor,
-})
+cli
+	.command('releaseMajor')
+	.description('Release a major version. Calls the same scripts as `npm version`.')
+	.action(commands.releaseMajor)
 
-const {releaseAlphaMinor} = commands
-cli.command('releaseAlphaMinor', {
-	desc: 'Release an alpha minor version. Calls the same npm hooks as `npm version`.',
-	run: releaseAlphaMinor,
-})
+cli
+	.command('releaseAlphaMajor')
+	.description('Release an alpha major version. Calls the same npm hooks as `npm version`.')
+	.action(commands.releaseAlphaMajor)
 
-const {releaseAlphaPatch} = commands
-cli.command('releaseAlphaPatch', {
-	desc: 'Release an alpha patch version. Calls the same npm hooks as `npm version`.',
-	run: releaseAlphaPatch,
-})
+cli
+	.command('releaseAlphaMinor')
+	.description('Release an alpha minor version. Calls the same npm hooks as `npm version`.')
+	.action(commands.releaseAlphaMinor)
 
-const {releaseBetaMajor} = commands
-cli.command('releaseBetaMajor', {
-	desc: 'Release a beta major version. Calls the same npm hooks as `npm version`.',
-	run: releaseBetaMajor,
-})
+cli
+	.command('releaseAlphaPatch')
+	.description('Release an alpha patch version. Calls the same npm hooks as `npm version`.')
+	.action(commands.releaseAlphaPatch)
 
-const {releaseBetaMinor} = commands
-cli.command('releaseBetaMinor', {
-	desc: 'Release a beta minor version. Calls the same npm hooks as `npm version`.',
-	run: releaseBetaMinor,
-})
+cli
+	.command('releaseBetaMajor')
+	.description('Release a beta major version. Calls the same npm hooks as `npm version`.')
+	.action(commands.releaseBetaMajor)
 
-const {releaseBetaPatch} = commands
-cli.command('releaseBetaPatch', {
-	desc: 'Release a beta patch version. Calls the same npm hooks as `npm version`.',
-	run: releaseBetaPatch,
-})
+cli
+	.command('releaseBetaMinor')
+	.description('Release a beta minor version. Calls the same npm hooks as `npm version`.')
+	.action(commands.releaseBetaMinor)
 
-const {versionHook} = commands
-cli.command('versionHook', {
-	desc: 'Your package.json "version" script should run this. Used by "npm version".',
-	run: versionHook,
-})
+cli
+	.command('releaseBetaPatch')
+	.description('Release a beta patch version. Calls the same npm hooks as `npm version`.')
+	.action(commands.releaseBetaPatch)
 
-const {postVersionHook} = commands
-cli.command('postVersionHook', {
-	desc: 'Your package.json "postversion" script should run this. Used by "npm version".',
-	run: postVersionHook,
-})
+cli
+	.command('versionHook')
+	.description('Your package.json "version" script should run this. Used by "npm version".')
+	.action(commands.versionHook)
 
-const {prettier} = commands
-cli.command('prettier', {desc: 'Format the code base with Prettier.', run: prettier})
+cli
+	.command('postVersionHook')
+	.description('Your package.json "postversion" script should run this. Used by "npm version".')
+	.action(commands.postVersionHook)
 
-const {prettierCheck} = commands
-cli.command('prettierCheck', {
-	desc: 'List which files would be formatted by Prettier. Exits non-zero if files need to be formatted.',
-	run: prettierCheck,
-})
+cli.command('prettier').description('Format the code base with Prettier.').action(commands.prettier)
 
-// General example os Sywac with colored help text: https://github.com/sywac/sywac/issues/46
-cli.style({
-	usagePrefix: str => chalk().yellow(str.slice(0, 6)) + ' ' + chalk().bold(str.slice(7)),
-	usageCommandPlaceholder: str => chalk().bold(str),
-	usagePositionals: str => chalk().bold(str),
-	usageArgsPlaceholder: str => chalk().bold(str),
-	usageOptionsPlaceholder: str => chalk().bold(str),
-	group: str => chalk().yellow(str),
-	flags: str => chalk().bold(str),
-	desc: str => chalk().cyan(str),
-	hints: str => chalk().gray.dim(str),
-	groupError: str => chalk().red.bold(str),
-	flagsError: str => chalk().red.bold(str),
-	descError: str => chalk().red.bold(str),
-	hintsError: str => chalk().red(str),
-	messages: str => chalk().red.bold(str), // these are error messages
-})
-
-// display help unless a command with "run" method is called
-cli.showHelpByDefault()
-
-async function main() {
-	const argv = await cli.parseAndExit()
-}
-
-main()
+cli
+	.command('prettierCheck')
+	.description('List which files would be formatted by Prettier. Exits non-zero if files need to be formatted.')
+	.action(commands.prettierCheck)
 
 // Make sure the process exits with a non-zero exit code on unhandle promise
 // rejections. This won't be necessary in an upcoming release of Node.js, in
@@ -190,3 +147,9 @@ process.on('SIGINT', () => {
 	console.log('\nInterrupted. Exiting.\n')
 	process.exit(130) // 130 is the standard exit code for interruptions.
 })
+
+async function main() {
+	cli.parse()
+}
+
+main()
