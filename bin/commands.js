@@ -249,7 +249,7 @@ const prettierConfig = '--config ./node_modules/@lume/cli/.prettierrc.js'
 const prettierIgnore = '--ignore-path ./node_modules/@lume/cli/.prettierignore'
 // Check formatting of all supported file types in the project.
 // TODO allow user to override this.
-const prettierFiles = './'
+const prettierFiles = process.cwd()
 
 exports.prettier = prettier
 async function prettier() {
