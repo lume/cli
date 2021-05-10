@@ -7,7 +7,7 @@ const commander = require('commander')
 const commands = require('./commands')
 const {version} = require('../package.json')
 
-const cli = commander.createCommand()
+const cli = new commander.Command()
 
 globalThis.cli = cli
 

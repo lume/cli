@@ -2,9 +2,13 @@
 const path = require('path')
 const fs = require('fs')
 
+function verbose() {
+	return cli.opts().verbose
+}
+
 exports.build = build
 async function build({skipClean = false} = {}) {
-	if (cli.opts().verbose) console.log(`===> Running the "build" command.\n`)
+	if (verbose()) console.log(`===> Running the "build" command.\n`)
 
 	await Promise.all([
 		showName(),
@@ -23,12 +27,13 @@ async function build({skipClean = false} = {}) {
 		})(),
 	])
 
-	if (cli.opts().verbose) console.log(`===> Done running the "build" command.\n`)
+	if (verbose()) console.log(`===> Done running the "build" command.\n`)
 }
 
 exports.clean = clean
 async function clean() {
-	if (cli.opts().verbose) console.log(`===> Running the "clean" command.\n`)
+	if (verbose()) console.log(`===> Running the "clean" command.\n`)
+
 	const rmrf = require('rimraf')
 	const {promisify} = require('util')
 
@@ -36,12 +41,12 @@ async function clean() {
 
 	await Promise.all([promisify(rmrf)('dist'), promisify(rmrf)('tsconfig.tsbuildinfo')])
 
-	if (cli.opts().verbose) console.log(`===> Done running the "clean" command.\n`)
+	if (verbose()) console.log(`===> Done running the "clean" command.\n`)
 }
 
 exports.dev = dev
 async function dev() {
-	if (cli.opts().verbose) console.log(`===> Running the "dev" command.\n`)
+	if (verbose()) console.log(`===> Running the "dev" command.\n`)
 
 	// Skip cleaning in dev mode, makes things easier like not breaking an
 	// active type check process or webpack build.
@@ -54,7 +59,7 @@ async function dev() {
 
 	await Promise.all(promises)
 
-	if (cli.opts().verbose) console.log(`===> Done running the "dev" command.\n`)
+	if (verbose()) console.log(`===> Done running the "dev" command.\n`)
 }
 
 const {showName} = require('../scripts/name.js')
@@ -62,14 +67,14 @@ exports.showName = showName
 
 exports.copyAssets = copyAssets
 async function copyAssets() {
-	if (cli.opts().verbose) console.log(`===> Running the "copyAssets" command.\n`)
+	if (verbose()) console.log(`===> Running the "copyAssets" command.\n`)
 	await spawnWithEnv(`gulp --cwd ${process.cwd()} --gulpfile ./node_modules/@lume/cli/config/gulpfile.js copyAssets`)
-	if (cli.opts().verbose) console.log(`===> Done running the "copyAssets" command.\n`)
+	if (verbose()) console.log(`===> Done running the "copyAssets" command.\n`)
 }
 
 exports.buildTs = buildTs
 async function buildTs({babelConfig = undefined, tsConfig2 = undefined} = {}) {
-	if (cli.opts().verbose) console.log(`===> Running the "buildTs" command.\n`)
+	if (verbose()) console.log(`===> Running the "buildTs" command.\n`)
 
 	const fs = require('fs')
 
@@ -81,7 +86,7 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined} = {}) {
 		} catch (e) {
 			console.log('No tsconfig file found. Skipping TypeScript build.')
 
-			if (cli.opts().verbose) console.log(`===> Done running the "buildTs" command.\n`)
+			if (verbose()) console.log(`===> Done running the "buildTs" command.\n`)
 
 			// Don't try to run TypeScript build if no tsconfig.json file is present.
 			return false
@@ -97,19 +102,19 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined} = {}) {
 
 		const command = tsProjectReferenceMode ? 'tsc --build --incremental ' + file : 'tsc -p ./' + file
 
-		if (cli.opts().verbose) console.log(`=====> Running \`${command}\`.\n`)
+		if (verbose()) console.log(`=====> Running \`${command}\`.\n`)
 		await spawnWithEnv(command)
 	} else {
 		const command = `babel --config-file ${babelConfig} --extensions .ts,.tsx src --out-dir ./dist`
 
-		if (cli.opts().verbose) console.log(`=====> Running \`${command}\`.\n`)
+		if (verbose()) console.log(`=====> Running \`${command}\`.\n`)
 
 		// This is used while testing with all the possible Babel decorator
 		// configs (namely for @lume/element and @lume/variable).
 		await spawnWithEnv(command)
 	}
 
-	if (cli.opts().verbose) console.log(`===> Done running the "buildTs" command.\n`)
+	if (verbose()) console.log(`===> Done running the "buildTs" command.\n`)
 
 	return true
 }
@@ -118,75 +123,75 @@ exports.watchTs = watchTs
 async function watchTs() {
 	const command = `tsc -p ./tsconfig.json --watch`
 
-	if (cli.opts().verbose) {
+	if (verbose()) {
 		console.log(`===> Running the "watchTs" command.\n`)
 		console.log(`=====> Running \`${command}\`.\n`)
 	}
 
 	await spawnWithEnv(command)
 
-	if (cli.opts().verbose) console.log(`===> Done running the "watchTs" command.\n`)
+	if (verbose()) console.log(`===> Done running the "watchTs" command.\n`)
 }
 
 exports.typecheck = typecheck
 async function typecheck() {
 	const command = 'tsc -p ./tsconfig.json --noEmit'
 
-	if (cli.opts().verbose) {
+	if (verbose()) {
 		console.log(`===> Running the "typecheck" command.\n`)
 		console.log(`=====> Running \`${command}\`\n`)
 	}
 
 	await spawnWithEnv(command)
 
-	if (cli.opts().verbose) console.log(`===> Done running the "typecheck" command.\n`)
+	if (verbose()) console.log(`===> Done running the "typecheck" command.\n`)
 }
 
 exports.typecheckWatch = typecheckWatch
 async function typecheckWatch() {
 	const command = 'tsc -p ./tsconfig.json --noEmit --watch'
 
-	if (cli.opts().verbose) {
+	if (verbose()) {
 		console.log(`===> Running the "typecheckWatch" command.\n`)
 		console.log(`=====> Running \`${command}\`\n`)
 	}
 
 	await spawnWithEnv(command)
 
-	if (cli.opts().verbose) console.log(`===> Done running the "typecheckWatch" command.\n`)
+	if (verbose()) console.log(`===> Done running the "typecheckWatch" command.\n`)
 }
 
 exports.buildGlobal = buildGlobal
 async function buildGlobal() {
 	const command = `webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')}`
 
-	if (cli.opts().verbose) {
+	if (verbose()) {
 		console.log(`===> Running the "buildGlobal" command.\n`)
 		console.log(`=====> Running \`${command}\`\n`)
 	}
 
 	await spawnWithEnv(command)
 
-	if (cli.opts().verbose) console.log(`===> Done running the "buildGlobal" command.\n`)
+	if (verbose()) console.log(`===> Done running the "buildGlobal" command.\n`)
 }
 
 exports.buildGlobalWatch = buildGlobalWatch
 async function buildGlobalWatch() {
 	const command = `webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} --watch`
 
-	if (cli.opts().verbose) {
+	if (verbose()) {
 		console.log(`===> Running the "buildGlobalWatch" command.\n`)
 		console.log(`=====> Running \`${command}\`\n`)
 	}
 
 	await spawnWithEnv(command)
 
-	if (cli.opts().verbose) console.log(`===> Done running the "buildGlobalWatch" command.\n`)
+	if (verbose()) console.log(`===> Done running the "buildGlobalWatch" command.\n`)
 }
 
 exports.test = test
 async function test() {
-	if (cli.opts().verbose) console.log(`===> Running the "test" command.\n`)
+	if (verbose()) console.log(`===> Running the "test" command.\n`)
 
 	// This option was made mainly with @lume/variable and @lume/element, to
 	// test the code with all TypeScript and Babel decorator configs.
@@ -234,12 +239,12 @@ async function test() {
 
 	await spawnWithEnv(karmaCommand)
 
-	if (cli.opts().verbose) console.log(`===> Done running the "test" command.\n`)
+	if (verbose()) console.log(`===> Done running the "test" command.\n`)
 }
 
 exports.testDebug = testDebug
 async function testDebug() {
-	if (cli.opts().verbose) console.log(`===> Running the "testDebug" command.\n`)
+	if (verbose()) console.log(`===> Running the "testDebug" command.\n`)
 
 	const [builtTs] = await Promise.all([buildTs(), showName()])
 
@@ -250,102 +255,102 @@ async function testDebug() {
 
 	await spawnWithEnv(karmaCommand, {KARMA_DEBUG: 'true'})
 
-	if (cli.opts().verbose) console.log(`===> Done running the "testDebug" command.\n`)
+	if (verbose()) console.log(`===> Done running the "testDebug" command.\n`)
 }
 
 exports.releasePre = releasePre
 async function releasePre() {
-	if (cli.opts().verbose) console.log(`===> Running the "releasePre" command.\n`)
+	if (verbose()) console.log(`===> Running the "releasePre" command.\n`)
 	const command = path.resolve(__dirname, '..', 'scripts', 'release-pre.sh')
-	if (cli.opts().verbose) console.log(`=====> Running \`${command}\`.\n`)
+	if (verbose()) console.log(`=====> Running \`${command}\`.\n`)
 	await spawnWithEnv(command)
-	if (cli.opts().verbose) console.log(`===> Done running the "releasePre" command.\n`)
+	if (verbose()) console.log(`===> Done running the "releasePre" command.\n`)
 }
 
 exports.releasePatch = releasePatch
 async function releasePatch() {
-	if (cli.opts().verbose) console.log(`===> Running the "releasePatch" command.\n`)
+	if (verbose()) console.log(`===> Running the "releasePatch" command.\n`)
 	await releasePre()
 	await spawnWithEnv('npm version patch -m v%s')
-	if (cli.opts().verbose) console.log(`===> Done running the "releasePatch" command.\n`)
+	if (verbose()) console.log(`===> Done running the "releasePatch" command.\n`)
 }
 
 exports.releaseMinor = releaseMinor
 async function releaseMinor() {
-	if (cli.opts().verbose) console.log(`===> Running the "releaseMinor" command.\n`)
+	if (verbose()) console.log(`===> Running the "releaseMinor" command.\n`)
 	await releasePre()
 	await spawnWithEnv('npm version minor -m v%s')
-	if (cli.opts().verbose) console.log(`===> Done running the "releaseMinor" command.\n`)
+	if (verbose()) console.log(`===> Done running the "releaseMinor" command.\n`)
 }
 
 exports.releaseMajor = releaseMajor
 async function releaseMajor() {
-	if (cli.opts().verbose) console.log(`===> Running the "releaseMajor" command.\n`)
+	if (verbose()) console.log(`===> Running the "releaseMajor" command.\n`)
 	await releasePre()
 	await spawnWithEnv('npm version major -m v%s')
-	if (cli.opts().verbose) console.log(`===> Done running the "releaseMajor" command.\n`)
+	if (verbose()) console.log(`===> Done running the "releaseMajor" command.\n`)
 }
 
 exports.releaseAlphaMajor = releaseAlphaMajor
 async function releaseAlphaMajor() {
-	if (cli.opts().verbose) console.log(`===> Running the "releaseAlphaMajor" command.\n`)
+	if (verbose()) console.log(`===> Running the "releaseAlphaMajor" command.\n`)
 	await releasePre()
 	await spawnWithEnv('npm version premajor --preid alpha -m v%s')
-	if (cli.opts().verbose) console.log(`===> Done running the "releaseAlphaMajor" command.\n`)
+	if (verbose()) console.log(`===> Done running the "releaseAlphaMajor" command.\n`)
 }
 
 exports.releaseAlphaMinor = releaseAlphaMinor
 async function releaseAlphaMinor() {
-	if (cli.opts().verbose) console.log(`===> Running the "releaseAlphaMinor" command.\n`)
+	if (verbose()) console.log(`===> Running the "releaseAlphaMinor" command.\n`)
 	await releasePre()
 	await spawnWithEnv('npm version preminor --preid alpha -m v%s')
-	if (cli.opts().verbose) console.log(`===> Done running the "releaseAlphaMinor" command.\n`)
+	if (verbose()) console.log(`===> Done running the "releaseAlphaMinor" command.\n`)
 }
 
 exports.releaseAlphaPatch = releaseAlphaPatch
 async function releaseAlphaPatch() {
-	if (cli.opts().verbose) console.log(`===> Running the "releaseAlphaPatch" command.\n`)
+	if (verbose()) console.log(`===> Running the "releaseAlphaPatch" command.\n`)
 	await releasePre()
 	await spawnWithEnv('npm version prepatch --preid alpha -m v%s')
-	if (cli.opts().verbose) console.log(`===> Done running the "releaseAlphaPatch" command.\n`)
+	if (verbose()) console.log(`===> Done running the "releaseAlphaPatch" command.\n`)
 }
 
 exports.releaseBetaMajor = releaseBetaMajor
 async function releaseBetaMajor() {
-	if (cli.opts().verbose) console.log(`===> Running the "releaseBetaMajor" command.\n`)
+	if (verbose()) console.log(`===> Running the "releaseBetaMajor" command.\n`)
 	await releasePre()
 	await spawnWithEnv('npm version premajor --preid beta -m v%s')
-	if (cli.opts().verbose) console.log(`===> Done running the "releaseBetaMajor" command.\n`)
+	if (verbose()) console.log(`===> Done running the "releaseBetaMajor" command.\n`)
 }
 
 exports.releaseBetaMinor = releaseBetaMinor
 async function releaseBetaMinor() {
-	if (cli.opts().verbose) console.log(`===> Running the "releaseBetaMinor" command.\n`)
+	if (verbose()) console.log(`===> Running the "releaseBetaMinor" command.\n`)
 	await releasePre()
 	await spawnWithEnv('npm version preminor --preid beta -m v%s')
-	if (cli.opts().verbose) console.log(`===> Done running the "releaseBetaMinor" command.\n`)
+	if (verbose()) console.log(`===> Done running the "releaseBetaMinor" command.\n`)
 }
 
 exports.releaseBetaPatch = releaseBetaPatch
 async function releaseBetaPatch() {
-	if (cli.opts().verbose) console.log(`===> Running the "releaseBetaPatch" command.\n`)
+	if (verbose()) console.log(`===> Running the "releaseBetaPatch" command.\n`)
 	await releasePre()
 	await spawnWithEnv('npm version prepatch --preid beta -m v%s')
-	if (cli.opts().verbose) console.log(`===> Done running the "releaseBetaPatch" command.\n`)
+	if (verbose()) console.log(`===> Done running the "releaseBetaPatch" command.\n`)
 }
 
 exports.versionHook = versionHook
 async function versionHook() {
-	if (cli.opts().verbose) console.log(`===> Running the "versionHook" command.\n`)
+	if (verbose()) console.log(`===> Running the "versionHook" command.\n`)
 	await spawnWithEnv('./node_modules/@lume/cli/scripts/version.sh')
-	if (cli.opts().verbose) console.log(`===> Done running the "versionHook" command.\n`)
+	if (verbose()) console.log(`===> Done running the "versionHook" command.\n`)
 }
 
 exports.postVersionHook = postVersionHook
 async function postVersionHook() {
-	if (cli.opts().verbose) console.log(`===> Running the "postVersionHook" command.\n`)
+	if (verbose()) console.log(`===> Running the "postVersionHook" command.\n`)
 	await spawnWithEnv('./node_modules/@lume/cli/scripts/postversion.sh')
-	if (cli.opts().verbose) console.log(`===> Done running the "postVersionHook" command.\n`)
+	if (verbose()) console.log(`===> Done running the "postVersionHook" command.\n`)
 }
 
 const prettierConfig =
@@ -364,20 +369,20 @@ const prettierFiles = process.cwd()
 
 exports.prettier = prettier
 async function prettier() {
-	if (cli.opts().verbose) console.log(`===> Running the "prettier" command.\n`)
+	if (verbose()) console.log(`===> Running the "prettier" command.\n`)
 	const command = `prettier ${prettierConfig} ${prettierIgnore} --write ${prettierFiles}`
-	if (cli.opts().verbose) console.log(`=====> Running \`${command}\`\n`)
+	if (verbose()) console.log(`=====> Running \`${command}\`\n`)
 	await spawnWithEnv(command)
-	if (cli.opts().verbose) console.log(`===> Done running the "prettier" command.\n`)
+	if (verbose()) console.log(`===> Done running the "prettier" command.\n`)
 }
 
 exports.prettierCheck = prettierCheck
 async function prettierCheck() {
-	if (cli.opts().verbose) console.log(`===> Running the "prettierCheck" command.\n`)
+	if (verbose()) console.log(`===> Running the "prettierCheck" command.\n`)
 	const command = `prettier ${prettierConfig} ${prettierIgnore} --check ${prettierFiles}`
-	if (cli.opts().verbose) console.log(`=====> Running \`${command}\`\n`)
+	if (verbose()) console.log(`=====> Running \`${command}\`\n`)
 	await spawnWithEnv(command)
-	if (cli.opts().verbose) console.log(`===> Done running the "prettierCheck" command.\n`)
+	if (verbose()) console.log(`===> Done running the "prettierCheck" command.\n`)
 }
 
 const execOptions = {
