@@ -1,7 +1,7 @@
 set -e
 echo '--- POSTVERSION --------------------'
 echo ' -- Publish to NPM...'
-# TODO a way for projects to specify --access
+# TODO a way for projects to specify --access, lume/cli #16
 npm publish --access public
 echo ' -- Push to GitHub...'
 git push --follow-tags
