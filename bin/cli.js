@@ -114,6 +114,20 @@ cli
 	.action(commands.releaseBetaPatch)
 
 cli
+	.command('releaseAlpha')
+	.description(
+		'Release an alpha pre-release version bump, f.e. v1.2.3-alpha.1 to v1.2.3-alpha.2. Calls the same npm hooks as `npm version`.',
+	)
+	.action(commands.releaseBetaPatch)
+
+cli
+	.command('releaseBeta')
+	.description(
+		'Release a beta pre-release version bump, f.e. v1.2.3-beta.1 to v1.2.3-beta.2. Calls the same npm hooks as `npm version`.',
+	)
+	.action(commands.releaseBetaPatch)
+
+cli
 	.command('versionHook')
 	.description('Your package.json "version" script should run this. Used by "npm version".')
 	.action(commands.versionHook)

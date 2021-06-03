@@ -347,6 +347,22 @@ async function releaseBetaPatch() {
 	if (verbose()) console.log(`===> Done running the "releaseBetaPatch" command.\n`)
 }
 
+exports.releaseAlpha = releaseAlpha
+async function releaseAlpha() {
+	if (verbose()) console.log(`===> Running the "releaseAlpha" command.\n`)
+	await releasePre()
+	await exec('npm version prerelease --preid alpha -m v%s')
+	if (verbose()) console.log(`===> Done running the "releaseAlpha" command.\n`)
+}
+
+exports.releaseBeta = releaseBeta
+async function releaseBeta() {
+	if (verbose()) console.log(`===> Running the "releaseBeta" command.\n`)
+	await releasePre()
+	await exec('npm version prerelease --preid beta -m v%s')
+	if (verbose()) console.log(`===> Done running the "releaseBeta" command.\n`)
+}
+
 exports.versionHook = versionHook
 async function versionHook() {
 	if (verbose()) console.log(`===> Running the "versionHook" command.\n`)
