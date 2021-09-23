@@ -52,6 +52,69 @@ module.exports = function (config) {
 
 		basePath: CWD,
 
+		// The order of items in this array matters!
+		files: [
+			// Include the augment-node-path.js file first, which includes a
+			// snippet of code that forces NODE_PATH to include the project's
+			// node_modules folder even when karma-eletron in symlinked into the
+			// project. See
+			// https://github.com/twolfson/karma-electron/issues/44.
+			path.resolve(__dirname, 'karma-augment-node-path.js'),
+
+			// Polyfill for `globalThis`
+			path.resolve(__dirname, 'karma-globalThis.js'),
+
+			// When in mocha+chai mode, this proxies jasmine expect syntax
+			// (f.e. expect().toBe()) to chai expect syntax (f.e.
+			// expect().to.be()).
+			...(testSpecFormat === 'jasmine' ? [] : [require.resolve('chai-jasmine/chai-jasmine.js')]),
+
+			// Finally include all the test files after all of the above.
+			// They should all have watched:false while we are using karma-webpack.
+			...(testGlobals
+				? [
+						{pattern: 'dist/global*.js', watched: false},
+						{pattern: 'dist/global/*.js', watched: false},
+				  ]
+				: [
+						{pattern: 'dist/**/*.test.js', watched: false},
+						{pattern: 'dist/**/*.test.jsx', watched: false},
+				  ]),
+		],
+
+		exclude: testGlobals ? [] : ['dist/global.test.js', 'dist/global/*.test.js'],
+
+		// The augment-node-path.js file does not need to be included here,
+		// because it imports only the built-in 'module' module, and otherwise
+		// does not benefit from the electron or webpack preprocessors.
+		preprocessors: {
+			'dist/**/*.test.js': ['electron', 'webpack', 'sourcemap'],
+		},
+
+		client: {
+			...(testSpecFormat === 'jasmine'
+				? {
+						jasmine: {
+							// During debug mode, set the async test timeout to something
+							// high, otherwise if a timeout happens while debugging
+							// then before/after hooks can fire mid-test and cause
+							// confusion.
+							timeoutInterval: debugAsyncTestTimeout,
+						},
+				  }
+				: {
+						mocha: {
+							// Similar to the timeoutInterval for Jasmine.
+							timeout: debugAsyncTestTimeout,
+						},
+				  }),
+
+			useIframe: false,
+
+			// This is a karma-electron option.
+			loadScriptsViaRequire: true,
+		},
+
 		// Set up a "CustomElectron" launcher that extends karma-electron's
 		// default "Electron" launcher, so that we can control options
 		// (docs: // https://github.com/twolfson/karma-electron/tree/5.1.1#launcher-configuration)
@@ -192,69 +255,6 @@ module.exports = function (config) {
 					}
 				})(),
 			],
-		},
-
-		// The order of items in this array matters!
-		files: [
-			// Include the augment-node-path.js file first, which includes a
-			// snippet of code that forces NODE_PATH to include the project's
-			// node_modules folder even when karma-eletron in symlinked into the
-			// project. See
-			// https://github.com/twolfson/karma-electron/issues/44.
-			path.resolve(__dirname, 'karma-augment-node-path.js'),
-
-			// Polyfill for `globalThis`
-			path.resolve(__dirname, 'karma-globalThis.js'),
-
-			// When in mocha+chai mode, this proxies jasmine expect syntax
-			// (f.e. expect().toBe()) to chai expect syntax (f.e.
-			// expect().to.be()).
-			...(testSpecFormat === 'jasmine' ? [] : [require.resolve('chai-jasmine/chai-jasmine.js')]),
-
-			// Finally include all the test files after all of the above.
-			// They should all have watched:false while we are using karma-webpack.
-			...(testGlobals
-				? [
-						{pattern: 'dist/global*.js', watched: false},
-						{pattern: 'dist/global/*.js', watched: false},
-				  ]
-				: [
-						{pattern: 'dist/**/*.test.js', watched: false},
-						{pattern: 'dist/**/*.test.jsx', watched: false},
-				  ]),
-		],
-
-		exclude: testGlobals ? [] : ['dist/global.test.js', 'dist/global/*.test.js'],
-
-		// The augment-node-path.js file does not need to be included here,
-		// because it imports only the built-in 'module' module, and otherwise
-		// does not benefit from the electron or webpack preprocessors.
-		preprocessors: {
-			'dist/**/*.test.js': ['electron', 'webpack', 'sourcemap'],
-		},
-
-		client: {
-			...(testSpecFormat === 'jasmine'
-				? {
-						jasmine: {
-							// During debug mode, set the async test timeout to something
-							// high, otherwise if a timeout happens while debugging
-							// then before/after hooks can fire mid-test and cause
-							// confusion.
-							timeoutInterval: debugAsyncTestTimeout,
-						},
-				  }
-				: {
-						mocha: {
-							// Similar to the timeoutInterval for Jasmine.
-							timeout: debugAsyncTestTimeout,
-						},
-				  }),
-
-			useIframe: false,
-
-			// This is a karma-electron option.
-			loadScriptsViaRequire: true,
 		},
 	})
 }
