@@ -2,7 +2,6 @@
 const camelcase = require('camelcase')
 const path = require('path')
 const utils = require('./utils')
-const LastCallWebpackPlugin = require('last-call-webpack-plugin')
 
 const CWD = process.cwd()
 const pkg = require(path.join(CWD, 'package.json'))
@@ -30,12 +29,15 @@ if (
 
 const baseConfig = {
 	output: {
-		// The conditional checks of `NAME` cause Webpack to either not assign
-		// entrypoint exports to any variable if NAME is empty, or to otherwise
-		// assign exports to the variable with name NAME.
-		library: NAME || '',
-		// If `libraryTarget` is 'var' and `library` empty, then no assignment happens.
-		libraryTarget: NAME ? 'assign' : 'var',
+		library: NAME
+			? {
+					name: NAME,
+					type: 'assign-properties',
+			  }
+			: {
+					name: '__IGNORE_THIS_PLACEHOLDER_VARIABLE__',
+					type: 'var',
+			  },
 	},
 	resolve: {
 		modules: utils.alsoResolveRelativeToThisPackage(),
@@ -74,30 +76,6 @@ const baseConfig = {
 	stats: {
 		assets: false, // shows all output assets
 	},
-	plugins: [
-		// This plugin allows us to modify output source before it is finalized.
-		new LastCallWebpackPlugin({
-			assetProcessors: [
-				// This adds code to the top of the output bundles, which allows
-				// us to create the LUME global object if it doesn't exist yet,
-				// so that each bundle will assign its exports to it instead of
-				// overriding it.
-				{
-					regExp: /\.js$/,
-					processor: async (assetName, asset) => /* js */ `
-                        if (!('${NAME}' in window)) {
-                            __${NAME}__ = window.__${NAME}__ || {}
-                            Object.defineProperty(window, '${NAME}', {
-                                get() { return __${NAME}__ },
-                                set(val) { Object.assign(__${NAME}__, val) },
-                            });
-                        }
-                        ${asset.source()}
-                    `,
-				},
-			],
-		}),
-	],
 }
 
 if (skipGlobal && !(entrypoints && entrypoints.length)) {

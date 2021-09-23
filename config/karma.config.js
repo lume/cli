@@ -4,24 +4,48 @@ const utils = require('./utils')
 const webpack = require('webpack')
 const babelConfig = require('./babel.config.base')
 
-const {skipGlobal, globalEntrypoints} = require('./getUserConfig')
+const {skipGlobal, globalEntrypoints, testSpecFormat = 'jasmine'} = require('./getUserConfig')
 const CWD = process.cwd()
-const debugMode = !!(process.env.KARMA_DEBUG && process.env.KARMA_DEBUG !== 'false')
+const isDebugMode = !!(process.env.KARMA_DEBUG && process.env.KARMA_DEBUG !== 'false')
 const skipGlobalBuild = skipGlobal && !(globalEntrypoints && globalEntrypoints.length)
-const testGlobals = !!(process.env.TEST_GLOBALS && process.env.TEST_GLOBALS !== 'false' && !skipGlobalBuild)
+const testGlobals = !!(!skipGlobalBuild && process.env.TEST_GLOBALS && process.env.TEST_GLOBALS !== 'false')
+
+// 1 week, which still fits in an i32 as needed for setTimeout's second arg
+// Note, if the value is larger than fits in an i32, Jasmine will prematurely
+// timeout on async tests as if the timeout is 0.
+// https://github.com/jasmine/jasmine/issues/1930
+const debugAsyncTestTimeout = 1210000000
 
 // TODO, once Electron supports native Node ES Modules, then we should remove
 // all the Webpack stuff from here and loade ES Modules natively.
 
 module.exports = function (config) {
 	config.set({
-		frameworks: ['jasmine', 'stacktrace'],
-		reporters: ['spec'],
+		frameworks: [
+			...(testSpecFormat === 'jasmine' ? ['jasmine'] : ['mocha', 'chai']),
+
+			// TODO stacktrace doesn't work with latest Karma, but without it
+			// stack traces can be harder to debug.
+			// https://github.com/sergei-startsev/karma-stacktrace/issues/10
+			// 'stacktrace',
+
+			'webpack',
+		],
+
+		...(testSpecFormat === 'jasmine'
+			? {
+					reporters: ['spec'],
+			  }
+			: {
+					reporters: ['mocha'],
+					mochaReporter: {showDiff: true},
+			  }),
+
 		port: 9876, // karma web server port
 		colors: true,
 		logLevel: config.LOG_INFO,
 		autoWatch: false,
-		singleRun: debugMode ? false : true,
+		singleRun: isDebugMode ? false : true,
 		concurrency: Infinity,
 		// Exit with exit code zero if there are no tests to run. Makes testing opt-in.
 		failOnEmptyTestSuite: false,
@@ -36,30 +60,26 @@ module.exports = function (config) {
 			CustomElectron: {
 				base: 'Electron',
 
-				flags: debugMode
+				flags: isDebugMode
 					? [
-							// If in debug mode, this makes the electron window visible
-							// so that we can step through tests using Chromium devtools
-							//
-							// TODO, when we upgrade to a newer version of
-							// karma-electron, we'll need to use the "show"
-							// option in browserWindowOptions instead.
-							'--show',
-
-							// Alternatively to the --show option, we can use this
+							// Alternatively to the `browserWindowOptions.show` option, we can use this
 							// option, then open chrome://inspect in Google Chrome and
 							// inspect from there.
 							// '--remote-debugging-port=9222',
 					  ]
 					: [],
 
-				// TODO, When we upgrade to a newer version of karma-electron,
-				// we'll need to explicitly enable Node integration with these options.
-				// browserWindowOptions: {
-				// 	nodeIntegration: true,
-				// 	nodeIntegrationInWorker: true,
-				// 	nodeIntegrationInSubFrames: true,
-				// },
+				browserWindowOptions: {
+					// Open the window for debugging with devtools in debug mode.
+					show: isDebugMode ? true : false,
+
+					webPreferences: {
+						nodeIntegration: true,
+						nodeIntegrationInWorker: true,
+						nodeIntegrationInSubFrames: true,
+						contextIsolation: false,
+					},
+				},
 			},
 		},
 
@@ -117,7 +137,8 @@ module.exports = function (config) {
 			],
 
 			module: {
-				// TODO Add rule to compile Solid JSX with Babel.
+				// TODO Add a rule to compile Solid JSX with Babel. Until then,
+				// lume/cli consumers use Solid's html template tag only.
 				rules: [
 					{
 						// The source-map-loader tells Webpack to load source
@@ -142,12 +163,8 @@ module.exports = function (config) {
 				],
 			},
 
-			// do not shim node globals like 'process', otherwise the result of
-			// things like `process.cwd()` will be '/' instead of the actual
-			// working directory.
-			// TODO set this to 'false' only if a new user config option "node"
-			// is set to true. We may have to see how this works once we upgrade
-			// to native ESM when Electron supports that.
+			// Do not shim Node globals like '__dirname' or `__filename`. Use
+			// import.meta instead, which is standard in both web and Node.
 			node: false,
 
 			plugins: [
@@ -189,7 +206,13 @@ module.exports = function (config) {
 			// Polyfill for `globalThis`
 			path.resolve(__dirname, 'karma-globalThis.js'),
 
-			// Include all the test files *after* augment-node-path.js.
+			// When in mocha+chai mode, this proxies jasmine expect syntax
+			// (f.e. expect().toBe()) to chai expect syntax (f.e.
+			// expect().to.be()).
+			...(testSpecFormat === 'jasmine' ? [] : [require.resolve('chai-jasmine/chai-jasmine.js')]),
+
+			// Finally include all the test files after all of the above.
+			// They should all have watched:false while we are using karma-webpack.
 			...(testGlobals
 				? [
 						{pattern: 'dist/global*.js', watched: false},
@@ -210,13 +233,28 @@ module.exports = function (config) {
 			'dist/**/*.test.js': ['electron', 'webpack', 'sourcemap'],
 		},
 
-		client: debugMode
-			? {}
-			: {
-					// Prevent a "require is not defined" error in
-					// karma-electron
-					useIframe: false,
-					loadScriptsViaRequire: true,
-			  },
+		client: {
+			...(testSpecFormat === 'jasmine'
+				? {
+						jasmine: {
+							// During debug mode, set the async test timeout to something
+							// high, otherwise if a timeout happens while debugging
+							// then before/after hooks can fire mid-test and cause
+							// confusion.
+							timeoutInterval: debugAsyncTestTimeout,
+						},
+				  }
+				: {
+						mocha: {
+							// Similar to the timeoutInterval for Jasmine.
+							timeout: debugAsyncTestTimeout,
+						},
+				  }),
+
+			useIframe: false,
+
+			// This is a karma-electron option.
+			loadScriptsViaRequire: true,
+		},
 	})
 }

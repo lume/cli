@@ -12,15 +12,18 @@ if (!userConfigExists) {
 }
 
 /**
- * @type {{
+ * @typedef {{
  *   skipGlobal?: boolean
  *   globalName?: string | false
  *   globalEntrypoints?: string[]
  *   testWithAllTSAndBabelDecoratorBuildConfigurations?: boolean
  *   tsProjectReferenceMode?: boolean
  *   figletFont?: string
- * }}
+ *   testSpecFormat?: 'jasmine' | 'mochachai'
+ * }} UserConfig
  */
+
+/** @type {UserConfig} */
 const userConfig = userConfigExists ? require(userConfigPath) : {}
 
 module.exports = userConfig

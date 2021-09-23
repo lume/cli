@@ -205,6 +205,9 @@ async function test() {
 	// test the code with all TypeScript and Babel decorator configs.
 	const {testWithAllTSAndBabelDecoratorBuildConfigurations} = require('../config/getUserConfig')
 
+	// FIXME This is a mess, but it works: the build() step here runs
+	// buildTs(), but then we also redundantly run buildTs() here after.
+
 	await Promise.all([build(), prettierCheck()])
 
 	const karmaCommand = path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh')
@@ -239,7 +242,6 @@ async function test() {
 		await exec(karmaCommand)
 	}
 
-	// we don't need to build the global for testing, so it isn't being ran here. TODO Maybe we should test that too?
 	const builtTs = await buildTs()
 
 	// TODO if sources found, but no test files, also skip instead of error.
