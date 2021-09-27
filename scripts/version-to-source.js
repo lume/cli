@@ -30,6 +30,8 @@ if (!data) {
 }
 
 const lines = data.trim().split('\n')
+
+// TODO this is fragile. Prefer to modify a version.ts file instead that the user can explicitly put in the project to opt in.
 lines.pop() // delete last line
 
 lines.push(`export const version = '${version}'`)
