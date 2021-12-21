@@ -38,6 +38,9 @@ const baseConfig = {
 					name: '__IGNORE_THIS_PLACEHOLDER_VARIABLE__',
 					type: 'var',
 			  },
+
+		// Leaving the default hash function in Webpack 5 causes Webpack to crash with Node 17+.
+		hashFunction: 'xxhash64',
 	},
 	resolve: {
 		modules: utils.alsoResolveRelativeToThisPackage(),
