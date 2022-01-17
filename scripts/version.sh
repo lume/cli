@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 set -e
 echo '--- VERSION --------------------'
 echo ' -- Add version to source...'
