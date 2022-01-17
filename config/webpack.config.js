@@ -1,4 +1,8 @@
 // @ts-check
+
+// We use Webpack only to bundle the global scripts.
+// Source files are built using the buildTs command in commands.js.
+
 const camelcase = require('camelcase')
 const path = require('path')
 const utils = require('./utils')

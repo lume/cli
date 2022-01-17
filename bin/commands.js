@@ -76,8 +76,11 @@ exports.buildTs = buildTs
 async function buildTs({babelConfig = undefined, tsConfig2 = undefined} = {}) {
 	if (verbose()) console.log(`===> Running the "buildTs" command.\n`)
 
+	const start = performance.now()
 	const fs = require('fs')
 
+	// If babelConfig is not undefined, it means we're building using babel for testing decorator configs.
+	// TODO we need to use babel to compile JSX expressions.
 	if (!babelConfig) {
 		try {
 			// TODO If there's no user tsconfig fall back to cli's tsconfig. We
@@ -116,7 +119,9 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined} = {}) {
 		await exec(command)
 	}
 
-	if (verbose()) console.log(`===> Done running the "buildTs" command.\n`)
+	const end = performance.now()
+
+	if (verbose()) console.log(`===> Done running the "buildTs" command. (${Math.round(end - start)}ms) \n`)
 
 	return true
 }
