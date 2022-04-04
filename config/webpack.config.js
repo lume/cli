@@ -31,6 +31,7 @@ if (
 	DEV = true
 }
 
+/** @type {import('webpack').Configuration} */
 const baseConfig = {
 	output: {
 		library: NAME
@@ -48,6 +49,10 @@ const baseConfig = {
 	},
 	resolve: {
 		modules: utils.alsoResolveRelativeToThisPackage(),
+
+		alias: {
+			'solid-js': path.join(CWD, 'node_modules', 'solid-js')
+		},
 
 		// for now only bundle JS files
 		// TODO add a separate step for Babel after TypeScript (f.e. for JSX
@@ -71,10 +76,8 @@ const baseConfig = {
 		],
 	},
 	devtool: DEV ? 'source-map' : 'source-map',
-	// mode: DEV ? 'development' : 'production',
-	mode: 'production',
+	mode: DEV ? 'development' : 'production',
 	optimization: {
-		minimize: DEV ? false : true,
 		// default is false in dev, true in prod, but let's keep them the same
 		// so we can detect the same errors in both environments because module
 		// concantenation can change code meaning sometimes.
