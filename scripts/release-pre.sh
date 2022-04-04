@@ -23,8 +23,7 @@ npm run clean
 echo ' -- Run tests...'
 npm test
 
-# add one more time in case the build (ran by npm test) has inconsistent output
-# that might causes artifact to change each time.
-git add .
+# undo any changes in case test build output is non-deterministic
+git checkout .
 
 echo '--- PREVERSION DONE --------------------'
