@@ -11,7 +11,7 @@ const CWD = process.cwd()
 const pkg = require(path.join(CWD, 'package.json'))
 const userLumeConfig = require('./getUserConfig')
 
-const {globalEntrypoints: entrypoints, skipGlobal, globalName} = userLumeConfig
+const {globalEntrypoints, skipGlobal, globalName} = userLumeConfig
 
 // split by '/' in case a name is scoped, f.e. `@awaitbox/document-ready`
 const pkgNameParts = pkg.name.split('/')
@@ -51,7 +51,7 @@ const baseConfig = {
 		modules: utils.alsoResolveRelativeToThisPackage(),
 
 		alias: {
-			'solid-js': path.join(CWD, 'node_modules', 'solid-js')
+			'solid-js': path.join(CWD, 'node_modules', 'solid-js'),
 		},
 
 		// for now only bundle JS files
@@ -88,11 +88,12 @@ const baseConfig = {
 	},
 }
 
-if (skipGlobal && !(entrypoints && entrypoints.length)) {
+if (skipGlobal && !(globalEntrypoints && globalEntrypoints.length)) {
 	console.log('No global scripts to build, skipping.')
 	process.exit(0)
 }
 
+/** @type {import('webpack').Configuration[]} */
 const configs = []
 
 // Keep backwards compat with the old global build based on src/index.ts.
@@ -111,8 +112,8 @@ if (!skipGlobal) {
 }
 
 // This is the new way: the cli user specifies one or more entry points.
-if (entrypoints && entrypoints.length) {
-	entrypoints.forEach(fileNameWithoutExtension => {
+if (globalEntrypoints && globalEntrypoints.length) {
+	globalEntrypoints.forEach(fileNameWithoutExtension => {
 		configs.push({
 			...baseConfig,
 			entry: `./dist/${fileNameWithoutExtension}`,
@@ -129,5 +130,7 @@ if (!configs.length) {
 	console.log('No global scripts to build, skipping.')
 	process.exit(0)
 }
+
+userLumeConfig.webpackConfigs?.(configs)
 
 module.exports = configs

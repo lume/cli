@@ -16,6 +16,7 @@ if (!userConfigExists) {
  *   skipGlobal?: boolean
  *   globalName?: string | false
  *   globalEntrypoints?: string[]
+ *   webpackConfigs?: (configs: import('webpack').Configuration[]) => void
  *   testWithAllTSAndBabelDecoratorBuildConfigurations?: boolean
  *   tsProjectReferenceMode?: boolean
  *   figletFont?: string

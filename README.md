@@ -14,36 +14,36 @@ NOTE! This is designed with Node.js native ES Modules (ESM) in mind.
 The following is a brief overview of LUME cli's features. For more details,
 see `lume --help`.
 
--   Build a project's [TypeScript](https://www.typescriptlang.org) source code
-    from its `src/` folder to a `dist/` output folder.
-    -   The output code is in standard ES Module format.
--   Ability to bundle a project's output code into `dist/global.js` for use in
-    browser script tags.
-    -   The `dist/global.js` file assings the exports of the project entrypoint
-        onto a global object with the same name as the project, but camelCased, and
-        without the package scope. For example, a package named
-        `@foo/something-useful` would result in a global variable named
-        `somethingUseful` containing the package exports.
-    -   Allows for multiple global entry points to be specified (outputs multiple
-        global scripts for use with script tags in `dist/global/`). See config
-        options below.
--   Formats all code in a project with [`prettier`](https://prettier.io).
--   Run a project's tests (any files ending with `.test.ts` in the project's src/ folder).
-    -   Tests use [Jasmine](https://jasmine.github.io)'s `describe()`/`it()` functions for describing unit tests.
-    -   Tests run in Karma with karma-electron, so all tests have access to
-        Node.js, Electron, and Chrome Browser APIs.
-    -   If global scripts were built, it allows for testing those separately to
-        ensure global builds works like with regularly-imported code.
--   Publish a project to NPM.
+- Build a project's [TypeScript](https://www.typescriptlang.org) source code
+  from its `src/` folder to a `dist/` output folder.
+  - The output code is in standard ES Module format.
+- Ability to bundle a project's output code into `dist/global.js` for use in
+  browser script tags.
+  - The `dist/global.js` file assings the exports of the project entrypoint
+    onto a global object with the same name as the project, but camelCased, and
+    without the package scope. For example, a package named
+    `@foo/something-useful` would result in a global variable named
+    `somethingUseful` containing the package exports.
+  - Allows for multiple global entry points to be specified (outputs multiple
+    global scripts for use with script tags in `dist/global/`). See config
+    options below.
+- Formats all code in a project with [`prettier`](https://prettier.io).
+- Run a project's tests (any files ending with `.test.ts` in the project's src/ folder).
+  - Tests use [Jasmine](https://jasmine.github.io)'s `describe()`/`it()` functions for describing unit tests.
+  - Tests run in Karma with karma-electron, so all tests have access to
+    Node.js, Electron, and Chrome Browser APIs.
+  - If global scripts were built, it allows for testing those separately to
+    ensure global builds works like with regularly-imported code.
+- Publish a project to NPM.
 
 ## Future Features
 
--   Specify configuration overrides (Webpack options, Karma
-    options, etc).
--   Scaffold LUME-based applications.
--   Scaffold LUME elements.
--   Scaffold generic TypeScript packages.
--   Support plain JavaScript, not just TypeScript.
+- Specify configuration overrides (Webpack options, Karma
+  options, etc).
+- Scaffold LUME-based applications.
+- Scaffold LUME elements.
+- Scaffold generic TypeScript packages.
+- Support plain JavaScript, not just TypeScript.
 
 ## Projects using LUME CLI
 
@@ -67,13 +67,13 @@ formatting, and publishing packages.
 
 ## Requirements
 
--   A Unix-like OS (not tested in Windows).
--   Node v12.4+ or v13.2+ (might work with lower versions, not tested)
--   NPM v5+ (might work with lower versions, not tested)
--   If you don't have a graphical display (f.e. in Linux without a desktop on a
-    continuous integration server) install xvfb for tests to run headlessly
-    without issues - see
-    https://github.com/electron/electron/blob/v1.4.10/docs/tutorial/testing-on-headless-ci.md
+- A Unix-like OS (not tested in Windows).
+- Node v12.4+ or v13.2+ (might work with lower versions, not tested)
+- NPM v5+ (might work with lower versions, not tested)
+- If you don't have a graphical display (f.e. in Linux without a desktop on a
+  continuous integration server) install xvfb for tests to run headlessly
+  without issues - see
+  https://github.com/electron/electron/blob/v1.4.10/docs/tutorial/testing-on-headless-ci.md
 
 ## Getting Started
 
@@ -308,28 +308,28 @@ we'll want to run to manage the life cycle of our project. For sake of
 simplicity, the following examples assume that `lume` was installed globally
 as per the "Global Install" option above.
 
--   `lume test`
-    -   Run tests (all `.test.ts` files).
-    -   Exits with a non-zero error code if any test fails
-    -   If there are any `dist/global.test.js` or `dist/global/*.test.js`
-        files, they will be ran in a separate test run. This allows for testing
-        the global build of a package independently.
--   `lume dev`
-    -   "dev" for "development mode"
-    -   Builds all code, and rebuilds it automatically if any file changes.
-    -   This is useful while developing a project, so that any time we edit
-        files, the project will automatically rebuild.
--   `lume build`
-    -   Does a production build, and does not watch for file changes.
-    -   Generally you don't need to run this unless you need to debug production
-        code, which isn't common but sometimes there can be issues with
-        minification.
--   `lume releasePatch`, `lume releaseMinor`, `lume releaseMajor`
-    -   Updates the version of the project in `package.json` and `src/index.ts`.
-    -   Publishes the project to NPM under the new version number only if build
-        and tests pass. It basically runs `lume build` and `lume test`
-        internally.
-    -   Pushes the a version commit and tag to the remote git repo.
+- `lume test`
+  - Run tests (all `.test.ts` files).
+  - Exits with a non-zero error code if any test fails
+  - If there are any `dist/global.test.js` or `dist/global/*.test.js`
+    files, they will be ran in a separate test run. This allows for testing
+    the global build of a package independently.
+- `lume dev`
+  - "dev" for "development mode"
+  - Builds all code, and rebuilds it automatically if any file changes.
+  - This is useful while developing a project, so that any time we edit
+    files, the project will automatically rebuild.
+- `lume build`
+  - Does a production build, and does not watch for file changes.
+  - Generally you don't need to run this unless you need to debug production
+    code, which isn't common but sometimes there can be issues with
+    minification.
+- `lume releasePatch`, `lume releaseMinor`, `lume releaseMajor`
+  - Updates the version of the project in `package.json` and `src/index.ts`.
+  - Publishes the project to NPM under the new version number only if build
+    and tests pass. It basically runs `lume build` and `lume test`
+    internally.
+  - Pushes the a version commit and tag to the remote git repo.
 
 For more commands and details, run `lume --help`.
 
@@ -380,6 +380,13 @@ module.exports = {
 	// Default: []
 	globalEntrypoints: ['one', 'two'],
 
+	// If provided, this will be called with the final array of Webpack configs
+	// that the cli created, providing an opportunity to make custom
+	// modifications to the webpack configs on top of what the cli already made.
+	webpackConfigs(configs) {
+		// modify configs
+	},
+
 	// Run all tests 6 times instead of just once, each time using one of the
 	// six possible TypeScript and Babel decorator configurations. Packages that
 	// export decorators should set this to true to ensure that the decorators
@@ -425,19 +432,19 @@ Set while iterating on them, etc).
 
 ## TODOs
 
--   [ ] Add support for JSX (specifically Solid JSX expressions which requires Babel).
--   [ ] Allow overriding of Webpack config.
--   [ ] Allow overriding of Babel config.
--   [x] Don't commit global.js (and its map) on version changes, we can tell people to get it from
-        unpkg, GitHub, and how to build it.
--   [ ] Output both a global.js and global.min.js
--   [x] Source maps! Important!
--   [x] Important! Don't run `git stash` during version script if there's nothing to stash,
-        otherwise it will pop a previous stash after `npm version` is done.
--   [ ] Ability to scaffold applications.
--   [ ] Ability to scaffold packages.
--   [x] Testing (added Karma)
--   [ ] Code coverage (Karma is in place, we just need to hook up a code coverage tool)
--   [ ] GitHub Actions configuration for scaffolded apps and packages.
--   [ ] Switch to a separate `src/version.ts` file for the version number
-        export. Skip updating it if it doesn't exist.
+- [ ] Add support for JSX (specifically Solid JSX expressions which requires Babel).
+- [ ] Allow overriding of Webpack config.
+- [ ] Allow overriding of Babel config.
+- [x] Don't commit global.js (and its map) on version changes, we can tell people to get it from
+      unpkg, GitHub, and how to build it.
+- [ ] Output both a global.js and global.min.js
+- [x] Source maps! Important!
+- [x] Important! Don't run `git stash` during version script if there's nothing to stash,
+      otherwise it will pop a previous stash after `npm version` is done.
+- [ ] Ability to scaffold applications.
+- [ ] Ability to scaffold packages.
+- [x] Testing (added Karma)
+- [ ] Code coverage (Karma is in place, we just need to hook up a code coverage tool)
+- [ ] GitHub Actions configuration for scaffolded apps and packages.
+- [ ] Switch to a separate `src/version.ts` file for the version number
+      export. Skip updating it if it doesn't exist.
