@@ -50,10 +50,6 @@ const baseConfig = {
 	resolve: {
 		modules: utils.alsoResolveRelativeToThisPackage(),
 
-		alias: {
-			'solid-js': path.join(CWD, 'node_modules', 'solid-js'),
-		},
-
 		// for now only bundle JS files
 		// TODO add a separate step for Babel after TypeScript (f.e. for JSX
 		// files). TS can handle only React-form of JSX, but we'll need Babel in
