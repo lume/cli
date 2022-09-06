@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 // @ts-check
 
-// TODO: Move to something better documented. I literally have no clue how to read options with Sywac.
-
 const commander = require('commander')
 const commands = require('./commands')
 const {version} = require('../package.json')
 
 const cli = new commander.Command()
 
-globalThis.cli = cli
+// globalThis.cli = cli
 
 cli.version(version, '-v, --version')
 cli.helpOption('-h, --help')
 
 cli.option('-V, --verbose', 'Show verbose output.')
+
+cli.option('--noFail', 'Prevent build commands from failing on non-zero exit codes.', false)
 
 cli.command('clean').description('Remove all build outputs.').action(commands.clean)
 
@@ -163,6 +163,10 @@ process.on('SIGINT', () => {
 })
 
 async function main() {
+	commands.setCli(cli)
+	commands.setOpts(cli.opts())
+
+	// runs command(s)
 	cli.parse()
 }
 
