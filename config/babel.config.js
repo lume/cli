@@ -1,9 +1,15 @@
 module.exports = {
+	// sourceMaps: 'both',
+	// ^ This option is both confusing and useless.
+	// https://github.com/babel/babel/issues/14943. Instead we use the CLI
+	// option --source-maps.
+
 	plugins: [
-		// Webpack doesn't understand this syntax yet.
-		['@babel/plugin-proposal-optional-chaining', {}],
-		['@babel/plugin-proposal-nullish-coalescing-operator', {}],
+		['@babel/plugin-transform-typescript', {allowDeclareFields: true}],
+		['@babel/plugin-proposal-decorators', {version: '2022-03'}],
+		['@babel/plugin-proposal-class-static-block'],
 	].map(p => [require.resolve(p[0]), p[1]]),
+
 	presets: [
 		['@babel/preset-typescript', {isTSX: true, allExtensions: true, onlyRemoveTypeImports: true}],
 		// TODO update to @lume/element/babel-preset, lume/cli issue #7, lume/lume issue #219

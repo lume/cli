@@ -366,7 +366,7 @@ module.exports = {
 	// has dashes).
 	//
 	// Default: undefined (uses the name of the package)
-	globalName: 'example', // A string, `false`, or `undefined`
+	globalName: 'FOO', // A string, `false`, or `undefined`
 
 	// This is an array of entrypoints that global builds will be made from, and
 	// the output bundles will be placed in `dist/global/`. These should
@@ -387,14 +387,43 @@ module.exports = {
 		// modify configs
 	},
 
-	// Run all tests 6 times instead of just once, each time using one of the
-	// six possible TypeScript and Babel decorator configurations. Packages that
-	// export decorators should set this to true to ensure that the decorators
-	// will work in every TS/Babel build configuration in which the code may be
-	// possibly imported.
+	// EXPERIMENTAL: If true, the TypeScript compilation will use
+	// Project Reference mode for gains and benefits.
 	//
 	// Default: false
-	testWithAllTSAndBabelDecoratorBuildConfigurations: true,
+	tsProjectReferenceMode: true,
+
+	// Name of the figlet (https://www.npmjs.com/package/figlet) font to use
+	// when printing the project name to console when running commands.
+	// Example:
+	//   _   _      _ _        __        __         _     _ _ _
+	//  | | | | ___| | | ___   \ \      / /__  _ __| | __| | | |
+	//  | |_| |/ _ \ | |/ _ \   \ \ /\ / / _ \| '__| |/ _` | | |
+	//  |  _  |  __/ | | (_) |   \ V  V / (_) | |  | | (_| |_|_|
+	//  |_| |_|\___|_|_|\___/     \_/\_/ \___/|_|  |_|\__,_(_|_)
+	//
+	// Default: 'ICL-1900'
+	figletFont: 'Ghost',
+
+	// Specify which test format test code is written in. Can be 'jasmine' or 'mochachai'.
+	//
+	// Default: 'jasmine'
+	testSpecFormat: 'mochachai',
+
+	// If true, transpile TypeScript code with Babel instead of TypeScript. The
+	// `tsc` command will be used only for type checking, while the actual code
+	// transpilation will be done with `babel`.
+	//
+	// This can be useful, for example, when TypeScript doesn't support a feature
+	// Babel does. For example, at the time of writing this, Babel had Stage 3
+	// decorators, while TypeScript did not.
+	//
+	// NOTE! If you do not use this option, the legacy version of decorators will
+	// be used. This option must be `true` if you wish to use the current
+	// decorator spec.
+	//
+	// Default: true
+	useBabelForTypeScript: false,
 }
 ```
 

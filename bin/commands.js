@@ -3,6 +3,10 @@ const path = require('path')
 const fs = require('fs')
 const {showName} = require('../scripts/name.js')
 
+const {useBabelForTypeScript = true, tsProjectReferenceMode = false} = require('../config/getUserConfig')
+
+const babelConfigPath = './node_modules/@lume/cli/config/babel.config.js'
+
 // TODO read CLI options from a project's lume.config too.
 
 let cli
@@ -61,6 +65,8 @@ async function dev() {
 
 	// Skip cleaning in dev mode, makes things easier like not breaking an
 	// active type check process or webpack build.
+	// TODO we only need to compile TS initially for the global, but not the
+	// global build, because global build is ran below in watch mode.
 	await build({skipClean: true, noFailOnError: true})
 
 	const promises = []
@@ -81,51 +87,57 @@ async function copyAssets() {
 }
 
 exports.buildTs = buildTs
-async function buildTs({babelConfig = undefined, tsConfig2 = undefined, noFailOnError = opts.noFail} = {}) {
+async function buildTs({noFailOnError = opts.noFail} = {}) {
 	if (opts.verbose) console.log(`===> Running the "buildTs" command.\n`)
 
 	const start = performance.now()
 	const fs = require('fs')
 
-	// If babelConfig is not undefined, it means we're building using babel for testing decorator configs.
-	// TODO we need to use babel to compile JSX expressions.
-	if (!babelConfig) {
-		try {
-			// TODO If there's no user tsconfig fall back to cli's tsconfig. We
-			// might need to temporarily write it to the project root.
-			await fs.promises.access(path.resolve(process.cwd(), 'tsconfig.json'))
-		} catch (e) {
-			console.log('No tsconfig file found. Skipping TypeScript build.')
+	// If no tsconfig, don't build.
+	// TODO If no tsconfig, we can at least still build in babel/typescript mode.
+	// Or perhaps, if there's no user tsconfig fall back to cli's tsconfig. We
+	// might need to temporarily write it to the project root.
+	try {
+		await fs.promises.access(path.resolve(process.cwd(), 'tsconfig.json'))
+	} catch (e) {
+		console.log('No tsconfig file found. Skipping TypeScript build.')
 
-			if (opts.verbose) console.log(`===> Done running the "buildTs" command.\n`)
+		if (opts.verbose) console.log(`===> Done running the "buildTs" command.\n`)
 
-			// Don't try to run TypeScript build if no tsconfig.json file is present.
-			return false
-		}
-
-		const {tsProjectReferenceMode} = require('../config/getUserConfig')
-
-		// The use of tsConfig2 here is namely to test @lume/element and
-		// @lume/variable decorators with TypeScript useDefineForClassFields
-		// true and false to ensure they work in both cases.
-		let file = 'tsconfig.json'
-		if (tsConfig2) file = 'tsconfig2.json'
-
-		const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
-		const command =
-			`tsc ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./${file} ${tsCliOptions ?? ''} ${noFailOnError ? '|| true' : ''}`
-
-		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
-		await exec(command)
-	} else {
-		const command = `babel --config-file ${babelConfig} --extensions .ts,.tsx src --out-dir ./dist`
-
-		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
-
-		// This is used while testing with all the possible Babel decorator
-		// configs (namely for @lume/element and @lume/variable).
-		await exec(command)
+		// Don't try to run TypeScript build if no tsconfig.json file is present.
+		return false
 	}
+
+	let promises = []
+
+	if (useBabelForTypeScript) {
+		// Build with Babel decorators stage 3
+
+		// TODO merge cli's Babel config with user's Babel config
+		// const {configPath, configExists} = require('../config/getUserBabelConfig')
+		// if (!configExists) throw new Error('useBabelForTypeScript was true, but no Babel config exists in the project.')
+
+		const command = `babel --source-maps --config-file ${babelConfigPath} --extensions .ts,.tsx src --out-dir ./dist`
+
+		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
+
+		promises.push(exec(command))
+	}
+
+	// Build with TypeScript (or only emit declaration files if building with Babel)
+
+	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
+
+	// TODO not sure if the --emitDeclarationOnly flag is in the correct place when tsProjectReferenceMode is enabled.
+	const command = `tsc ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./tsconfig.json ${
+		useBabelForTypeScript ? '--emitDeclarationOnly' : ''
+	} ${tsCliOptions ?? ''} ${noFailOnError ? '|| true' : ''}`
+
+	if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
+
+	promises.push(exec(command))
+
+	await Promise.all(promises)
 
 	const end = performance.now()
 
@@ -137,13 +149,44 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined, noFailOn
 // TODO Project Reference mode for watch mode?
 exports.watchTs = watchTs
 async function watchTs() {
-	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
-	const command = `tsc -p ./tsconfig.json --watch ${tsCliOptions ?? ''}`
+	if (opts.verbose) console.log(`===> Running the "watchTs" command.\n`)
 
-	if (opts.verbose) {
-		console.log(`===> Running the "watchTs" command.\n`)
-		console.log(`=====> Running \`${command}\`.\n`)
+	try {
+		// TODO If there's no user tsconfig fall back to cli's tsconfig. We
+		// might need to temporarily write it to the project root.
+		await fs.promises.access(path.resolve(process.cwd(), 'tsconfig.json'))
+	} catch (e) {
+		console.log('No tsconfig file found. Skipping TypeScript watch mode.')
+
+		if (opts.verbose) console.log(`===> Done running the "watchTs" command.\n`)
+
+		// Don't try to run TypeScript build if no tsconfig.json file is present.
+		return false
 	}
+
+	if (useBabelForTypeScript) {
+		// Build with Babel decorators stage 3
+
+		// TODO merge cli's Babel config with user's Babel config
+		// const {configPath, configExists} = require('../config/getUserBabelConfig')
+		// if (!configExists) throw new Error('useBabelForTypeScript was true, but no Babel config exists in the project.')
+
+		const command = `babel --source-maps --watch --config-file ${babelConfigPath} --extensions .ts,.tsx src --out-dir ./dist`
+
+		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
+
+		await exec(command)
+	}
+
+	// TODO does tsProjectReferenceMode for watch mode too?
+
+	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
+
+	const command = `tsc ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./tsconfig.json ${
+		useBabelForTypeScript ? '--emitDeclarationOnly' : ''
+	} --watch ${tsCliOptions ?? ''}`
+
+	if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
 
 	await exec(command)
 
@@ -154,6 +197,7 @@ async function watchTs() {
 exports.typecheck = typecheck
 async function typecheck() {
 	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
+	// TODO tsProjectReferenceMode for typecheck too?
 	const command = 'tsc -p ./tsconfig.json --noEmit ' + (tsCliOptions ?? '')
 
 	if (opts.verbose) {
@@ -170,6 +214,7 @@ async function typecheck() {
 exports.typecheckWatch = typecheckWatch
 async function typecheckWatch() {
 	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
+	// TODO tsProjectReferenceMode for typecheck watch mode too?
 	const command = 'tsc -p ./tsconfig.json --noEmit --watch ' + (tsCliOptions ?? '')
 
 	if (opts.verbose) {
@@ -184,7 +229,9 @@ async function typecheckWatch() {
 
 exports.buildGlobal = buildGlobal
 async function buildGlobal({noFailOnError = opts.noFail}) {
-	const command = `webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} ${noFailOnError ? '|| true' : ''}`
+	const command = `webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} ${
+		noFailOnError ? '|| true' : ''
+	}`
 
 	if (opts.verbose) {
 		console.log(`===> Running the "buildGlobal" command.\n`)
@@ -214,46 +261,12 @@ exports.test = test
 async function test() {
 	if (opts.verbose) console.log(`===> Running the "test" command.\n`)
 
-	// This option was made mainly with @lume/variable and @lume/element, to
-	// test the code with all TypeScript and Babel decorator configs.
-	const {testWithAllTSAndBabelDecoratorBuildConfigurations} = require('../config/getUserConfig')
-
 	// FIXME This is a mess, but it works: the build() step here runs
 	// buildTs(), but then we also redundantly run buildTs() here after.
 
 	await Promise.all([build(), prettierCheck()])
 
 	const karmaCommand = path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh')
-
-	if (testWithAllTSAndBabelDecoratorBuildConfigurations) {
-		let builtTs = false
-
-		console.log(`=====> Running the permutations of decorator test builds.\n`)
-
-		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.1.js'})
-		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await exec(karmaCommand, {env: {DECORATOR_CAUSES_NONWRITABLE_ERROR: 'true'}})
-
-		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.2.js'})
-		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await exec(karmaCommand, {env: {DECORATOR_CAUSES_NONWRITABLE_ERROR: 'true'}})
-
-		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.3.js'})
-		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await exec(karmaCommand)
-
-		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.4.js'})
-		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await exec(karmaCommand)
-
-		// TODO The tsConfig2 option here requires the dependent app to have a
-		// tsconfig2.json file. The CLI should not require any tsconfig files,
-		// they should be optional. We should look for those files, and fall
-		// back to files here in the CLI.
-		builtTs = await buildTs({tsConfig2: true})
-		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await exec(karmaCommand)
-	}
 
 	const builtTs = await buildTs()
 
@@ -269,7 +282,7 @@ exports.testDebug = testDebug
 async function testDebug() {
 	if (opts.verbose) console.log(`===> Running the "testDebug" command.\n`)
 
-	const [builtTs] = await Promise.all([buildTs(), showName()])
+	const [builtTs] = await Promise.all([buildTs({noFailOnError: true}), showName()])
 
 	// TODO if sources found, but no tests files, also skip instead of error.
 	if (!builtTs) return console.log('No sources found, skipping tests.')

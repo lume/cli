@@ -17,10 +17,10 @@ if (!userConfigExists) {
  *   globalName?: string | false
  *   globalEntrypoints?: string[]
  *   webpackConfigs?: (configs: import('webpack').Configuration[]) => void
- *   testWithAllTSAndBabelDecoratorBuildConfigurations?: boolean
  *   tsProjectReferenceMode?: boolean
  *   figletFont?: string
  *   testSpecFormat?: 'jasmine' | 'mochachai'
+ *   useBabelForTypeScript?: boolean
  * }} UserConfig
  */
 

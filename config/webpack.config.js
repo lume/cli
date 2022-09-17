@@ -78,6 +78,11 @@ const baseConfig = {
 		// so we can detect the same errors in both environments because module
 		// concantenation can change code meaning sometimes.
 		concatenateModules: true,
+
+		// Disable some tree-shaking optimization for now, because it causes an
+		// error with invalid code output relating to Babel stage 3 decorators:
+		// https://github.com/webpack/webpack/issues/16262
+		innerGraph: false,
 	},
 	stats: {
 		assets: false, // shows all output assets

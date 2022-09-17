@@ -2,7 +2,7 @@
 const path = require('path')
 const utils = require('./utils')
 const webpack = require('webpack')
-const babelConfig = require('./babel.config.base')
+const babelConfig = require('./babel.config')
 
 const {skipGlobal, globalEntrypoints, testSpecFormat = 'jasmine'} = require('./getUserConfig')
 const CWD = process.cwd()
