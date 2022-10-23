@@ -31,7 +31,7 @@
 		// Language feature options
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"useDefineForClassFields": false,
+		"useDefineForClassFields": false, // TODO should be true with stage 3 decorators
 		"preserveConstEnums": true,
 		// JSX is preserved so that we can handle JSX with babel-preset-solid
 		// (for use with @lume/element).

@@ -347,8 +347,9 @@ shows the available options (so far) with their defaults.
 ```js
 module.exports = {
 	// If set to a truthy value, the global build will be skipped. This is
-	// useful for packages that are meant only for Node.js and not intended for
-	// use in brosers.
+	// useful for packages that don't publish bundles, only publish source
+	// output as ES modules, or are for use in Node.js and not intended for use
+	// in browsers, etc (anything without a bundle).
 	//
 	// Default: false
 	skipGlobal: false,
