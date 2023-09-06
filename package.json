@@ -34,7 +34,7 @@
 		"chai-jasmine": "^2.0.3",
 		"chalk": "4.1.2",
 		"commander": "8.2.0",
-		"electron": "14.0.1",
+		"electron": "22.3.21",
 		"figlet": "1.5.2",
 		"file-loader": "6.2.0",
 		"gulp": "4.0.2",
