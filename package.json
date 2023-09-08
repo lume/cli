@@ -18,8 +18,7 @@
 		"// ^ build": "Sometimes an npm rebuild is needed in order to make sure electron binaries are up to date. This will make lerna bootstrap run it just in case.",
 		"release:patch": "npm version patch --message 'v%s' && npm publish && git push --follow-tags",
 		"release:minor": "npm version minor --message 'v%s' && npm publish && git push --follow-tags",
-		"release:major": "npm version major --message 'v%s' && npm publish && git push --follow-tags",
-		"prepare": "npm run build"
+		"release:major": "npm version major --message 'v%s' && npm publish && git push --follow-tags"
 	},
 	"dependencies": {
 		"@babel/cli": "7.11.6",
