@@ -21,6 +21,7 @@ if (!userConfigExists) {
  *   tsProjectReferenceMode?: boolean
  *   figletFont?: string
  *   testSpecFormat?: 'jasmine' | 'mochachai'
+ *   prettierIgnorePath?: string
  * }} UserConfig
  */
 

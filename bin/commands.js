@@ -2,6 +2,7 @@
 const path = require('path')
 const fs = require('fs')
 const {showName} = require('../scripts/name.js')
+const config = require('../config/getUserConfig.js')
 
 // TODO read CLI options from a project's lume.config too.
 
@@ -112,8 +113,9 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined, noFailOn
 		if (tsConfig2) file = 'tsconfig2.json'
 
 		const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
-		const command =
-			`tsc ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./${file} ${tsCliOptions ?? ''} ${noFailOnError ? '|| true' : ''}`
+		const command = `tsc ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./${file} ${tsCliOptions ?? ''} ${
+			noFailOnError ? '|| true' : ''
+		}`
 
 		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
 		await exec(command)
@@ -184,7 +186,9 @@ async function typecheckWatch() {
 
 exports.buildGlobal = buildGlobal
 async function buildGlobal({noFailOnError = opts.noFail}) {
-	const command = `webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} ${noFailOnError ? '|| true' : ''}`
+	const command = `webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} ${
+		noFailOnError ? '|| true' : ''
+	}`
 
 	if (opts.verbose) {
 		console.log(`===> Running the "buildGlobal" command.\n`)
@@ -401,7 +405,8 @@ const prettierConfig =
 		: './node_modules/@lume/cli/.prettierrc.js')
 
 const prettierIgnore =
-	'--ignore-path ' + (fs.existsSync('.prettierignore') ? '.prettierignore' : './node_modules/@lume/cli/.prettierignore')
+	'--ignore-path ' + config.prettierIgnorePath ??
+	(fs.existsSync('.prettierignore') ? '.prettierignore' : './node_modules/@lume/cli/.prettierignore')
 
 // Check formatting of all supported file types in the project.
 const prettierFiles = process.cwd()

@@ -1,7 +1,7 @@
+// TODO: Karma is deprecated. Switch to web-test-runner.
+
 // @ts-check
-const path = require('path')
 const utils = require('./utils')
-const webpack = require('webpack')
 const babelConfig = require('./babel.config.base')
 
 const {skipGlobal, globalEntrypoints, testSpecFormat = 'jasmine'} = require('./getUserConfig')
@@ -15,14 +15,6 @@ const testGlobals = !!(!skipGlobalBuild && process.env.TEST_GLOBALS && process.e
 // timeout on async tests as if the timeout is 0.
 // https://github.com/jasmine/jasmine/issues/1930
 const debugAsyncTestTimeout = 1210000000
-
-// TODO, once Electron supports native Node ES Modules, then we should remove
-// all the Webpack stuff from here and loade ES Modules natively.
-//
-// Another idea is maybe we can rely on the browser inside of Electron (Chrome)
-// for native ES Modules? What would need to happen is our test code would be
-// loaded as browser ESM, but we still need to externalize Node dependencies to
-// be imported using require() until Node ESM is supported (if ever).
 
 module.exports = function (config) {
 	config.set({
@@ -59,16 +51,6 @@ module.exports = function (config) {
 
 		// The order of items in this array matters!
 		files: [
-			// Include the augment-node-path.js file first, which includes a
-			// snippet of code that forces NODE_PATH to include the project's
-			// node_modules folder even when karma-eletron in symlinked into the
-			// project. See
-			// https://github.com/twolfson/karma-electron/issues/44.
-			path.resolve(__dirname, 'karma-augment-node-path.js'),
-
-			// Polyfill for `globalThis`
-			path.resolve(__dirname, 'karma-globalThis.js'),
-
 			// When in mocha+chai mode, this proxies jasmine expect syntax
 			// (f.e. expect().toBe()) to chai expect syntax (f.e.
 			// expect().to.be()).
@@ -89,11 +71,8 @@ module.exports = function (config) {
 
 		exclude: testGlobals ? [] : ['dist/global.test.js', 'dist/global/*.test.js'],
 
-		// The augment-node-path.js file does not need to be included here,
-		// because it imports only the built-in 'module' module, and otherwise
-		// does not benefit from the electron or webpack preprocessors.
 		preprocessors: {
-			'dist/**/*.test.js': ['electron', 'webpack', 'sourcemap'],
+			'dist/**/*.test.js': ['webpack', 'sourcemap'],
 		},
 
 		client: {
@@ -115,50 +94,17 @@ module.exports = function (config) {
 				  }),
 
 			useIframe: false,
-
-			// This is a karma-electron option.
-			loadScriptsViaRequire: true,
 		},
 
-		// Set up a "CustomElectron" launcher that extends karma-electron's
-		// default "Electron" launcher, so that we can control options
-		// (docs: // https://github.com/twolfson/karma-electron/tree/5.1.1#launcher-configuration)
-		browsers: ['CustomElectron'],
-		customLaunchers: {
-			CustomElectron: {
-				base: 'Electron',
+		browsers: ['Chrome'],
 
-				flags: isDebugMode
-					? [
-							// Alternatively to the `browserWindowOptions.show` option, we can use this
-							// option, then open chrome://inspect in Google Chrome and
-							// inspect from there.
-							// '--remote-debugging-port=9222',
-					  ]
-					: [],
-
-				browserWindowOptions: {
-					// Open the window for debugging with devtools in debug mode.
-					show: isDebugMode ? true : false,
-
-					webPreferences: {
-						nodeIntegration: true,
-						nodeIntegrationInWorker: true,
-						nodeIntegrationInSubFrames: true,
-						contextIsolation: false,
-					},
-				},
-			},
-		},
-
-		// We need Webpack support because the code running through Karma uses
-		// ES Module syntax. Once native ES Modules are released in Electron,
-		// then karma-webpack will no longer be a requirement and test code will
-		// run as-is without any bundling needed.
+		// We use Webpack support for ES Modules. We'll be switching to
+		// web-test-runner soon though.
 		webpack: webpackConfig,
 	})
 }
 
+/** @type {import('webpack').Configuration} */
 const webpackConfig = {
 	// Make it FAST with development mode, for testing purposes. We
 	// don't need to compile test code in production mode with
@@ -187,30 +133,11 @@ const webpackConfig = {
 	},
 
 	output: {
-		// This ensures that any modules listed in externals are
-		// imported using CommonJS require calls.
-		libraryTarget: 'commonjs2',
+		libraryTarget: 'umd2',
 
 		// Leaving the default hash function in Webpack 5 causes Webpack to crash with Node 17+.
 		hashFunction: 'xxhash64',
 	},
-
-	externals: [
-		// Ignore Node libs that don't need to be bundled, as well as
-		// anything in node_modules, because they'll be require'd. We want
-		// to bundle only our code.
-		// TODO Set this if user config option "node" is true.
-		...require('module').builtinModules,
-
-		// XXX We only mark builtin modules as external. karma-webpack
-		// will otherwise bundle code for each test file.
-
-		// TODO Once Electron supports native Node ESM and
-		// karma-electron catches up to that, we should ideally be able
-		// to remove karma-webpack and run all tests without a build
-		// step, and without having to externalize Node builtin modules as
-		// they'll be imported via ESM.
-	],
 
 	module: {
 		// TODO Add a rule to compile Solid JSX with Babel. Until then,
@@ -244,14 +171,6 @@ const webpackConfig = {
 	node: false,
 
 	plugins: [
-		new webpack.DefinePlugin({
-			...(process.env.DECORATOR_CAUSES_NONWRITABLE_ERROR !== undefined
-				? {
-						DECORATOR_CAUSES_NONWRITABLE_ERROR: 'true',
-				  }
-				: {}),
-		}),
-
 		// This is needed because if Webpack fails to build test code,
 		// Karma still keeps running, and exits with code 0 instead of
 		// non-zero, making it seem that everything passed.
