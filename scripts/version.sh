@@ -8,4 +8,6 @@ git add .
 git status
 echo ' -- Making production build.'
 lume build
+git add .
+git status
 echo '--- VERSION DONE --------------------'
