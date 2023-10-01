@@ -405,8 +405,9 @@ const prettierConfig =
 		: './node_modules/@lume/cli/.prettierrc.js')
 
 const prettierIgnore =
-	'--ignore-path ' + config.prettierIgnorePath ??
-	(fs.existsSync('.prettierignore') ? '.prettierignore' : './node_modules/@lume/cli/.prettierignore')
+	'--ignore-path ' +
+	(config.prettierIgnorePath ??
+		(fs.existsSync('.prettierignore') ? '.prettierignore' : './node_modules/@lume/cli/.prettierignore'))
 
 // Check formatting of all supported file types in the project.
 const prettierFiles = process.cwd()
