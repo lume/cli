@@ -16,7 +16,7 @@ echo "--- Running regular tests (dist/**/*.test.js files but not dist/global.tes
 NODE_PATH=`pwd`/node_modules:$NODE_PATH \
 	ELECTRON_DISABLE_SECURITY_WARNINGS=true \
 	xvfb-maybe \
-	karma start ./node_modules/@lume/cli/config/karma.config.js
+	./node_modules/@lume/cli/node_modules/.bin/karma start ./node_modules/@lume/cli/config/karma.config.js
 
 # TODO split regular tests and global tests into two separate process (separate CLI commands) so consumers can run either one separately.
 echo "--- Running tests for global build (dist/global.test.js and dist/global/*.test.js files) ---"
@@ -24,4 +24,4 @@ NODE_PATH=`pwd`/node_modules:$NODE_PATH \
 	ELECTRON_DISABLE_SECURITY_WARNINGS=true \
 	TEST_GLOBALS=true \
 	xvfb-maybe \
-	karma start ./node_modules/@lume/cli/config/karma.config.js
+	./node_modules/@lume/cli/node_modules/.bin/karma start ./node_modules/@lume/cli/config/karma.config.js
