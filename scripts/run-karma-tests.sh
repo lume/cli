@@ -10,7 +10,8 @@ set -e
 #
 # xvfb-maybe: If we don't have a graphical display, xvfb-maybe will set up an
 # X11 emulator, and set the DISPLAY env var for electron so it can run
-# "headless".
+# "headless". (NOTE, We're no longer using Electron, and we will replace Karma
+# with @web/test-runner, but this still works as-is for now)
 echo "--- Running regular tests (dist/**/*.test.js files but not dist/global.test.js or dist/global/*.test.js files) ---"
 NODE_PATH=`pwd`/node_modules:$NODE_PATH \
 	ELECTRON_DISABLE_SECURITY_WARNINGS=true \
