@@ -3,7 +3,11 @@ const {src, dest, series} = require('gulp')
 const { promises} = require('fs')
 
 async function mkDist() {
-	await promises.mkdir('./dist')
+	try {
+		await promises.mkdir('./dist')
+	} catch (e) {
+		if (e.code !== 'EEXIST') throw e
+	}
 }
 
 // Copies assets from src/ to dist/, matching the same folder structure as in
