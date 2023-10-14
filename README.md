@@ -30,8 +30,7 @@ see `lume --help`.
 - Formats all code in a project with [`prettier`](https://prettier.io).
 - Run a project's tests (any files ending with `.test.ts` in the project's src/ folder).
   - Tests use [Jasmine](https://jasmine.github.io)'s `describe()`/`it()` functions for describing unit tests.
-  - Tests run in Karma with karma-electron, so all tests have access to
-    Node.js, Electron, and Chrome Browser APIs.
+  - Tests run in Karma with karma-chrome-launcher, so all tests have access Chrome Browser APIs.
   - If global scripts were built, it allows for testing those separately to
     ensure global builds works like with regularly-imported code.
 - Publish a project to NPM.
@@ -72,8 +71,7 @@ formatting, and publishing packages.
 - NPM v5+ (might work with lower versions, not tested)
 - If you don't have a graphical display (f.e. in Linux without a desktop on a
   continuous integration server) install xvfb for tests to run headlessly
-  without issues - see
-  https://github.com/electron/electron/blob/v1.4.10/docs/tutorial/testing-on-headless-ci.md
+  without issues
 
 ## Getting Started
 
