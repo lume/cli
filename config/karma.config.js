@@ -1,6 +1,7 @@
 // TODO: Karma is deprecated. Switch to web-test-runner.
 
 // @ts-check
+const path = require('path')
 const utils = require('./utils')
 const babelConfig = require('./babel.config.base')
 
@@ -127,6 +128,13 @@ const webpackConfig = {
 	resolve: {
 		modules: utils.alsoResolveRelativeToThisPackage(),
 		extensions: ['.js', '.jsx'],
+
+		// Prevent duplicates of solid-js or reactivity can break in various
+		// ways (f.e. untrack from one solid-js not untracking inside the
+		// createEffect of another solid-js).
+		alias: {
+			'solid-js': path.resolve(process.cwd(), 'node_modules', 'solid-js'),
+		},
 	},
 	resolveLoader: {
 		modules: utils.alsoResolveRelativeToThisPackage(),
