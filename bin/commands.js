@@ -77,7 +77,8 @@ async function dev() {
 exports.copyAssets = copyAssets
 async function copyAssets() {
 	if (opts.verbose) console.log(`===> Running the "copyAssets" command.\n`)
-	await exec(`gulp --cwd ${process.cwd()} --gulpfile ./node_modules/@lume/cli/config/gulpfile.js copyAssets`)
+	const gulpBin = path.resolve(require.resolve('gulp'), '..', 'bin', 'gulp.js')
+	await exec(`node ${gulpBin} --cwd ${process.cwd()} --gulpfile ./node_modules/@lume/cli/config/gulpfile.js copyAssets`)
 	if (opts.verbose) console.log(`===> Done running the "copyAssets" command.\n`)
 }
 
@@ -114,7 +115,7 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined, noFailOn
 
 		const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
 		const command = `tsc ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./${file} ${tsCliOptions ?? ''} ${
-			noFailOnError ? '|| true' : ''
+			noFailOnError ? '|| echo ""' : ''
 		}`
 
 		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
@@ -186,9 +187,9 @@ async function typecheckWatch() {
 
 exports.buildGlobal = buildGlobal
 async function buildGlobal({noFailOnError = opts.noFail}) {
-	const command = `webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} ${
-		noFailOnError ? '|| true' : ''
-	}`
+	const webpackBin = path.resolve(require.resolve('webpack-cli'), '..', '..', 'bin', 'cli.js')
+	const webpackConf = path.resolve(__dirname, '..', 'config', 'webpack.config.js')
+	const command = `node ${webpackBin} --color --config ${webpackConf} ${noFailOnError ? '|| echo ""' : ''}`
 
 	if (opts.verbose) {
 		console.log(`===> Running the "buildGlobal" command.\n`)
