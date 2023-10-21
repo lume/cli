@@ -18,6 +18,16 @@ module.exports.setOpts = function (options) {
 
 exports.showName = showName
 
+// We use these so that no matter if we are running in a Yarn or Npm env (which
+// set PATH differently), we'll always be able to run the needed bins by relying
+// on Node.js module lookup algo (calling them directly might fail if they are
+// not in PATH)
+const tscBin = path.resolve(require.resolve('typescript'), '..', '..', 'bin', 'tsc')
+const gulpBin = path.resolve(require.resolve('gulp'), '..', 'bin', 'gulp.js')
+const babelBin = path.resolve(require.resolve('@babel/cli'), '..', 'bin', 'babel.js')
+const webpackBin = path.resolve(require.resolve('webpack-cli'), '..', '..', 'bin', 'cli.js')
+const prettierBin = path.resolve(require.resolve('prettier'), '..', 'bin', 'prettier.cjs')
+
 exports.build = build
 async function build({skipClean = false, noFailOnError = opts.noFail} = {}) {
 	if (opts.verbose) console.log(`===> Running the "build" command.\n`)
@@ -49,7 +59,7 @@ async function clean() {
 	const rmrf = require('rimraf')
 	const {promisify} = require('util')
 
-	await exec('tsc --build --clean')
+	await exec(`node ${tscBin} --build --clean`)
 
 	await Promise.all([promisify(rmrf)('dist'), promisify(rmrf)('tsconfig.tsbuildinfo')])
 
@@ -77,7 +87,6 @@ async function dev() {
 exports.copyAssets = copyAssets
 async function copyAssets() {
 	if (opts.verbose) console.log(`===> Running the "copyAssets" command.\n`)
-	const gulpBin = path.resolve(require.resolve('gulp'), '..', 'bin', 'gulp.js')
 	await exec(`node ${gulpBin} --cwd ${process.cwd()} --gulpfile ./node_modules/@lume/cli/config/gulpfile.js copyAssets`)
 	if (opts.verbose) console.log(`===> Done running the "copyAssets" command.\n`)
 }
@@ -114,14 +123,14 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined, noFailOn
 		if (tsConfig2) file = 'tsconfig2.json'
 
 		const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
-		const command = `tsc ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./${file} ${tsCliOptions ?? ''} ${
-			noFailOnError ? '|| echo ""' : ''
-		}`
+		const command = `node ${tscBin} ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./${file} ${
+			tsCliOptions ?? ''
+		} ${noFailOnError ? '|| echo ""' : ''}`
 
 		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
 		await exec(command)
 	} else {
-		const command = `babel --config-file ${babelConfig} --extensions .ts,.tsx src --out-dir ./dist`
+		const command = `node ${babelBin} --config-file ${babelConfig} --extensions .ts,.tsx src --out-dir ./dist`
 
 		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
 
@@ -141,7 +150,7 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined, noFailOn
 exports.watchTs = watchTs
 async function watchTs() {
 	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
-	const command = `tsc -p ./tsconfig.json --watch ${tsCliOptions ?? ''}`
+	const command = `node ${tscBin} -p ./tsconfig.json --watch ${tsCliOptions ?? ''}`
 
 	if (opts.verbose) {
 		console.log(`===> Running the "watchTs" command.\n`)
@@ -157,7 +166,7 @@ async function watchTs() {
 exports.typecheck = typecheck
 async function typecheck() {
 	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
-	const command = 'tsc -p ./tsconfig.json --noEmit ' + (tsCliOptions ?? '')
+	const command = `node ${tscBin} -p ./tsconfig.json --noEmit ${tsCliOptions ?? ''}`
 
 	if (opts.verbose) {
 		console.log(`===> Running the "typecheck" command.\n`)
@@ -173,7 +182,7 @@ async function typecheck() {
 exports.typecheckWatch = typecheckWatch
 async function typecheckWatch() {
 	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
-	const command = 'tsc -p ./tsconfig.json --noEmit --watch ' + (tsCliOptions ?? '')
+	const command = `node ${tscBin} -p ./tsconfig.json --noEmit --watch ${tsCliOptions ?? ''}`
 
 	if (opts.verbose) {
 		console.log(`===> Running the "typecheckWatch" command.\n`)
@@ -187,7 +196,6 @@ async function typecheckWatch() {
 
 exports.buildGlobal = buildGlobal
 async function buildGlobal({noFailOnError = opts.noFail}) {
-	const webpackBin = path.resolve(require.resolve('webpack-cli'), '..', '..', 'bin', 'cli.js')
 	const webpackConf = path.resolve(__dirname, '..', 'config', 'webpack.config.js')
 	const command = `node ${webpackBin} --color --config ${webpackConf} ${noFailOnError ? '|| echo ""' : ''}`
 
@@ -416,7 +424,7 @@ const prettierFiles = process.cwd()
 exports.prettier = prettier
 async function prettier() {
 	if (opts.verbose) console.log(`===> Running the "prettier" command.\n`)
-	const command = `prettier ${prettierConfig} ${prettierIgnore} --write ${prettierFiles}`
+	const command = `node ${prettierBin} ${prettierConfig} ${prettierIgnore} --write ${prettierFiles}`
 	if (opts.verbose) console.log(`=====> Running \`${command}\`\n`)
 	await exec(command)
 	if (opts.verbose) console.log(`===> Done running the "prettier" command.\n`)
@@ -425,7 +433,7 @@ async function prettier() {
 exports.prettierCheck = prettierCheck
 async function prettierCheck() {
 	if (opts.verbose) console.log(`===> Running the "prettierCheck" command.\n`)
-	const command = `prettier ${prettierConfig} ${prettierIgnore} --check ${prettierFiles}`
+	const command = `node ${prettierBin} ${prettierConfig} ${prettierIgnore} --check ${prettierFiles}`
 	if (opts.verbose) console.log(`=====> Running \`${command}\`\n`)
 	await exec(command)
 	if (opts.verbose) console.log(`===> Done running the "prettierCheck" command.\n`)
