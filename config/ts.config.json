@@ -18,6 +18,12 @@
 		"module": "esnext",
 		"moduleResolution": "node",
 
+		// Prevent possible issues in Windows (https://github.com/prettier/prettier/issues/7825#issuecomment-602171740)
+		// It may seem counterintuitive that we don't set CRLF. That's because
+		// all tools we use, even in Windows, work with LF (VS Code, Prettier,
+		// etc), so this keeps things consistent.
+		"newLine": "lf",
+
 		// Code strictness
 		"strict": true,
 		"importsNotUsedAsValues": "error",
