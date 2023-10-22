@@ -3,6 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const {showName} = require('../scripts/name.js')
 const config = require('../config/getUserConfig.js')
+const {exec} = require('../scripts/exec.js')
 
 // TODO read CLI options from a project's lume.config too.
 
@@ -236,7 +237,7 @@ async function test() {
 
 	await Promise.all([build(), prettierCheck()])
 
-	const karmaCommand = path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh')
+	const karmaCommand = `node ${path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.js')}`
 
 	if (testWithAllTSAndBabelDecoratorBuildConfigurations) {
 		let builtTs = false
@@ -437,53 +438,4 @@ async function prettierCheck() {
 	if (opts.verbose) console.log(`=====> Running \`${command}\`\n`)
 	await exec(command)
 	if (opts.verbose) console.log(`===> Done running the "prettierCheck" command.\n`)
-}
-
-/** @type {import('child_process').SpawnOptions | undefined} */
-let execSpawnOptions
-
-/**
- * @param {string} cmd
- * @param {{exitOnFail?: boolean, env?: {[k:string]: string}} | undefined} options - Options. If
- * .exitOnFail is not true (true is default), then the process that called
- * exec will exit if the spawned child process exits non-zero.
- */
-async function exec(cmd, options = {}) {
-	if (!execSpawnOptions) {
-		execSpawnOptions = {
-			shell: true,
-			stdio: 'inherit',
-			env: {
-				...process.env,
-
-				PATH: [
-					// project node_modules
-					path.resolve(process.cwd(), 'node_modules', '.bin'),
-					// local node_modules wherever this package is installed
-					path.resolve(__dirname, '..', 'node_modules', '.bin'),
-					process.env.PATH,
-				].join(':'),
-			},
-		}
-	}
-
-	const {exitOnFail = true, env = {}} = options
-
-	let parts = cmd.trim().split(/\s+/)
-	const bin = parts.shift()
-	const {spawn} = require('child_process')
-
-	await new Promise((resolve, reject) => {
-		const child = spawn(bin, parts, {...execSpawnOptions, env: {...execSpawnOptions.env, ...env}})
-
-		child.on('close', exitCode => {
-			if (exitCode !== 0) {
-				if (exitOnFail) process.exit(exitCode)
-				else reject(exitCode)
-			}
-			resolve()
-		})
-
-		process.on('exit', () => child.kill())
-	})
 }
