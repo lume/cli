@@ -28,8 +28,4 @@ async function main() {
 		'--- Running regular tests (dist/**/*.test.js files but not dist/global.test.js or dist/global/*.test.js files) ---',
 	)
 	await exec(karmaCommand, opts)
-
-	// TODO remove global build and global tests
-	console.log('--- Running tests for global build (dist/global.test.js and dist/global/*.test.js files) ---')
-	await exec(karmaCommand, {...opts, env: {...opts.env, TEST_GLOBALS: 'true'}})
 }

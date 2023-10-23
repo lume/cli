@@ -40,7 +40,6 @@ exports.exec = async function exec(cmd, options = {}) {
 	const {spawn} = require('child_process')
 
 	await new Promise((resolve, reject) => {
-		console.log('spawn command parts:', bin, ...parts)
 		const child = spawn(bin, parts, {...execSpawnOptions, env: {...execSpawnOptions.env, ...env}})
 
 		child.on('close', exitCode => {

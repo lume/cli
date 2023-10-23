@@ -17,22 +17,10 @@ see `lume --help`.
 - Build a project's [TypeScript](https://www.typescriptlang.org) source code
   from its `src/` folder to a `dist/` output folder.
   - The output code is in standard ES Module format.
-- Ability to bundle a project's output code into `dist/global.js` for use in
-  browser script tags.
-  - The `dist/global.js` file assings the exports of the project entrypoint
-    onto a global object with the same name as the project, but camelCased, and
-    without the package scope. For example, a package named
-    `@foo/something-useful` would result in a global variable named
-    `somethingUseful` containing the package exports.
-  - Allows for multiple global entry points to be specified (outputs multiple
-    global scripts for use with script tags in `dist/global/`). See config
-    options below.
 - Formats all code in a project with [`prettier`](https://prettier.io).
 - Run a project's tests (any files ending with `.test.ts` in the project's src/ folder).
   - Tests use [Jasmine](https://jasmine.github.io)'s `describe()`/`it()` functions for describing unit tests.
   - Tests run in Karma with karma-chrome-launcher, so all tests have access Chrome Browser APIs.
-  - If global scripts were built, it allows for testing those separately to
-    ensure global builds works like with regularly-imported code.
 - Publish a project to NPM.
 
 ## Future Features
@@ -103,7 +91,8 @@ Then run the cli and show the help menu:
 
 **`lume --help`**
 
-> NOTE! Installing `lume` globally may work up to a certain point (at least
+> [!Important]
+> Installing `lume` globally may work up to a certain point (at least
 > the way the cli currently works, where it does not yet manage internal
 > versioning). If you have multiple projects that depend on different versions
 > of the `lume` cli with differing and incompatible features, you'll want to
@@ -121,7 +110,8 @@ executables) to run the cli and show the help menu:
 
 **`npx lume --help`**
 
-> NOTE! This poses a problem similar to the global install option: the latest
+> [!Important]
+> This poses a problem similar to the global install option: the latest
 > version of the cli downloaded by `npx` may not be the version of LUME cli
 > that your project works with. In the future, the LUME cli will have internal
 > version management.
@@ -148,11 +138,8 @@ tsconfig.json      # Optional, TypeScript configuration overrides. Extend from .
 The `lume build` command will compile `.ts` files from the `src/` folder,
 outputting them as `.js` files along with `.js.map` [source map
 files](https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map)
-into the `dist/` folder.
-
-A `dist/global.js` (and its source map file) is also outputted, containing
-the global version of the lib that can be easily loaded on a website using a
-script tag.
+into the `dist/` folder. It will also output `.d.ts` and `.d.ts.map` files for
+type definitions and mapping from type definitions back to `.ts` sources files.
 
 ### Set up files
 
@@ -257,7 +244,7 @@ Lets write a test file to test our nifty `isAwesome` function.
 **`src/index.test.ts`**
 
 ```ts
-import {isAwesome} from './index'
+import {isAwesome} from './index.js'
 
 describe('isAwesome', () => {
 	it('is a function', () => {
@@ -274,44 +261,17 @@ This is enough to get a project bootstrapped. To learn more on how to
 configure build and test settings with `lume.config.cjs` and `tsconfig.json`
 files, see [Configuration](#configuration) below.
 
-We may want to test that the global build of our package works too. For
-this, we can specify a `src/global.test.ts` file, or `.test.ts` files in
-`src/global/`.
-
-For example, we can ensure that our global build loads our `isAwesome` API
-globally in a global variable without any issues by writing the following
-`src/global.test.js` file, assuming that we've chosen our package's name to be
-`AwesomeLib` (by replacing `PACKAGE-NAME` in the above example with
-`AwesomeLib`):
-
-```ts
-// Note! In this file, we do not import our lib, it will be loaded globally
-// (the test setup will automatically load the global file).
-
-describe('AwesomeLib global build', () => {
-	it('provides the AwesomeLib API as a global variable', () => {
-		expect(window.AwesomeLib).toBeInstanceOf(Object)
-		expect(AwesomeLib.isAwesome).toBeInstanceOf(Function)
-	})
-})
-```
-
-We can specify the name of the global variable to be different than the
-pacakge name (see [Configuration](#configuration) below).
-
 ## Managing a project
 
 Now that we've bootstrapped our project, the following are the basic commands
-we'll want to run to manage the life cycle of our project. For sake of
+we'll want to run to manage the life cycle of our project.
+For sake of
 simplicity, the following examples assume that `lume` was installed globally
 as per the "Global Install" option above.
 
 - `lume test`
   - Run tests (all `.test.ts` files).
   - Exits with a non-zero error code if any test fails
-  - If there are any `dist/global.test.js` or `dist/global/*.test.js`
-    files, they will be ran in a separate test run. This allows for testing
-    the global build of a package independently.
 - `lume dev`
   - "dev" for "development mode"
   - Builds all code, and rebuilds it automatically if any file changes.
@@ -319,13 +279,12 @@ as per the "Global Install" option above.
     files, the project will automatically rebuild.
 - `lume build`
   - Does a production build, and does not watch for file changes.
-  - Generally you don't need to run this unless you need to debug production
-    code, which isn't common but sometimes there can be issues with
-    minification.
-- `lume releasePatch`, `lume releaseMinor`, `lume releaseMajor`
+  - Currently this doesn't do anything except _not watch_ files to rebuild on
+    file changes. In the future, we might decide to minify output modules.
+- `lume releasePatch`, `lume releaseMinor`, `lume releaseMajor`, etc
   - Updates the version of the project in `package.json` and `src/index.ts`.
   - Publishes the project to NPM under the new version number only if build
-    and tests pass. It basically runs `lume build` and `lume test`
+    and tests pass. It runs `lume build` and `lume test`
     internally.
   - Pushes the a version commit and tag to the remote git repo.
 
@@ -344,40 +303,6 @@ shows the available options (so far) with their defaults.
 
 ```js
 module.exports = {
-	// If set to a truthy value, the global build will be skipped. This is
-	// useful for packages that are meant only for Node.js and not intended for
-	// use in brosers.
-	//
-	// Default: false
-	skipGlobal: false,
-
-	// If set to `false` or an empty string, then the global build will not add
-	// a global variable into the environment, which is useful for libraries
-	// that may instead expose their own globals in a custom way, or some other
-	// sideeffects.
-	//
-	// Otherwise, the library's exports will be assigned onto a global variable
-	// of the name defined here.
-	//
-	// If omitted, this defaults to the name of the package (minus the @scope/
-	// part if the package name is scoped and converted to camelCase if the name
-	// has dashes).
-	//
-	// Default: undefined (uses the name of the package)
-	globalName: 'example', // A string, `false`, or `undefined`
-
-	// This is an array of entrypoints that global builds will be made from, and
-	// the output bundles will be placed in `dist/global/`. These should
-	// correspond to files at the top level of src. For example, the following
-	// will build a take `src/one.ts` and `src/two.ts` and output
-	// `dist/global/one.js` and `dist/global/two.js`
-	//
-	// These entry points are built into global scripts in addition to the
-	// default one built from `src/index.ts`.
-	//
-	// Default: []
-	globalEntrypoints: ['one', 'two'],
-
 	// If provided, this will be called with the final array of Webpack configs
 	// that the cli created, providing an opportunity to make custom
 	// modifications to the webpack configs on top of what the cli already made.
@@ -431,11 +356,7 @@ Set while iterating on them, etc).
 ## TODOs
 
 - [ ] Add support for JSX (specifically Solid JSX expressions which requires Babel).
-- [ ] Allow overriding of Webpack config.
 - [ ] Allow overriding of Babel config.
-- [x] Don't commit global.js (and its map) on version changes, we can tell people to get it from
-      unpkg, GitHub, and how to build it.
-- [ ] Output both a global.js and global.min.js
 - [x] Source maps! Important!
 - [x] Important! Don't run `git stash` during version script if there's nothing to stash,
       otherwise it will pop a previous stash after `npm version` is done.

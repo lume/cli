@@ -26,7 +26,6 @@ exports.showName = showName
 const tscBin = path.resolve(require.resolve('typescript'), '..', '..', 'bin', 'tsc')
 const gulpBin = path.resolve(require.resolve('gulp'), '..', 'bin', 'gulp.js')
 const babelBin = path.resolve(require.resolve('@babel/cli'), '..', 'bin', 'babel.js')
-const webpackBin = path.resolve(require.resolve('webpack-cli'), '..', '..', 'bin', 'cli.js')
 const prettierBin = path.resolve(require.resolve('prettier'), '..', 'bin', 'prettier.cjs')
 
 exports.build = build
@@ -45,8 +44,6 @@ async function build({skipClean = false, noFailOnError = opts.noFail} = {}) {
 				console.log('No sources to build.')
 				return
 			}
-
-			await buildGlobal({noFailOnError})
 		})(),
 	])
 
@@ -78,7 +75,6 @@ async function dev() {
 	const promises = []
 
 	promises.push(watchTs())
-	promises.push(buildGlobalWatch())
 
 	await Promise.all(promises)
 
@@ -193,35 +189,6 @@ async function typecheckWatch() {
 	await exec(command)
 
 	if (opts.verbose) console.log(`===> Done running the "typecheckWatch" command.\n`)
-}
-
-exports.buildGlobal = buildGlobal
-async function buildGlobal({noFailOnError = opts.noFail}) {
-	const webpackConf = path.resolve(__dirname, '..', 'config', 'webpack.config.js')
-	const command = `node ${webpackBin} --color --config ${webpackConf} ${noFailOnError ? '|| echo ""' : ''}`
-
-	if (opts.verbose) {
-		console.log(`===> Running the "buildGlobal" command.\n`)
-		console.log(`=====> Running \`${command}\`\n`)
-	}
-
-	await exec(command)
-
-	if (opts.verbose) console.log(`===> Done running the "buildGlobal" command.\n`)
-}
-
-exports.buildGlobalWatch = buildGlobalWatch
-async function buildGlobalWatch() {
-	const command = `webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} --watch`
-
-	if (opts.verbose) {
-		console.log(`===> Running the "buildGlobalWatch" command.\n`)
-		console.log(`=====> Running \`${command}\`\n`)
-	}
-
-	await exec(command)
-
-	if (opts.verbose) console.log(`===> Done running the "buildGlobalWatch" command.\n`)
 }
 
 exports.test = test

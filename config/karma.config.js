@@ -5,11 +5,9 @@ const path = require('path')
 const utils = require('./utils')
 const babelConfig = require('./babel.config.base')
 
-const {skipGlobal, globalEntrypoints, testSpecFormat = 'jasmine'} = require('./getUserConfig')
+const {testSpecFormat = 'jasmine'} = require('./getUserConfig')
 const CWD = process.cwd()
 const isDebugMode = !!(process.env.KARMA_DEBUG && process.env.KARMA_DEBUG !== 'false')
-const skipGlobalBuild = skipGlobal && !(globalEntrypoints && globalEntrypoints.length)
-const testGlobals = !!(!skipGlobalBuild && process.env.TEST_GLOBALS && process.env.TEST_GLOBALS !== 'false')
 
 // 1 week, which still fits in an i32 as needed for setTimeout's second arg
 // Note, if the value is larger than fits in an i32, Jasmine will prematurely
@@ -59,18 +57,13 @@ module.exports = function (config) {
 
 			// Finally include all the test files after all of the above.
 			// They should all have watched:false while we are using karma-webpack.
-			...(testGlobals
-				? [
-						{pattern: 'dist/global*.js', watched: false},
-						{pattern: 'dist/global/*.js', watched: false},
-				  ]
-				: [
-						{pattern: 'dist/**/*.test.js', watched: false},
-						{pattern: 'dist/**/*.test.jsx', watched: false},
-				  ]),
+			...[
+				{pattern: 'dist/**/*.test.js', watched: false},
+				{pattern: 'dist/**/*.test.jsx', watched: false},
+			],
 		],
 
-		exclude: testGlobals ? [] : ['dist/global.test.js', 'dist/global/*.test.js'],
+		exclude: [],
 
 		preprocessors: {
 			'dist/**/*.test.js': ['webpack', 'sourcemap'],

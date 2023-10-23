@@ -37,16 +37,6 @@ cli
 		await commands.buildTs()
 	})
 
-cli
-	.command('buildGlobal')
-	.description('Build the global version of the project for simple usage with browser script tags.')
-	.action(commands.buildGlobal)
-
-cli
-	.command('buildGlobalWatch')
-	.description('Build the global version of the project in watch mode any time files change.')
-	.action(commands.buildGlobalWatch)
-
 cli.command('showName').description('Output the project name to console.').action(commands.showName)
 
 cli
