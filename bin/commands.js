@@ -275,7 +275,7 @@ exports.releasePatch = releasePatch
 async function releasePatch() {
 	if (opts.verbose) console.log(`===> Running the "releasePatch" command.\n`)
 	await releasePre()
-	await exec('npm version patch -m v%s')
+	await exec('npm version --no-workspaces patch -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releasePatch" command.\n`)
 }
 
@@ -283,7 +283,7 @@ exports.releaseMinor = releaseMinor
 async function releaseMinor() {
 	if (opts.verbose) console.log(`===> Running the "releaseMinor" command.\n`)
 	await releasePre()
-	await exec('npm version minor -m v%s')
+	await exec('npm version --no-workspaces minor -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseMinor" command.\n`)
 }
 
@@ -291,7 +291,7 @@ exports.releaseMajor = releaseMajor
 async function releaseMajor() {
 	if (opts.verbose) console.log(`===> Running the "releaseMajor" command.\n`)
 	await releasePre()
-	await exec('npm version major -m v%s')
+	await exec('npm version --no-workspaces major -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseMajor" command.\n`)
 }
 
@@ -299,7 +299,7 @@ exports.releaseAlphaMajor = releaseAlphaMajor
 async function releaseAlphaMajor() {
 	if (opts.verbose) console.log(`===> Running the "releaseAlphaMajor" command.\n`)
 	await releasePre()
-	await exec('npm version premajor --preid alpha -m v%s')
+	await exec('npm version --no-workspaces premajor --preid alpha -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseAlphaMajor" command.\n`)
 }
 
@@ -307,7 +307,7 @@ exports.releaseAlphaMinor = releaseAlphaMinor
 async function releaseAlphaMinor() {
 	if (opts.verbose) console.log(`===> Running the "releaseAlphaMinor" command.\n`)
 	await releasePre()
-	await exec('npm version preminor --preid alpha -m v%s')
+	await exec('npm version --no-workspaces preminor --preid alpha -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseAlphaMinor" command.\n`)
 }
 
@@ -315,7 +315,7 @@ exports.releaseAlphaPatch = releaseAlphaPatch
 async function releaseAlphaPatch() {
 	if (opts.verbose) console.log(`===> Running the "releaseAlphaPatch" command.\n`)
 	await releasePre()
-	await exec('npm version prepatch --preid alpha -m v%s')
+	await exec('npm version --no-workspaces prepatch --preid alpha -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseAlphaPatch" command.\n`)
 }
 
@@ -323,7 +323,7 @@ exports.releaseBetaMajor = releaseBetaMajor
 async function releaseBetaMajor() {
 	if (opts.verbose) console.log(`===> Running the "releaseBetaMajor" command.\n`)
 	await releasePre()
-	await exec('npm version premajor --preid beta -m v%s')
+	await exec('npm version --no-workspaces premajor --preid beta -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseBetaMajor" command.\n`)
 }
 
@@ -331,7 +331,7 @@ exports.releaseBetaMinor = releaseBetaMinor
 async function releaseBetaMinor() {
 	if (opts.verbose) console.log(`===> Running the "releaseBetaMinor" command.\n`)
 	await releasePre()
-	await exec('npm version preminor --preid beta -m v%s')
+	await exec('npm version --no-workspaces preminor --preid beta -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseBetaMinor" command.\n`)
 }
 
@@ -339,7 +339,7 @@ exports.releaseBetaPatch = releaseBetaPatch
 async function releaseBetaPatch() {
 	if (opts.verbose) console.log(`===> Running the "releaseBetaPatch" command.\n`)
 	await releasePre()
-	await exec('npm version prepatch --preid beta -m v%s')
+	await exec('npm version --no-workspaces prepatch --preid beta -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseBetaPatch" command.\n`)
 }
 
@@ -347,7 +347,7 @@ exports.releaseAlpha = releaseAlpha
 async function releaseAlpha() {
 	if (opts.verbose) console.log(`===> Running the "releaseAlpha" command.\n`)
 	await releasePre()
-	await exec('npm version prerelease --preid alpha -m v%s')
+	await exec('npm version --no-workspaces prerelease --preid alpha -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseAlpha" command.\n`)
 }
 
@@ -355,7 +355,7 @@ exports.releaseBeta = releaseBeta
 async function releaseBeta() {
 	if (opts.verbose) console.log(`===> Running the "releaseBeta" command.\n`)
 	await releasePre()
-	await exec('npm version prerelease --preid beta -m v%s')
+	await exec('npm version --no-workspaces prerelease --preid beta -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseBeta" command.\n`)
 }
 
