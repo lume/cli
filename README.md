@@ -5,7 +5,7 @@ A command line tool for building, testing, and publishing JavaScript/TypeScript 
 Write source code (with tests) and don't worry about the specifics of package
 management.
 
-NOTE! This is designed with Node.js native ES Modules (ESM) in mind.
+`@lume/cli` is designed with ES Modules (ESM), i.e. JavaScript modules, in mind. CommonJS is not supported.
 
 #### `npm install @lume/cli --global`
 
@@ -18,19 +18,23 @@ see `lume --help`.
   from its `src/` folder to a `dist/` output folder.
   - The output code is in standard ES Module format.
 - Formats all code in a project with [`prettier`](https://prettier.io).
-- Run a project's tests (any files ending with `.test.ts` in the project's src/ folder).
-  - Tests use [Jasmine](https://jasmine.github.io)'s `describe()`/`it()` functions for describing unit tests.
-  - Tests run in Karma with karma-chrome-launcher, so all tests have access Chrome Browser APIs.
+- Run a project's tests (any files ending with `.test.ts` in the project's src/
+  folder) with the excellent
+  [`@web/test-runner`](https://modern-web.dev/docs/test-runner/overview/).
+  - Tests use [Mocha](https://mochajs.org)'s `describe()`/`it()` functions for describing unit tests.
+  - Tests use Jest's [`expect()`](https://jestjs.io/docs/expect) library for assertions (`expect` is global, don't `import` it, TODO: type definition for `expect()`)
+  - Tests run in Google Chrome (TODO: `@web/test-runner` has more browser launchers, expose more options).
 - Publish a project to NPM.
 
 ## Future Features
 
-- Specify configuration overrides (Webpack options, Karma
-  options, etc).
+- Allow more configuration overrides (f.e. `@web/test-runner` options).
 - Scaffold LUME-based applications.
 - Scaffold LUME elements.
-- Scaffold generic TypeScript packages.
-- Support plain JavaScript, not just TypeScript.
+- Scaffold generic packages.
+- Ensure full support of plain JavaScript (untested, as Lume packages are all
+  TypeScript, but if it doesn't already work, it probably requires minimal
+  changes)
 
 ## Projects using LUME CLI
 
@@ -41,25 +45,23 @@ see `lume --help`.
 [trusktr/lowclass](https://github.com/trusktr/lowclass),
 [trusktr/perfect](https://github.com/trusktr/perfect)
 
-Notice in those projects that they have no dependencies on any build tools
+Notice in those projects that they have no dependencies on any build tools directly
 and no build configurations; they use `lume` commands for building, testing,
-formatting, and publishing packages.
+formatting, and publishing in a common way.
 
-> **NOTE:** This project initially meets needs for LUME packages, and as such may not
+> [!Note]
+> This project initially meets needs for LUME packages, and as such may not
 > be a perfect fit for everyone's needs.
 >
 > I'd like to make this easy to extend and even more generic to fit any needs, so that only few
-> modifications are needed in order to adopt its use for more specific cases (f.e. adding babel
-> plugins or webpack loaders and configs). See [TODO](#todos).
+> modifications are needed in order to adopt its use for more specific cases (f.e. adding Babel
+> or `@web/test-runner` plugins). See [TODO](#todos).
 
 ## Requirements
 
-- A Unix-like OS (not tested in Windows).
-- Node v12.4+ or v13.2+ (might work with lower versions, not tested)
-- NPM v5+ (might work with lower versions, not tested)
-- If you don't have a graphical display (f.e. in Linux without a desktop on a
-  continuous integration server) install xvfb for tests to run headlessly
-  without issues
+- Linux or macOS if publishing commands will be used, otherwise any OS for all other commands.
+- One of the latest two LTS versions of Node.js (might work with lower versions, not tested)
+- One of the lataest two versions of NPM (might work with lower versions, not tested)
 
 ## Getting Started
 
@@ -79,11 +81,11 @@ executables) to run the cli and show the help menu:
 
 ### Global Install
 
-Install the `lume` command to globally so it is available in any shell:
+Install the `lume` command globally so it is available in any shell:
 
 **`npm install @lume/cli --global`**
 
-If the above fails with permissions errors, you may need to run it with `sudo` (depending on your OS):
+If the above fails with permissions errors, you may need to run it with `sudo` in Linux/macOS or Admin priviliges in Windows:
 
 **`sudo npm install @lume/cli --global`**
 
@@ -113,7 +115,7 @@ executables) to run the cli and show the help menu:
 > [!Important]
 > This poses a problem similar to the global install option: the latest
 > version of the cli downloaded by `npx` may not be the version of LUME cli
-> that your project works with. In the future, the LUME cli will have internal
+> that your project works with. In the future, the LUME cli may have internal
 > version management.
 
 ## Project setup
@@ -127,12 +129,11 @@ src/               # All source files go here, as well as `.test.ts` files.
   index.ts         # The project's entry point.
   index.test.ts    # A co-located test file.
   ...              # Other files imported by entry point, and associated test files.
-dist/              # The folder where build output goes, ignored by version control.
+dist/              # The folder where build output goes (you might ignore this folder in your version control system).
 .gitignore         # Things to ignore, like the `dist/` output folder, are listed in here.
 package.json       # The project meta file, listing dependencies, scripts, etc.
-lume.config.cjs # Optional config options read by `lume` cli, see below.
+lume.config.cjs    # Optional config options read by `lume` cli, see below.
 tsconfig.json      # Optional, TypeScript configuration overrides. Extend from ./node_modules/@lume/cli/config/ts.config.json.
-.npmrc             # Used to configure NPM to not use package-lock.json (see why below)
 ```
 
 The `lume build` command will compile `.ts` files from the `src/` folder,
@@ -143,7 +144,7 @@ type definitions and mapping from type definitions back to `.ts` sources files.
 
 ### Set up files
 
-Let's set up `package.json`, `.gitignore`, `.npmrc`, `src/index.ts`, and `src/index.test.ts`.
+Let's set up `package.json`, `.gitignore`, `src/index.ts`, and `src/index.test.ts`.
 
 > NOTE, in the near future we'll add command to LUME cli to scaffold these
 > files.
@@ -196,27 +197,9 @@ We should ignore some things in a `.gitignore` file.
 
 ```sh
 node_modules/ # project dependencies
-package-lock.json # ignore package-lock.json files.
-dist/ # build output
+dist/ # build output (unless you want to commit output JS files)
 *.log # log files in case of errors, etc
 ```
-
-If we're making a package, and not an application, then we'll make sure
-`.npmrc` tells `npm` not to create `package-lock.json` files. NPM packages do
-not use package-lock files (`npm publish` will not publish them), while
-applications do. By not having lock files during package development, it
-becomes easier to catch in-range breaking changes that may affect end users,
-and we'll be more prepared to act on it.
-
-**`.npmrc`**
-
-```conf
-package-lock=false
-```
-
-Note, although this `.npmrc` config causes `npm` not to make the files, we
-still add it to `.gitignore` because popular tools like
-[Lerna](https://lerna.js.org) still output lock files regardless.
 
 Lastly, let's create `src/index.ts` with some sample code and ensure that it
 exports the project's version number at the very bottom:
@@ -261,35 +244,6 @@ This is enough to get a project bootstrapped. To learn more on how to
 configure build and test settings with `lume.config.cjs` and `tsconfig.json`
 files, see [Configuration](#configuration) below.
 
-## Managing a project
-
-Now that we've bootstrapped our project, the following are the basic commands
-we'll want to run to manage the life cycle of our project.
-For sake of
-simplicity, the following examples assume that `lume` was installed globally
-as per the "Global Install" option above.
-
-- `lume test`
-  - Run tests (all `.test.ts` files).
-  - Exits with a non-zero error code if any test fails
-- `lume dev`
-  - "dev" for "development mode"
-  - Builds all code, and rebuilds it automatically if any file changes.
-  - This is useful while developing a project, so that any time we edit
-    files, the project will automatically rebuild.
-- `lume build`
-  - Does a production build, and does not watch for file changes.
-  - Currently this doesn't do anything except _not watch_ files to rebuild on
-    file changes. In the future, we might decide to minify output modules.
-- `lume releasePatch`, `lume releaseMinor`, `lume releaseMajor`, etc
-  - Updates the version of the project in `package.json` and `src/index.ts`.
-  - Publishes the project to NPM under the new version number only if build
-    and tests pass. It runs `lume build` and `lume test`
-    internally.
-  - Pushes the a version commit and tag to the remote git repo.
-
-For more commands and details, run `lume --help`.
-
 ## Configuration
 
 The `lume.config.cjs` and `tsconfig.json` files can be used for
@@ -303,13 +257,6 @@ shows the available options (so far) with their defaults.
 
 ```js
 module.exports = {
-	// If provided, this will be called with the final array of Webpack configs
-	// that the cli created, providing an opportunity to make custom
-	// modifications to the webpack configs on top of what the cli already made.
-	webpackConfigs(configs) {
-		// modify configs
-	},
-
 	// Run all tests 6 times instead of just once, each time using one of the
 	// six possible TypeScript and Babel decorator configurations. Packages that
 	// export decorators should set this to true to ensure that the decorators
@@ -318,6 +265,42 @@ module.exports = {
 	//
 	// Default: false
 	testWithAllTSAndBabelDecoratorBuildConfigurations: true,
+
+	// Whether or not to run the TypeScript compiler in project reference mode
+	// (--build). This requires some advanced configuration of tsconfig.json.
+	//
+	// Default: false
+	tsProjectReferenceMode: true,
+
+	// The figlet font to use when your project's name is displayed at the
+	// beginning of `lume build`. Info: https://www.npmjs.com/package/figlet
+	//
+	// Default: "ICL-1900"
+	figletFont: 'Ghost',
+
+	// A path (if not absolute, then relative to the working directory) to a file
+	// that has ignore rules in it. This is useful for cases when we want `lume
+	// prettier` to use a specific ignore file, but otherwise (for example) want
+	// our IDE to use the default .prettierignore file. In the `lume` repo, we
+	// want the IDE to format on save in any file we are editing, even in
+	// sub-workspaces, but we want `lume prettier` to format only files in the top
+	// level workspace.
+	//
+	// Default: The `.prettierignore` in your project if it exists, otherwise "./node_modules/@lume/cli/.prettierignore".
+	prettierIgnorePath: './path/to/.some-other-ignore-file',
+
+	// The import map to use for `@web/test-runner`, which runs tests as native
+	// JavaScript modules in a browser. The import map is needed for mapping
+	// import specifiers to URLs from which to get those imports. Learn about import maps here:
+	// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap
+	//
+	// Default: {}
+	importMap: {
+		imports: {
+			// If we `npm install`ed `some-package`, then we tell web test-runner where to get it from:
+			'some-package': '/node_modules/some-package/dist/index.js',
+		},
+	},
 }
 ```
 
@@ -326,8 +309,15 @@ module.exports = {
 To configure (override) TypeScript compiler options, create a `tsconfig.json`
 file at the root of the project that extends from
 `./node_modules/@lume/cli/config/ts.config.json`, and override any settings
-as needed (to see what LUME cli's default settings are, see that
-[./config/lume.config.ts](./config/ts.config.json)).
+as needed (to see what LUME cli's default settings are, see
+[./config/ts.config.ts](./config/ts.config.json)).
+
+> [!Note]
+> If you don't wish to override anything, then `tsconfig.json` is not necessary,
+> Lume cli will automatically use its own config during `lume build`. However,
+> IDEs by default look for `tsconfig.json` for configuration, so if you want your
+> IDE to use the same configuration, you can make an empty config that only
+> `extends` from Lume's.
 
 See the [TypeScript compiler
 options](https://www.typescriptlang.org/docs/handbook/compiler-options.html)
@@ -341,6 +331,45 @@ For TypeScript-specific build and type-checking configuration.
 	}
 }
 ```
+
+## Managing a project
+
+Now that we've bootstrapped our project, the following are the basic commands
+we'll want to run to manage the life cycle of our project.
+For sake of
+simplicity, the following examples assume that `lume` was installed globally
+as per the "Global Install" option above.
+
+- `lume dev`
+  - "dev" for "development mode"
+  - Builds all code, and rebuilds it automatically if any file changes.
+  - This is useful while developing a project, so that any time we edit
+    files, the project will automatically rebuild.
+- `lume prettierCheck`
+  - Check that files are formatted well.
+  - Exits with a non-zero error code if any files don't pass, showing failed files in the output.
+- `lume prettier`
+  - Format all files.
+- `lume test`
+  - Run tests (all `.test.js` files in `dist/`). Run `lume build` first if you are not already running `lume dev`.
+  - Exits with a non-zero error code if any test fails, showing failed tests in the output.
+- `lume test --watch`
+  - Run tests in watch mode. This is useful while running `lume dev` so that
+    tests automatically re-run as soon as `dist/` is updated.
+- `lume build`
+  - Does a production build, and does not watch for file changes.
+  - Currently this doesn't do anything except _not watch_ files to rebuild on
+    file changes. In the future, we might decide to minify output modules, etc.
+- `lume releasePatch`, `lume releaseMinor`, `lume releaseMajor`, etc
+  - Updates the version of the project in `package.json` and `src/index.ts`.
+  - It runs `lume clean && lume build && lume test` to ensure code is in
+    working condition.
+  - Publishes the project to NPM using the new version number only if build and
+    tests pass.
+  - Pushes a version commit and tag to the remote git repo, including updated
+    `dist/` which exports the new version number in `dist/index.js`.
+
+For more commands and details, run `lume --help`.
 
 ## Caveats
 
@@ -362,8 +391,8 @@ Set while iterating on them, etc).
       otherwise it will pop a previous stash after `npm version` is done.
 - [ ] Ability to scaffold applications.
 - [ ] Ability to scaffold packages.
-- [x] Testing (added Karma)
-- [ ] Code coverage (Karma is in place, we just need to hook up a code coverage tool)
-- [ ] GitHub Actions configuration for scaffolded apps and packages.
+- [x] Testing (we're using `@web/test-runner`)
+- [ ] Code coverage (configure web test-runner, https://modern-web.dev/docs/test-runner/writing-tests/code-coverage/)
+- [ ] Enable visual regression testing (https://github.com/modernweb-dev/web/tree/master/packages/test-runner-visual-regression)
 - [ ] Switch to a separate `src/version.ts` file for the version number
-      export. Skip updating it if it doesn't exist.
+      export. Skip updating it if it doesn't exist instead of crashing.

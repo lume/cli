@@ -29,16 +29,17 @@ const babelBin = path.resolve(require.resolve('@babel/cli'), '..', 'bin', 'babel
 const prettierBin = path.resolve(require.resolve('prettier'), '..', 'bin', 'prettier.cjs')
 
 exports.build = build
-async function build({skipClean = false, noFailOnError = opts.noFail} = {}) {
+async function build({clean: _clean = false, noFail = opts.noFail} = {}) {
 	if (opts.verbose) console.log(`===> Running the "build" command.\n`)
 
+	await showName()
+
 	await Promise.all([
-		showName(),
 		copyAssets(),
 		(async function () {
-			if (!skipClean) await clean()
+			if (_clean) await clean()
 
-			const builtTs = await buildTs({noFailOnError})
+			const builtTs = await buildTs({noFail})
 
 			if (!builtTs) {
 				console.log('No sources to build.')
@@ -68,15 +69,7 @@ exports.dev = dev
 async function dev() {
 	if (opts.verbose) console.log(`===> Running the "dev" command.\n`)
 
-	// Skip cleaning in dev mode, makes things easier like not breaking an
-	// active type check process or webpack build.
-	await build({skipClean: true, noFailOnError: true})
-
-	const promises = []
-
-	promises.push(watchTs())
-
-	await Promise.all(promises)
+	await watchTs()
 
 	if (opts.verbose) console.log(`===> Done running the "dev" command.\n`)
 }
@@ -89,7 +82,7 @@ async function copyAssets() {
 }
 
 exports.buildTs = buildTs
-async function buildTs({babelConfig = undefined, tsConfig2 = undefined, noFailOnError = opts.noFail} = {}) {
+async function buildTs({babelConfig = undefined, tsConfig2 = undefined, noFail = opts.noFail} = {}) {
 	if (opts.verbose) console.log(`===> Running the "buildTs" command.\n`)
 
 	const start = performance.now()
@@ -122,7 +115,7 @@ async function buildTs({babelConfig = undefined, tsConfig2 = undefined, noFailOn
 		const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
 		const command = `node ${tscBin} ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./${file} ${
 			tsCliOptions ?? ''
-		} ${noFailOnError ? '|| echo ""' : ''}`
+		} ${noFail ? '|| echo ""' : ''}`
 
 		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
 		await exec(command)
@@ -192,40 +185,37 @@ async function typecheckWatch() {
 }
 
 exports.test = test
-async function test() {
+async function test(subOpts) {
+	const watch = subOpts.watch ?? false
+
 	if (opts.verbose) console.log(`===> Running the "test" command.\n`)
 
 	// This option was made mainly with @lume/variable and @lume/element, to
 	// test the code with all TypeScript and Babel decorator configs.
 	const {testWithAllTSAndBabelDecoratorBuildConfigurations} = require('../config/getUserConfig')
 
-	// FIXME This is a mess, but it works: the build() step here runs
-	// buildTs(), but then we also redundantly run buildTs() here after.
+	const webTestRunnerCommand = `node ${path.resolve(__dirname, '..', 'scripts', 'run-web-test-runner.js')}`
 
-	await Promise.all([build(), prettierCheck()])
-
-	const karmaCommand = `node ${path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.js')}`
-
-	if (testWithAllTSAndBabelDecoratorBuildConfigurations) {
+	if (testWithAllTSAndBabelDecoratorBuildConfigurations && !watch) {
 		let builtTs = false
 
 		console.log(`=====> Running the permutations of decorator test builds.\n`)
 
 		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.1.js'})
 		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await exec(karmaCommand, {env: {DECORATOR_CAUSES_NONWRITABLE_ERROR: 'true'}})
+		await exec(webTestRunnerCommand, {env: {DECORATOR_CAUSES_NONWRITABLE_ERROR: 'true'}})
 
 		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.2.js'})
 		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await exec(karmaCommand, {env: {DECORATOR_CAUSES_NONWRITABLE_ERROR: 'true'}})
+		await exec(webTestRunnerCommand, {env: {DECORATOR_CAUSES_NONWRITABLE_ERROR: 'true'}})
 
 		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.3.js'})
 		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await exec(karmaCommand)
+		await exec(webTestRunnerCommand)
 
 		builtTs = await buildTs({babelConfig: './node_modules/@lume/cli/config/babel.decorator-config.4.js'})
 		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await exec(karmaCommand)
+		await exec(webTestRunnerCommand)
 
 		// TODO The tsConfig2 option here requires the dependent app to have a
 		// tsconfig2.json file. The CLI should not require any tsconfig files,
@@ -233,7 +223,7 @@ async function test() {
 		// back to files here in the CLI.
 		builtTs = await buildTs({tsConfig2: true})
 		if (!builtTs) return console.log('No sources found, skipping tests.')
-		await exec(karmaCommand)
+		await exec(webTestRunnerCommand)
 	}
 
 	const builtTs = await buildTs()
@@ -241,25 +231,15 @@ async function test() {
 	// TODO if sources found, but no test files, also skip instead of error.
 	if (!builtTs) return console.log('No sources found, skipping tests.')
 
-	await exec(karmaCommand)
+	await exec(webTestRunnerCommand, {env: {WATCH_TESTS: String(watch)}})
 
 	if (opts.verbose) console.log(`===> Done running the "test" command.\n`)
 }
 
 exports.testDebug = testDebug
 async function testDebug() {
-	if (opts.verbose) console.log(`===> Running the "testDebug" command.\n`)
-
-	const [builtTs] = await Promise.all([buildTs(), showName()])
-
-	// TODO if sources found, but no tests files, also skip instead of error.
-	if (!builtTs) return console.log('No sources found, skipping tests.')
-
-	const karmaCommand = path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh')
-
-	await exec(karmaCommand, {env: {KARMA_DEBUG: 'true'}})
-
-	if (opts.verbose) console.log(`===> Done running the "testDebug" command.\n`)
+	console.error('The `lume testDebug` command has been removed. Instead use `lume test --watch`.')
+	process.exit(1)
 }
 
 exports.releasePre = releasePre

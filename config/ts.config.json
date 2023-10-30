@@ -12,9 +12,9 @@
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": false,
 
-		"lib": ["es2018", "dom"],
 		"skipLibCheck": false,
-		"target": "es2018",
+		"lib": ["esnext", "dom"],
+		"target": "esnext",
 		"module": "esnext",
 		"moduleResolution": "node",
 
