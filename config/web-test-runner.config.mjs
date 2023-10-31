@@ -16,9 +16,12 @@ export default {
 	// For now we limit concurrency until this is fixed: https://github.com/modernweb-dev/web/issues/2520
 	concurrency: 1,
 
-	// Run on random ports because we run test for multiple workspaces in
-	// parallel.
-	port: 3000 + Math.round(Math.random() * 5000),
+	// Run on random ports because we run tests for multiple workspaces in
+	// parallel, otherwise CI can fail (hasn't happened locally though, it could
+	// be something else about CI). Note, a bunch of ports between 1 and 10080
+	// are considered unsafe ports and Chrome will refuse to connect to them, so
+	// we start at 11000 and higher. See: https://superuser.com/questions/188058/which-ports-are-considered-unsafe-by-chrome
+	port: 11000 + Math.round(Math.random() * 50000),
 
 	// Override the default Chrome launcher with Playwright launcher so to test
 	// in all browsers in CI.
