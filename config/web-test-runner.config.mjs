@@ -14,6 +14,10 @@ export default {
 	// For now we limit concurrency until this is fixed: https://github.com/modernweb-dev/web/issues/2520
 	concurrency: 1,
 
+	// Run on random ports because we run test for multiple workspaces in
+	// parallel.
+	port: 3000 + Math.round(Math.random() * 5000),
+
 	// We're using vanilla ES Modules, not automatic Node-based module
 	// resolution, only import maps. Yeah baby! Embrace the platform!
 	nodeResolve: false,
