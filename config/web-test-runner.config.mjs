@@ -28,10 +28,16 @@ export default {
 	browsers: process.env.CI
 		? [
 				playwrightLauncher({product: 'chromium'}),
-				playwrightLauncher({product: 'firefox'}),
-				playwrightLauncher({product: 'webkit'}),
+
+				// TODO re-enable these once we fix native.js in lowclass for
+				// Firefox and Safari
+				// playwrightLauncher({product: 'firefox'}),
+				// playwrightLauncher({product: 'webkit'}),
 		  ]
-		: // undefined defaults to Chrome (must be locally installed)
+		: // undefined defaults to the test-runner Chrome launcher (must be
+		  // locally installed). Note, it will not work in CI unless we add a step
+		  // that installs Chrome, so we use playwrightLauncher in CI because it
+		  // downloads the browsers.
 		  undefined,
 
 	// We're using vanilla ES Modules, not automatic Node-based module
