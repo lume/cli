@@ -26,7 +26,11 @@ export default {
 	// Override the default Chrome launcher with Playwright launcher so to test
 	// in all browsers in CI.
 	browsers: process.env.CI
-		? [playwrightLauncher({product: 'chromium'})]
+		? [
+				playwrightLauncher({product: 'chromium'}),
+				playwrightLauncher({product: 'firefox'}),
+				playwrightLauncher({product: 'webkit'}),
+		  ]
 		: // undefined defaults to Chrome (must be locally installed)
 		  undefined,
 
