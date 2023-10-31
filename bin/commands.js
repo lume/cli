@@ -27,6 +27,7 @@ const tscBin = path.resolve(require.resolve('typescript'), '..', '..', 'bin', 't
 const gulpBin = path.resolve(require.resolve('gulp'), '..', 'bin', 'gulp.js')
 const babelBin = path.resolve(require.resolve('@babel/cli'), '..', 'bin', 'babel.js')
 const prettierBin = path.resolve(require.resolve('prettier'), '..', 'bin', 'prettier.cjs')
+const playwrightBin = path.resolve(require.resolve('playwright'), '..', 'cli.js')
 
 exports.build = build
 async function build({clean: _clean = false, noFail = opts.noFail} = {}) {
@@ -182,6 +183,11 @@ async function typecheckWatch() {
 	await exec(command)
 
 	if (opts.verbose) console.log(`===> Done running the "typecheckWatch" command.\n`)
+}
+
+exports.installBrowsers = installBrowsers
+async function installBrowsers() {
+	exec(`node ${playwrightBin} install`)
 }
 
 exports.test = test

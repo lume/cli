@@ -1,4 +1,6 @@
+// @ts-check
 import {importMapsPlugin} from '@web/dev-server-import-maps'
+import {playwrightLauncher} from '@web/test-runner-playwright'
 import userConfig from './getUserConfig.js'
 
 // path.resolve(process.cwd(), 'node_modules', 'jasmine-core', 'lib', 'jasmine-core', 'jasmine.js')
@@ -17,6 +19,13 @@ export default {
 	// Run on random ports because we run test for multiple workspaces in
 	// parallel.
 	port: 3000 + Math.round(Math.random() * 5000),
+
+	// Override the default Chrome launcher with Playwright launcher so to test
+	// in all browsers in CI.
+	browsers: process.env.CI
+		? [playwrightLauncher({product: 'chromium'})]
+		: // undefined defaults to Chrome (must be locally installed)
+		  undefined,
 
 	// We're using vanilla ES Modules, not automatic Node-based module
 	// resolution, only import maps. Yeah baby! Embrace the platform!

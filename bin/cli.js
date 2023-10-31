@@ -60,6 +60,11 @@ cli
 	.option('-w, --watch', 'Run tests in watch mode, with an interactive debug menu.')
 	.action(commands.test)
 
+cli
+	.command('install-browsers')
+	.description('Install browsers used for testing by Playwright in @web/test-runner.')
+	.action(commands.installBrowsers)
+
 cli.command('testDebug').description('Removed, use test --watch instead.').action(commands.testDebug)
 
 cli
