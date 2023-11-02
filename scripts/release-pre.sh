@@ -20,8 +20,12 @@ npm run build
 echo ' -- Run tests...'
 npm test
 
-# undo any changes in case build effects are tracked and are not deterministic
-# or someone forgot to commit them.
-git checkout .
+# Double check that the build and test did not create unexpected modifications.
+if [[ $(git status --porcelain) ]]; then
+	echo ""
+	echo "Working directory is not clean after build and test, quitting."
+	echo ""
+	exit 1
+fi
 
 echo '--- PREVERSION DONE --------------------'
