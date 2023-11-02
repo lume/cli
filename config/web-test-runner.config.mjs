@@ -66,7 +66,7 @@ export default {
 				Install Jest API globally (namely for the expect() API).
 				TODO: type defs specifically for expect() without bringing all type defs of all Jest globals. Right now Lume packages declare it with an any args type and any return type.
 				-->
-				<script src="/node_modules/@lume/cli/node_modules/jest-browser-globals/build-es5/index.js"></script>
+				<script src="/node_modules/@lume/cli/config/wtr-load-jest-globals.js"></script>
 
 				<script>
 					// Polyfill some Jasmine/Jest APIs using web-test-runner's
