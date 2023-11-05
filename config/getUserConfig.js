@@ -13,14 +13,12 @@ if (!userConfigExists) {
 
 /**
  * @typedef {{
- *   skipGlobal?: boolean
- *   globalName?: string | false
- *   globalEntrypoints?: string[]
- *   webpackConfigs?: (configs: import('webpack').Configuration[]) => void
+ *   testWithAllTSAndBabelDecoratorBuildConfigurations?: boolean
  *   tsProjectReferenceMode?: boolean
  *   figletFont?: string
- *   testSpecFormat?: 'jasmine' | 'mochachai'
  *   useBabelForTypeScript?: boolean
+ *   prettierIgnorePath?: string
+ *   importMap?: { imports: { [specifier: string]: string }, scopes: { [scope: string]: { [specifier: string]: string } } }
  * }} UserConfig
  */
 

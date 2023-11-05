@@ -1,10 +1,19 @@
 // @ts-check
-const {src, dest} = require('gulp')
+const {src, dest, series} = require('gulp')
+const { promises} = require('fs')
+
+async function mkDist() {
+	try {
+		await promises.mkdir('./dist')
+	} catch (e) {
+		if (e.code !== 'EEXIST') throw e
+	}
+}
 
 // Copies assets from src/ to dist/, matching the same folder structure as in
 // src/. An asset is considered to be any file other than source files. Source
 // files end in .ts or .tsx.
-exports.copyAssets = function () {
+function copy() {
 	return src([
 		'./src/**',
 		'!./src/**/*.{ts,tsx}',
@@ -12,4 +21,7 @@ exports.copyAssets = function () {
 		// XXX Should we make this configurable in lume.config.js?
 		'./src/**/*.d.ts',
 	]).pipe(dest('./dist/'))
+
 }
+
+exports.copyAssets = series(mkDist, copy)

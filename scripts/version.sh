@@ -7,5 +7,7 @@ echo ' -- Add version to source...'
 git add .
 git status
 echo ' -- Making production build.'
-lume build
+lume build --clean
+git add .
+git status
 echo '--- VERSION DONE --------------------'

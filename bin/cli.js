@@ -16,9 +16,14 @@ cli.option('-V, --verbose', 'Show verbose output.')
 
 cli.option('--noFail', 'Prevent build commands from failing on non-zero exit codes.', false)
 
-cli.command('clean').description('Remove all build outputs.').action(commands.clean)
+cli.command('clean').description('Remove all build outputs (deletes dist/).').action(commands.clean)
 
-cli.command('build').description('Build the project in which this command is being ran.').action(commands.build)
+cli
+	.command('build')
+	.description('Build the project in which this command is being ran.')
+	.option('-c, --clean', 'Remove all build outputs first (deletes dist/).')
+	.option('-n, --noFail', 'Exit successfully even on build failure.')
+	.action(commands.build)
 
 cli
 	.command('dev')
@@ -37,16 +42,6 @@ cli
 		await commands.buildTs()
 	})
 
-cli
-	.command('buildGlobal')
-	.description('Build the global version of the project for simple usage with browser script tags.')
-	.action(commands.buildGlobal)
-
-cli
-	.command('buildGlobalWatch')
-	.description('Build the global version of the project in watch mode any time files change.')
-	.action(commands.buildGlobalWatch)
-
 cli.command('showName').description('Output the project name to console.').action(commands.showName)
 
 cli
@@ -59,9 +54,18 @@ cli
 	.description('Run a typecheck of TypeScript source code without compiling output, in watch mode.')
 	.action(commands.typecheckWatch)
 
-cli.command('test').description('Run tests.').action(commands.test)
+cli
+	.command('test')
+	.description('Run tests.')
+	.option('-w, --watch', 'Run tests in watch mode, with an interactive debug menu.')
+	.action(commands.test)
 
-cli.command('testDebug').description('Run tests with GUI debugger.').action(commands.testDebug)
+cli
+	.command('install-browsers')
+	.description('Install browsers used for testing by Playwright in @web/test-runner.')
+	.action(commands.installBrowsers)
+
+cli.command('testDebug').description('Removed, use test --watch instead.').action(commands.testDebug)
 
 cli
 	.command('releasePre')

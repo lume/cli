@@ -14,61 +14,40 @@
 		"url": "https://github.com/lume/cli/issues"
 	},
 	"scripts": {
-		"build": "npm rebuild",
-		"// ^ build": "Sometimes an npm rebuild is needed in order to make sure electron binaries are up to date. This will make lerna bootstrap run it just in case.",
 		"release:patch": "npm version patch --message 'v%s' && npm publish && git push --follow-tags",
 		"release:minor": "npm version minor --message 'v%s' && npm publish && git push --follow-tags",
-		"release:major": "npm version major --message 'v%s' && npm publish && git push --follow-tags",
-		"prepare": "npm run build"
+		"release:major": "npm version major --message 'v%s' && npm publish && git push --follow-tags"
 	},
 	"dependencies": {
 		"@babel/cli": "7.18.10",
 		"@babel/core": "7.19.1",
-		"@babel/plugin-proposal-class-static-block": "7.18.6",
+		"@babel/plugin-proposal-class-properties": "7.10.4",
 		"@babel/plugin-proposal-decorators": "7.19.1",
 		"@babel/preset-typescript": "7.18.6",
 		"@babel/runtime": "7.19.0",
-		"@types/jasmine": "3.9.1",
-		"babel-loader": "8.2.5",
+		"@web/dev-server-import-maps": "^0.1.3",
+		"@web/test-runner": "^0.17.2",
+		"@web/test-runner-playwright": "^0.10.2",
 		"babel-preset-solid": "1.5.4",
-		"chai-jasmine": "^2.0.3",
 		"chalk": "4.1.2",
 		"commander": "8.2.0",
-		"electron": "14.0.1",
 		"figlet": "1.5.2",
-		"file-loader": "6.2.0",
 		"gulp": "4.0.2",
-		"jasmine-core": "3.9.0",
-		"karma": "6.3.4",
-		"karma-chai": "^0.1.0",
-		"karma-electron": "7.0.0",
-		"karma-jasmine": "4.0.1",
-		"karma-mocha": "^2.0.1",
-		"karma-mocha-reporter": "^2.2.5",
-		"karma-sourcemap-loader": "0.3.8",
-		"karma-spec-reporter": "0.0.32",
-		"karma-webpack": "5.0.0",
+		"jest-browser-globals": "^25.1.0-beta",
 		"lit-dom-expressions": "^0.35.9",
-		"mocha": "^9.1.1",
-		"prettier": "2.7.1",
+		"prettier": "3.0.3",
 		"rimraf": "3.0.0",
-		"source-map-loader": "4.0.0",
-		"typescript": "^4.6.3",
-		"webpack": "5.74.0",
-		"webpack-cli": "4.10.0",
-		"xvfb-maybe": "0.2.1"
-	},
-	"disabled-dependencies": {
-		"karma-stacktrace": "2.0.2, this is causing an error after the karma update: https://github.com/sergei-startsev/karma-stacktrace/issues/10"
+		"sinon": "^17.0.0",
+		"typescript": "4.6.3"
 	},
 	"keywords": [
+		"lume",
+		"solidjs",
 		"typescript",
 		"build",
 		"babel",
-		"webpack",
 		"web-development",
 		"webdev",
-		"karma",
-		"electron"
+		"web-test-runner"
 	]
 }

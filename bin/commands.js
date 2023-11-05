@@ -2,6 +2,8 @@
 const path = require('path')
 const fs = require('fs')
 const {showName} = require('../scripts/name.js')
+const config = require('../config/getUserConfig.js')
+const {exec} = require('../scripts/exec.js')
 
 const {useBabelForTypeScript = true, tsProjectReferenceMode = false} = require('../config/getUserConfig')
 
@@ -21,24 +23,33 @@ module.exports.setOpts = function (options) {
 
 exports.showName = showName
 
+// We use these so that no matter if we are running in a Yarn or Npm env (which
+// set PATH differently), we'll always be able to run the needed bins by relying
+// on Node.js module lookup algo (calling them directly might fail if they are
+// not in PATH)
+const tscBin = path.resolve(require.resolve('typescript'), '..', '..', 'bin', 'tsc')
+const gulpBin = path.resolve(require.resolve('gulp'), '..', 'bin', 'gulp.js')
+const babelBin = path.resolve(require.resolve('@babel/cli'), '..', 'bin', 'babel.js')
+const prettierBin = path.resolve(require.resolve('prettier'), '..', 'bin', 'prettier.cjs')
+const playwrightBin = path.resolve(require.resolve('playwright'), '..', 'cli.js')
+
 exports.build = build
-async function build({skipClean = false, noFailOnError = opts.noFail} = {}) {
+async function build({clean: _clean = false, noFail = opts.noFail} = {}) {
 	if (opts.verbose) console.log(`===> Running the "build" command.\n`)
 
+	await showName()
+
 	await Promise.all([
-		showName(),
 		copyAssets(),
 		(async function () {
-			if (!skipClean) await clean()
+			if (_clean) await clean()
 
-			const builtTs = await buildTs({noFailOnError})
+			const builtTs = await buildTs({noFail})
 
 			if (!builtTs) {
 				console.log('No sources to build.')
 				return
 			}
-
-			await buildGlobal({noFailOnError})
 		})(),
 	])
 
@@ -52,7 +63,7 @@ async function clean() {
 	const rmrf = require('rimraf')
 	const {promisify} = require('util')
 
-	await exec('tsc --build --clean')
+	await exec(`node ${tscBin} --build --clean`)
 
 	await Promise.all([promisify(rmrf)('dist'), promisify(rmrf)('tsconfig.tsbuildinfo')])
 
@@ -63,18 +74,7 @@ exports.dev = dev
 async function dev() {
 	if (opts.verbose) console.log(`===> Running the "dev" command.\n`)
 
-	// Skip cleaning in dev mode, makes things easier like not breaking an
-	// active type check process or webpack build.
-	// TODO we only need to compile TS initially for the global, but not the
-	// global build, because global build is ran below in watch mode.
-	await build({skipClean: true, noFailOnError: true})
-
-	const promises = []
-
-	promises.push(watchTs())
-	promises.push(buildGlobalWatch())
-
-	await Promise.all(promises)
+	await watchTs()
 
 	if (opts.verbose) console.log(`===> Done running the "dev" command.\n`)
 }
@@ -82,20 +82,19 @@ async function dev() {
 exports.copyAssets = copyAssets
 async function copyAssets() {
 	if (opts.verbose) console.log(`===> Running the "copyAssets" command.\n`)
-	await exec(`gulp --cwd ${process.cwd()} --gulpfile ./node_modules/@lume/cli/config/gulpfile.js copyAssets`)
+	await exec(`node ${gulpBin} --cwd ${process.cwd()} --gulpfile ./node_modules/@lume/cli/config/gulpfile.js copyAssets`)
 	if (opts.verbose) console.log(`===> Done running the "copyAssets" command.\n`)
 }
 
 exports.buildTs = buildTs
-async function buildTs({noFailOnError = opts.noFail} = {}) {
+async function buildTs({noFail = opts.noFail} = {}) {
 	if (opts.verbose) console.log(`===> Running the "buildTs" command.\n`)
 
 	const start = performance.now()
 	const fs = require('fs')
 
 	// If no tsconfig, don't build.
-	// TODO If no tsconfig, we can at least still build in babel/typescript mode.
-	// Or perhaps, if there's no user tsconfig fall back to cli's tsconfig. We
+	// TODO If there's no user tsconfig fall back to cli's tsconfig. We
 	// might need to temporarily write it to the project root.
 	try {
 		await fs.promises.access(path.resolve(process.cwd(), 'tsconfig.json'))
@@ -117,7 +116,7 @@ async function buildTs({noFailOnError = opts.noFail} = {}) {
 		// const {configPath, configExists} = require('../config/getUserBabelConfig')
 		// if (!configExists) throw new Error('useBabelForTypeScript was true, but no Babel config exists in the project.')
 
-		const command = `babel --source-maps --config-file ${babelConfigPath} --extensions .ts,.tsx src --out-dir ./dist`
+		const command = `node ${babelBin} --source-maps --config-file ${babelConfigPath} --extensions .ts,.tsx src --out-dir ./dist`
 
 		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
 
@@ -129,9 +128,9 @@ async function buildTs({noFailOnError = opts.noFail} = {}) {
 	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
 
 	// TODO not sure if the --emitDeclarationOnly flag is in the correct place when tsProjectReferenceMode is enabled.
-	const command = `tsc ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./tsconfig.json ${
+	const command = `node ${tscBin} ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./tsconfig.json ${
 		useBabelForTypeScript ? '--emitDeclarationOnly' : ''
-	} ${tsCliOptions ?? ''} ${noFailOnError ? '|| true' : ''}`
+	} ${tsCliOptions ?? ''} ${noFail ? '|| echo ""' : ''}`
 
 	if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
 
@@ -164,6 +163,8 @@ async function watchTs() {
 		return false
 	}
 
+	// TODO: watch both TS and Babel at the same time.
+
 	if (useBabelForTypeScript) {
 		// Build with Babel decorators stage 3
 
@@ -171,7 +172,7 @@ async function watchTs() {
 		// const {configPath, configExists} = require('../config/getUserBabelConfig')
 		// if (!configExists) throw new Error('useBabelForTypeScript was true, but no Babel config exists in the project.')
 
-		const command = `babel --source-maps --watch --config-file ${babelConfigPath} --extensions .ts,.tsx src --out-dir ./dist`
+		const command = `node ${babelBin} --source-maps --watch --config-file ${babelConfigPath} --extensions .ts,.tsx src --out-dir ./dist`
 
 		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
 
@@ -182,7 +183,7 @@ async function watchTs() {
 
 	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
 
-	const command = `tsc ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./tsconfig.json ${
+	const command = `node ${tscBin} ${tsProjectReferenceMode ? '--build --incremental' : '-p'} ./tsconfig.json ${
 		useBabelForTypeScript ? '--emitDeclarationOnly' : ''
 	} --watch ${tsCliOptions ?? ''}`
 
@@ -198,7 +199,7 @@ exports.typecheck = typecheck
 async function typecheck() {
 	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
 	// TODO tsProjectReferenceMode for typecheck too?
-	const command = 'tsc -p ./tsconfig.json --noEmit ' + (tsCliOptions ?? '')
+	const command = `node ${tscBin} -p ./tsconfig.json --noEmit ${tsCliOptions ?? ''}`
 
 	if (opts.verbose) {
 		console.log(`===> Running the "typecheck" command.\n`)
@@ -215,7 +216,7 @@ exports.typecheckWatch = typecheckWatch
 async function typecheckWatch() {
 	const tsCliOptions = cli.rawArgs.join(' ').split(' -- ')[1]
 	// TODO tsProjectReferenceMode for typecheck watch mode too?
-	const command = 'tsc -p ./tsconfig.json --noEmit --watch ' + (tsCliOptions ?? '')
+	const command = `node ${tscBin} -p ./tsconfig.json --noEmit --watch ${tsCliOptions ?? ''}`
 
 	if (opts.verbose) {
 		console.log(`===> Running the "typecheckWatch" command.\n`)
@@ -227,71 +228,28 @@ async function typecheckWatch() {
 	if (opts.verbose) console.log(`===> Done running the "typecheckWatch" command.\n`)
 }
 
-exports.buildGlobal = buildGlobal
-async function buildGlobal({noFailOnError = opts.noFail}) {
-	const command = `webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} ${
-		noFailOnError ? '|| true' : ''
-	}`
-
-	if (opts.verbose) {
-		console.log(`===> Running the "buildGlobal" command.\n`)
-		console.log(`=====> Running \`${command}\`\n`)
-	}
-
-	await exec(command)
-
-	if (opts.verbose) console.log(`===> Done running the "buildGlobal" command.\n`)
-}
-
-exports.buildGlobalWatch = buildGlobalWatch
-async function buildGlobalWatch() {
-	const command = `webpack --color --config ${path.resolve(__dirname, '..', 'config', 'webpack.config.js')} --watch`
-
-	if (opts.verbose) {
-		console.log(`===> Running the "buildGlobalWatch" command.\n`)
-		console.log(`=====> Running \`${command}\`\n`)
-	}
-
-	await exec(command)
-
-	if (opts.verbose) console.log(`===> Done running the "buildGlobalWatch" command.\n`)
+exports.installBrowsers = installBrowsers
+async function installBrowsers() {
+	exec(`node ${playwrightBin} install`)
 }
 
 exports.test = test
-async function test() {
+async function test(subOpts) {
+	const watch = subOpts.watch ?? false
+
 	if (opts.verbose) console.log(`===> Running the "test" command.\n`)
 
-	// FIXME This is a mess, but it works: the build() step here runs
-	// buildTs(), but then we also redundantly run buildTs() here after.
+	const webTestRunnerCommand = `node ${path.resolve(__dirname, '..', 'scripts', 'run-web-test-runner.js')}`
 
-	await Promise.all([build(), prettierCheck()])
-
-	const karmaCommand = path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh')
-
-	const builtTs = await buildTs()
-
-	// TODO if sources found, but no test files, also skip instead of error.
-	if (!builtTs) return console.log('No sources found, skipping tests.')
-
-	await exec(karmaCommand)
+	await exec(webTestRunnerCommand, {env: {WATCH_TESTS: String(watch)}})
 
 	if (opts.verbose) console.log(`===> Done running the "test" command.\n`)
 }
 
 exports.testDebug = testDebug
 async function testDebug() {
-	if (opts.verbose) console.log(`===> Running the "testDebug" command.\n`)
-
-	const [builtTs] = await Promise.all([buildTs({noFailOnError: true}), showName()])
-
-	// TODO if sources found, but no tests files, also skip instead of error.
-	if (!builtTs) return console.log('No sources found, skipping tests.')
-
-	const karmaCommand = path.resolve(__dirname, '..', 'scripts', 'run-karma-tests.sh')
-
-	await exec(karmaCommand, {env: {KARMA_DEBUG: 'true'}})
-
-	if (opts.verbose) console.log(`===> Done running the "testDebug" command.\n`)
+	console.error('The `lume testDebug` command has been removed. Instead use `lume test --watch`.')
+	process.exit(1)
 }
 
 exports.releasePre = releasePre
@@ -307,7 +265,7 @@ exports.releasePatch = releasePatch
 async function releasePatch() {
 	if (opts.verbose) console.log(`===> Running the "releasePatch" command.\n`)
 	await releasePre()
-	await exec('npm version patch -m v%s')
+	await exec('npm version --no-workspaces patch -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releasePatch" command.\n`)
 }
 
@@ -315,7 +273,7 @@ exports.releaseMinor = releaseMinor
 async function releaseMinor() {
 	if (opts.verbose) console.log(`===> Running the "releaseMinor" command.\n`)
 	await releasePre()
-	await exec('npm version minor -m v%s')
+	await exec('npm version --no-workspaces minor -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseMinor" command.\n`)
 }
 
@@ -323,7 +281,7 @@ exports.releaseMajor = releaseMajor
 async function releaseMajor() {
 	if (opts.verbose) console.log(`===> Running the "releaseMajor" command.\n`)
 	await releasePre()
-	await exec('npm version major -m v%s')
+	await exec('npm version --no-workspaces major -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseMajor" command.\n`)
 }
 
@@ -331,7 +289,7 @@ exports.releaseAlphaMajor = releaseAlphaMajor
 async function releaseAlphaMajor() {
 	if (opts.verbose) console.log(`===> Running the "releaseAlphaMajor" command.\n`)
 	await releasePre()
-	await exec('npm version premajor --preid alpha -m v%s')
+	await exec('npm version --no-workspaces premajor --preid alpha -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseAlphaMajor" command.\n`)
 }
 
@@ -339,7 +297,7 @@ exports.releaseAlphaMinor = releaseAlphaMinor
 async function releaseAlphaMinor() {
 	if (opts.verbose) console.log(`===> Running the "releaseAlphaMinor" command.\n`)
 	await releasePre()
-	await exec('npm version preminor --preid alpha -m v%s')
+	await exec('npm version --no-workspaces preminor --preid alpha -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseAlphaMinor" command.\n`)
 }
 
@@ -347,7 +305,7 @@ exports.releaseAlphaPatch = releaseAlphaPatch
 async function releaseAlphaPatch() {
 	if (opts.verbose) console.log(`===> Running the "releaseAlphaPatch" command.\n`)
 	await releasePre()
-	await exec('npm version prepatch --preid alpha -m v%s')
+	await exec('npm version --no-workspaces prepatch --preid alpha -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseAlphaPatch" command.\n`)
 }
 
@@ -355,7 +313,7 @@ exports.releaseBetaMajor = releaseBetaMajor
 async function releaseBetaMajor() {
 	if (opts.verbose) console.log(`===> Running the "releaseBetaMajor" command.\n`)
 	await releasePre()
-	await exec('npm version premajor --preid beta -m v%s')
+	await exec('npm version --no-workspaces premajor --preid beta -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseBetaMajor" command.\n`)
 }
 
@@ -363,7 +321,7 @@ exports.releaseBetaMinor = releaseBetaMinor
 async function releaseBetaMinor() {
 	if (opts.verbose) console.log(`===> Running the "releaseBetaMinor" command.\n`)
 	await releasePre()
-	await exec('npm version preminor --preid beta -m v%s')
+	await exec('npm version --no-workspaces preminor --preid beta -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseBetaMinor" command.\n`)
 }
 
@@ -371,7 +329,7 @@ exports.releaseBetaPatch = releaseBetaPatch
 async function releaseBetaPatch() {
 	if (opts.verbose) console.log(`===> Running the "releaseBetaPatch" command.\n`)
 	await releasePre()
-	await exec('npm version prepatch --preid beta -m v%s')
+	await exec('npm version --no-workspaces prepatch --preid beta -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseBetaPatch" command.\n`)
 }
 
@@ -379,7 +337,7 @@ exports.releaseAlpha = releaseAlpha
 async function releaseAlpha() {
 	if (opts.verbose) console.log(`===> Running the "releaseAlpha" command.\n`)
 	await releasePre()
-	await exec('npm version prerelease --preid alpha -m v%s')
+	await exec('npm version --no-workspaces prerelease --preid alpha -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseAlpha" command.\n`)
 }
 
@@ -387,7 +345,7 @@ exports.releaseBeta = releaseBeta
 async function releaseBeta() {
 	if (opts.verbose) console.log(`===> Running the "releaseBeta" command.\n`)
 	await releasePre()
-	await exec('npm version prerelease --preid beta -m v%s')
+	await exec('npm version --no-workspaces prerelease --preid beta -m v%s')
 	if (opts.verbose) console.log(`===> Done running the "releaseBeta" command.\n`)
 }
 
@@ -414,7 +372,9 @@ const prettierConfig =
 		: './node_modules/@lume/cli/.prettierrc.js')
 
 const prettierIgnore =
-	'--ignore-path ' + (fs.existsSync('.prettierignore') ? '.prettierignore' : './node_modules/@lume/cli/.prettierignore')
+	'--ignore-path ' +
+	(config.prettierIgnorePath ??
+		(fs.existsSync('.prettierignore') ? '.prettierignore' : './node_modules/@lume/cli/.prettierignore'))
 
 // Check formatting of all supported file types in the project.
 const prettierFiles = process.cwd()
@@ -422,7 +382,7 @@ const prettierFiles = process.cwd()
 exports.prettier = prettier
 async function prettier() {
 	if (opts.verbose) console.log(`===> Running the "prettier" command.\n`)
-	const command = `prettier ${prettierConfig} ${prettierIgnore} --write ${prettierFiles}`
+	const command = `node ${prettierBin} ${prettierConfig} ${prettierIgnore} --write ${prettierFiles}`
 	if (opts.verbose) console.log(`=====> Running \`${command}\`\n`)
 	await exec(command)
 	if (opts.verbose) console.log(`===> Done running the "prettier" command.\n`)
@@ -431,57 +391,8 @@ async function prettier() {
 exports.prettierCheck = prettierCheck
 async function prettierCheck() {
 	if (opts.verbose) console.log(`===> Running the "prettierCheck" command.\n`)
-	const command = `prettier ${prettierConfig} ${prettierIgnore} --check ${prettierFiles}`
+	const command = `node ${prettierBin} ${prettierConfig} ${prettierIgnore} --check ${prettierFiles}`
 	if (opts.verbose) console.log(`=====> Running \`${command}\`\n`)
 	await exec(command)
 	if (opts.verbose) console.log(`===> Done running the "prettierCheck" command.\n`)
-}
-
-/** @type {import('child_process').SpawnOptions | undefined} */
-let execSpawnOptions
-
-/**
- * @param {string} cmd
- * @param {{exitOnFail?: boolean, env?: {[k:string]: string}} | undefined} options - Options. If
- * .exitOnFail is not true (true is default), then the process that called
- * exec will exit if the spawned child process exits non-zero.
- */
-async function exec(cmd, options = {}) {
-	if (!execSpawnOptions) {
-		execSpawnOptions = {
-			shell: true,
-			stdio: 'inherit',
-			env: {
-				...process.env,
-
-				PATH: [
-					// project node_modules
-					path.resolve(process.cwd(), 'node_modules', '.bin'),
-					// local node_modules wherever this package is installed
-					path.resolve(__dirname, '..', 'node_modules', '.bin'),
-					process.env.PATH,
-				].join(':'),
-			},
-		}
-	}
-
-	const {exitOnFail = true, env = {}} = options
-
-	let parts = cmd.trim().split(/\s+/)
-	const bin = parts.shift()
-	const {spawn} = require('child_process')
-
-	await new Promise((resolve, reject) => {
-		const child = spawn(bin, parts, {...execSpawnOptions, env: {...execSpawnOptions.env, ...env}})
-
-		child.on('close', exitCode => {
-			if (exitCode !== 0) {
-				if (exitOnFail) process.exit(exitCode)
-				else reject(exitCode)
-			}
-			resolve()
-		})
-
-		process.on('exit', () => child.kill())
-	})
 }
