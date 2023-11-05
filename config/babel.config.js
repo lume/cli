@@ -6,9 +6,7 @@ module.exports = {
 
 	plugins: [
 		['@babel/plugin-transform-typescript', {allowDeclareFields: true}],
-		['@babel/plugin-proposal-decorators', {version: '2022-03'}],
-		['@babel/plugin-proposal-class-properties', {loose: false}],
-		['@babel/plugin-proposal-class-static-block'],
+		['@babel/plugin-proposal-decorators', {version: '2023-05'}],
 	].map(p => [require.resolve(p[0]), p[1]]),
 
 	presets: [

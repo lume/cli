@@ -63,8 +63,6 @@ async function clean() {
 	const rmrf = require('rimraf')
 	const {promisify} = require('util')
 
-	await exec(`node ${tscBin} --build --clean`)
-
 	await Promise.all([promisify(rmrf)('dist'), promisify(rmrf)('tsconfig.tsbuildinfo')])
 
 	if (opts.verbose) console.log(`===> Done running the "clean" command.\n`)
@@ -112,11 +110,9 @@ async function buildTs({noFail = opts.noFail} = {}) {
 	if (useBabelForTypeScript) {
 		// Build with Babel decorators stage 3
 
-		// TODO merge cli's Babel config with user's Babel config
-		// const {configPath, configExists} = require('../config/getUserBabelConfig')
-		// if (!configExists) throw new Error('useBabelForTypeScript was true, but no Babel config exists in the project.')
+		const {configPath} = require('../config/getUserBabelConfig')
 
-		const command = `node ${babelBin} --source-maps --config-file ${babelConfigPath} --extensions .ts,.tsx src --out-dir ./dist`
+		const command = `node ${babelBin} --source-maps --config-file ${configPath} --extensions .ts,.tsx src --out-dir ./dist`
 
 		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
 
@@ -168,11 +164,9 @@ async function watchTs() {
 	if (useBabelForTypeScript) {
 		// Build with Babel decorators stage 3
 
-		// TODO merge cli's Babel config with user's Babel config
-		// const {configPath, configExists} = require('../config/getUserBabelConfig')
-		// if (!configExists) throw new Error('useBabelForTypeScript was true, but no Babel config exists in the project.')
+		const {configPath} = require('../config/getUserBabelConfig')
 
-		const command = `node ${babelBin} --source-maps --watch --config-file ${babelConfigPath} --extensions .ts,.tsx src --out-dir ./dist`
+		const command = `node ${babelBin} --source-maps --watch --config-file ${configPath} --extensions .ts,.tsx src --out-dir ./dist`
 
 		if (opts.verbose) console.log(`=====> Running \`${command}\`.\n`)
 

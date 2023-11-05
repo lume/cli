@@ -2,6 +2,7 @@
 const fs = require('fs')
 const path = require('path')
 const CWD = process.cwd()
+const cliBabelConfigPath = path.resolve(__dirname, 'babel.config.js')
 
 let configPath = path.join(CWD, 'babel.config.js')
 let configExists = fs.existsSync(configPath)
@@ -21,6 +22,9 @@ if (!configExists) {
 	configExists = fs.existsSync(configPath)
 }
 
-const config = configExists ? require(configPath) : {}
+if (!configExists) {
+	configPath = cliBabelConfigPath
+	configExists = true
+}
 
-module.exports = {config, configPath, configExists}
+module.exports = {configPath}
