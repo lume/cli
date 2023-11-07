@@ -19,7 +19,7 @@
 		"skipLibCheck": true,
 
 		"lib": ["esnext", "dom"],
-		"target": "esnext",
+		"target": "es2022",
 		"module": "esnext",
 		"moduleResolution": "node",
 
