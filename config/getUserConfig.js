@@ -18,6 +18,7 @@ if (!userConfigExists) {
  *   figletFont?: string
  *   useBabelForTypeScript?: boolean
  *   prettierIgnorePath?: string
+ *   testFiles?: string | string[]
  *   importMap?: { imports: { [specifier: string]: string }, scopes: { [scope: string]: { [specifier: string]: string } } }
  * }} UserConfig
  */

@@ -7,7 +7,7 @@ import userConfig from './getUserConfig.js'
 
 /** @type {import('@web/test-runner').TestRunnerConfig} */
 export default {
-	files: 'dist/**/*.test.js',
+	files: userConfig.testFiles ?? 'dist/**/*.test.js',
 
 	// For now, set this manually to true to enable watch mode.
 	// TODO pass options like --watch from lume cli to web-test-runner.

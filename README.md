@@ -253,7 +253,7 @@ configuration.
 
 Various parts of the build/test/publish process can be configured with a
 `lume.config.cjs` file at the root of the project. The following example
-shows the available options (so far) with their defaults.
+shows the available options with their defaults.
 
 ```js
 module.exports = {
@@ -266,7 +266,7 @@ module.exports = {
 	// Default: false
 	testWithAllTSAndBabelDecoratorBuildConfigurations: true,
 
-  // EXPERIMENTAL
+	// EXPERIMENTAL
 	// Whether or not to run the TypeScript compiler in project reference mode
 	// (--build) for incremental compilation. This requires some advanced
 	// configuration of tsconfig.json.
@@ -276,7 +276,7 @@ module.exports = {
 
 	// The figlet font to use when your project's name is displayed at the
 	// beginning of `lume build`. Info: https://www.npmjs.com/package/figlet
-  //
+	//
 	// Example:
 	//   _   _      _ _        __        __         _     _ _ _
 	//  | | | | ___| | | ___   \ \      / /__  _ __| | __| | | |
@@ -312,6 +312,13 @@ module.exports = {
 	//
 	// Default: The `.prettierignore` in your project if it exists, otherwise "./node_modules/@lume/cli/.prettierignore".
 	prettierIgnorePath: './path/to/.some-other-ignore-file',
+
+	// The test files that will be executed with `@web/test-runner`. It can be a
+	// string glob, or array of string globs. Prefix a glob with `!` to negate
+	// it.
+	//
+	// Default: "dist/**/*.test.js"
+	testFiles: ['./build/**/tests/*.js'],
 
 	// The import map to use for `@web/test-runner`, which runs tests as native
 	// JavaScript modules in a browser. The import map is needed for mapping
