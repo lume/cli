@@ -13,7 +13,6 @@ if (!userConfigExists) {
 
 /**
  * @typedef {{
- *   testWithAllTSAndBabelDecoratorBuildConfigurations?: boolean
  *   tsProjectReferenceMode?: boolean
  *   figletFont?: string
  *   useBabelForTypeScript?: boolean

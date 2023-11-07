@@ -257,15 +257,6 @@ shows the available options with their defaults.
 
 ```js
 module.exports = {
-	// Run all tests 6 times instead of just once, each time using one of the
-	// six possible TypeScript and Babel decorator configurations. Packages that
-	// export decorators should set this to true to ensure that the decorators
-	// will work in every TS/Babel build configuration in which the code may be
-	// possibly imported.
-	//
-	// Default: false
-	testWithAllTSAndBabelDecoratorBuildConfigurations: true,
-
 	// EXPERIMENTAL
 	// Whether or not to run the TypeScript compiler in project reference mode
 	// (--build) for incremental compilation. This requires some advanced

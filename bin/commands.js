@@ -7,8 +7,6 @@ const {exec} = require('../scripts/exec.js')
 
 const {useBabelForTypeScript = false, tsProjectReferenceMode = false} = require('../config/getUserConfig')
 
-const babelConfigPath = './node_modules/@lume/cli/config/babel.config.js'
-
 // TODO read CLI options from a project's lume.config too.
 
 let cli
