@@ -5,7 +5,7 @@ const {showName} = require('../scripts/name.js')
 const config = require('../config/getUserConfig.js')
 const {exec} = require('../scripts/exec.js')
 
-const {useBabelForTypeScript = true, tsProjectReferenceMode = false} = require('../config/getUserConfig')
+const {useBabelForTypeScript = false, tsProjectReferenceMode = false} = require('../config/getUserConfig')
 
 const babelConfigPath = './node_modules/@lume/cli/config/babel.config.js'
 
