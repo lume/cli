@@ -12,7 +12,12 @@
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": false,
 
-		"skipLibCheck": false,
+		// This is often a source of problems. Assume that if a project built
+		// fine, then its declaration output is fine and we don't need to type
+		// check it. Sometimes declaration output causes type errors, which is a
+		// major pain.
+		"skipLibCheck": true,
+
 		"lib": ["esnext", "dom"],
 		"target": "esnext",
 		"module": "esnext",
@@ -36,8 +41,6 @@
 		// "noImplicitOverride": true, // TODO, many type errors will result (f.e. in the lume package)
 
 		// Language feature options
-		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true,
 		"useDefineForClassFields": true,
 		"preserveConstEnums": true,
 		// JSX is preserved so that we can handle JSX with babel-preset-solid
