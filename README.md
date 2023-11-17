@@ -39,7 +39,7 @@ see `lume --help`.
 ## Projects using LUME CLI
 
 [lume/element](https://github.com/lume/element),
-[lume/variable](https://github.com/lume/variable),
+[classy-solid](https://github.com/lume/classy-solid),
 [lume/element-behaviors](https://github.com/lume/element-behaviors),
 [lume/lume](https://github.com/lume/lume),
 [trusktr/lowclass](https://github.com/trusktr/lowclass),
