@@ -52,7 +52,7 @@
 		"declarationMap": true,
 		"noEmitOnError": false,
 		"sourceMap": true,
-		"removeComments": true,
+		"removeComments": false, // If true, then useful documentation will not appear in end-user IDEs.
 
 		"paths": {"*": ["*"]},
 		"rootDir": "../../../../src",
