@@ -5,7 +5,7 @@ const {showName} = require('../scripts/name.js')
 const config = require('../config/getUserConfig.js')
 const {exec} = require('../scripts/exec.js')
 
-const {useBabelForTypeScript = false, tsProjectReferenceMode = false} = require('../config/getUserConfig')
+const {useBabelForTypeScript = false, tsProjectReferenceMode = false} = require('../config/getUserConfig.js')
 
 // TODO read CLI options from a project's lume.config too.
 
@@ -108,7 +108,7 @@ async function buildTs({noFail = opts.noFail} = {}) {
 	if (useBabelForTypeScript) {
 		// Build with Babel decorators stage 3
 
-		const {configPath} = require('../config/getUserBabelConfig')
+		const {configPath} = require('../config/getUserBabelConfig.js')
 
 		const command = `node ${babelBin} --source-maps --config-file ${configPath} --extensions .ts,.tsx src --out-dir ./dist`
 
@@ -162,7 +162,7 @@ async function watchTs() {
 	if (useBabelForTypeScript) {
 		// Build with Babel decorators stage 3
 
-		const {configPath} = require('../config/getUserBabelConfig')
+		const {configPath} = require('../config/getUserBabelConfig.js')
 
 		const command = `node ${babelBin} --source-maps --watch --config-file ${configPath} --extensions .ts,.tsx src --out-dir ./dist`
 

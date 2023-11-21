@@ -2,7 +2,7 @@
 // @ts-check
 
 const commander = require('commander')
-const commands = require('./commands')
+const commands = require('./commands.js')
 const {version} = require('../package.json')
 
 const cli = new commander.Command()

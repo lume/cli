@@ -6,7 +6,7 @@ const CWD = process.cwd()
 const path = require('path')
 const figlet = require('figlet')
 const chalk = require('chalk')
-const userConfig = require('../config/getUserConfig')
+const userConfig = require('../config/getUserConfig.js')
 
 const pkg = require(path.resolve(CWD, 'package.json'))
 let {name} = pkg
