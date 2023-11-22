@@ -14,9 +14,9 @@
 		"url": "https://github.com/lume/cli/issues"
 	},
 	"scripts": {
-		"release:patch": "npm version patch --message 'v%s' && npm publish && git push --follow-tags",
-		"release:minor": "npm version minor --message 'v%s' && npm publish && git push --follow-tags",
-		"release:major": "npm version major --message 'v%s' && npm publish && git push --follow-tags"
+		"release:patch": "npm version patch --no-workspaces --message 'v%s' && npm publish && git push --follow-tags",
+		"release:minor": "npm version minor --no-workspaces --message 'v%s' && npm publish && git push --follow-tags",
+		"release:major": "npm version major --no-workspaces --message 'v%s' && npm publish && git push --follow-tags"
 	},
 	"dependencies": {
 		"@babel/cli": "7.23.0",
