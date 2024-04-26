@@ -1,6 +1,6 @@
 {
 	"name": "@lume/cli",
-	"version": "0.5.10",
+	"version": "0.5.11",
 	"description": "A CLI for managing JavaScript/TypeScript packages.",
 	"homepage": "https://github.com/lume/cli",
 	"bin": {
