@@ -19,7 +19,7 @@
 		"release:patch": "npm version patch --message 'v%s' && npm publish && git push --follow-tags",
 		"release:minor": "npm version minor --message 'v%s' && npm publish && git push --follow-tags",
 		"release:major": "npm version major --message 'v%s' && npm publish && git push --follow-tags",
-		"prepare": "npm run build"
+		"xprepare": "npm run build"
 	},
 	"dependencies": {
 		"@babel/cli": "7.11.6",
