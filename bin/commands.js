@@ -26,7 +26,6 @@ exports.showName = showName
 // on Node.js module lookup algo (calling them directly might fail if they are
 // not in PATH)
 const tscBin = path.resolve(require.resolve('typescript'), '..', '..', 'bin', 'tsc')
-const gulpBin = path.resolve(require.resolve('gulp'), '..', 'bin', 'gulp.js')
 const babelBin = path.resolve(require.resolve('@babel/cli'), '..', 'bin', 'babel.js')
 const prettierBin = path.resolve(require.resolve('prettier'), '..', 'bin', 'prettier.cjs')
 const playwrightBin = path.resolve(require.resolve('playwright'), '..', 'cli.js')
@@ -75,11 +74,30 @@ async function dev() {
 	if (opts.verbose) console.log(`===> Done running the "dev" command.\n`)
 }
 
+const srcDir = path.join(process.cwd(), 'src')
+const distDir = path.join(process.cwd(), 'dist')
+
 exports.copyAssets = copyAssets
 async function copyAssets() {
 	if (opts.verbose) console.log(`===> Running the "copyAssets" command.\n`)
-	await exec(`node ${gulpBin} --cwd ${process.cwd()} --gulpfile ./node_modules/@lume/cli/config/gulpfile.js copyAssets`)
+
+	await fs.promises.cp(srcDir, distDir, {
+		recursive: true,
+		filter(src) {
+			if (src.endsWith('.tsx') || (src.endsWith('.ts') && !src.endsWith('.d.ts'))) return false
+			return true
+		}
+	})
+
 	if (opts.verbose) console.log(`===> Done running the "copyAssets" command.\n`)
+}
+
+async function mkDist() {
+	try {
+		await fs.promises.mkdir(distDir)
+	} catch (e) {
+		if (e.code !== 'EEXIST') throw e
+	}
 }
 
 exports.buildTs = buildTs

@@ -32,7 +32,6 @@
 		"chalk": "4.1.2",
 		"commander": "8.2.0",
 		"figlet": "1.5.2",
-		"gulp": "4.0.2",
 		"jest-browser-globals": "^25.1.0-beta",
 		"prettier": "3.0.3",
 		"rimraf": "3.0.0",
