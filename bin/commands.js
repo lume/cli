@@ -31,16 +31,16 @@ const prettierBin = path.resolve(require.resolve('prettier'), '..', 'bin', 'pret
 const playwrightBin = path.resolve(require.resolve('playwright'), '..', 'cli.js')
 
 exports.build = build
-async function build({clean: _clean = false, noFail = opts.noFail} = {}) {
+async function build({clean: shouldClean = false, noFail = opts.noFail} = {}) {
 	if (opts.verbose) console.log(`===> Running the "build" command.\n`)
 
 	await showName()
 
+	if (shouldClean) await clean()
+
 	await Promise.all([
 		copyAssets(),
 		(async function () {
-			if (_clean) await clean()
-
 			const builtTs = await buildTs({noFail})
 
 			if (!builtTs) {
@@ -86,7 +86,7 @@ async function copyAssets() {
 		filter(src) {
 			if (src.endsWith('.tsx') || (src.endsWith('.ts') && !src.endsWith('.d.ts'))) return false
 			return true
-		}
+		},
 	})
 
 	if (opts.verbose) console.log(`===> Done running the "copyAssets" command.\n`)
