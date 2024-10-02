@@ -38,7 +38,8 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"forceConsistentCasingInFileNames": true,
-		// "noImplicitOverride": true, // TODO, many type errors will result (f.e. in the lume package)
+		"noImplicitOverride": true,
+		"noUncheckedIndexedAccess": true,
 
 		// Language feature options
 		"useDefineForClassFields": true,
@@ -46,6 +47,8 @@
 		// JSX is preserved so that we can handle JSX with babel-preset-solid
 		// (for use with @lume/element).
 		"jsx": "preserve",
+		// Default to supporting Solid JSX by default. This is the default the Lume project uses right now.
+		"jsxImportSource": "solid-js",
 
 		"pretty": true,
 		"declaration": true,
