@@ -46,6 +46,8 @@
 		// JSX is preserved so that we can handle JSX with babel-preset-solid
 		// (for use with @lume/element).
 		"jsx": "preserve",
+		// Default to supporting Solid JSX by default. This is the default the Lume project uses right now.
+		"jsxImportSource": "solid-js",
 
 		"pretty": true,
 		"declaration": true,
