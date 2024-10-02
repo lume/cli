@@ -38,7 +38,8 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"forceConsistentCasingInFileNames": true,
-		// "noImplicitOverride": true, // TODO, many type errors will result (f.e. in the lume package)
+		"noImplicitOverride": true,
+		"noUncheckedIndexedAccess": true,
 
 		// Language feature options
 		"useDefineForClassFields": true,
