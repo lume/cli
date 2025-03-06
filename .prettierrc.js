@@ -7,5 +7,5 @@ module.exports = {
 	printWidth: 120,
 	arrowParens: 'avoid',
 
-	overrides: [{files: '*.md', options: {tabWidth: 2}}],
+	overrides: [{files: '*.md', options: {useTabs: false}}],
 }

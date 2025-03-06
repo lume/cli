@@ -33,7 +33,7 @@
 		"commander": "8.2.0",
 		"figlet": "1.5.2",
 		"jest-browser-globals": "^25.1.0-beta",
-		"prettier": "3.0.3",
+		"prettier": "3.5.3",
 		"rimraf": "3.0.0",
 		"sinon": "^17.0.0",
 		"typescript": "5.6.x"
